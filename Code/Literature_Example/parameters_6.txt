@@ -1,0 +1,6 @@
+horizon:18.0
+population:2000
+generations:75
+theta:0.1
+mutation:0.6
+delta:0.5
