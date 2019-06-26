@@ -1,0 +1,12 @@
+
+Motivating example (Optimal): 71.39
+
+TESTS: 30
+
+Horizon: 12.0 Events: 4 Generations: 25 	--- Total Time: 1.935457 Optimal Fitness: 71.450895
+Horizon: 24.0 Events: 10 Generations: 25 	--- Total Time: 3.740180 Optimal Fitness: 244.041288
+Horizon: 36.0 Events: 14 Generations: 25 	--- Total Time: 4.720426 Optimal Fitness: 388.271333
+Horizon: 48.0 Events: 23 Generations: 50 	--- Total Time: 31.044390 Optimal Fitness: 595.332178
+Horizon: 60.0 Events: 27 Generations: 50 	--- Total Time: 36.028791 Optimal Fitness: 746.329406
+Horizon: 72.0 Events: 33 Generations: 50 	--- Total Time: 43.124095 Optimal Fitness: 902.327290
+Horizon: 168.0 Events: 76 Generations: 200 	--- Total Time: 831.894067 Optimal Fitness: 2236.726650

@@ -5,7 +5,7 @@ using Printf
 
 include("bp_motivating_structs.jl")
 include("bp_motivating_functions.jl")
-include("mh_algs.jl")
+include("ga_alg.jl")
 include("bp_motivating_fitness.jl")
 
 #Seed
@@ -33,13 +33,19 @@ print("\n")
 
 no_params = 7
 no_tests = 30
+top_fitness = 0.0
+
+@printf "TESTS: %d\n\n" no_tests
 
 for p in 1:no_params
 
 	#### METAHEURISTIC PARAMETERS ####
 	parameters_filename = "parameters_$(p).txt"
 	params = read_parameters(parameters_filename)
-	@printf "PARAMETERS %d\n" p
+	@printf "Horizon: %.1f Events: %d Generations: %d \t--- " params.horizon params.no_events params.generations
+
+	time_sum = 0.0
+	top_fitness = 0.0
 
 	for test in 1:no_tests
 		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
@@ -48,13 +54,16 @@ for p in 1:no_params
 		cands = generate_pool(config, params)
 
 		##### EVOLVE CHROMOSOMES #####
-		@time best, best_fitness = evolve_chromosomes(config, cands, params)
+		seconds = @elapsed best, best_fitness = evolve_chromosomes(config, cands, params, false)
+		time_sum += seconds
 
 		#print data
-		@printf "Fitness: %.6f" best_fitness
-		print_instructions(best, config, params)
-		print_durations(best, config, params)
+#		print_instructions(best, config, params)
+#		print_durations(best, config, params)
+
+		if best_fitness > top_fitness top_fitness = best_fitness end
+		
 	end
-	@printf "\n"
+	@printf "Total Time: %.6f Optimal Fitness: %.6f\n" time_sum top_fitness
 
 end

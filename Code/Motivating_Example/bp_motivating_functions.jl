@@ -131,7 +131,7 @@ end
 ### key=pdata Print data ###
 
 function print_instructions(prog::BPS_Program, config::BPS_Config, params::Params)
-	@printf "Instructions: \n\n"
+	@printf "Instructions:\n"
 	for unit in 1:config.no_units
 		@printf "Unit %d: " unit
 		for event in 1:params.no_events
@@ -139,11 +139,10 @@ function print_instructions(prog::BPS_Program, config::BPS_Config, params::Param
 		end
 		@printf "\n"
 	end
-	@printf "\n"
 end
 
 function print_durations(prog::BPS_Program, config::BPS_Config, params::Params)
-	@printf "Durations: \n\n"
+	@printf "Durations:\n"
 	for event in 1:params.no_events
 		@printf "%d:%.3f " event prog.durations[event]
 	end

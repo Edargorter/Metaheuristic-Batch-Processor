@@ -118,6 +118,9 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 	# Generation loop
 	for generation in 1:params.generations
 
+		# New random seed
+		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
+
 		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s]) end
 		average_fitness::Float64 = sum(fitness)/N
 		indices::Array{Int} = sortperm(fitness, rev=true)
