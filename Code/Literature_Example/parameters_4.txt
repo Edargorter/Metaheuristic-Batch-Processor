@@ -1,4 +1,5 @@
 horizon:14.0
+no_events:10
 population:1000
 generations:75
 theta:0.1

@@ -95,35 +95,41 @@ storage_capacity = [Inf, Inf, Inf, 100, 200, 150, 200, Inf, Inf]
 #Setup config
 config = BPS_Config(no_units, no_storages, no_instructions, products, units, storage_capacity)
 
-##### TESTS #####
+### RUN TESTS ###
 
 no_params = 7
 no_tests = 30
+top_fitness = 0.0
 
-#Iterate through the parameters
+@printf "TESTS: %d\n\n" no_tests
+
 for p in 1:no_params
-	
-	filename = "parameters_%d.txt" p
 
 	#### METAHEURISTIC PARAMETERS ####
-	params = read_parameters(filename)
-	@printf "PARAMETERS %d\n" p
+	parameters_filename = "parameters_$(p).txt"
+	params = read_parameters(parameters_filename)
+	@printf "Horizon: %.1f Events: %d Generations: %d \t--- " params.horizon params.no_events params.generations
 
-	for test in 1:30
+	time_sum = 0.0
+	top_fitness = 0.0
+
+	for test in 1:no_tests
 		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
-		
-		#### CANDIDATE GENERATION ####
+
+		##### GENERATE CANDIDATES #####
 		cands = generate_pool(config, params)
 
-		#### EVOLVE CHROMOSOMES ####
-		#Get best with time
-
-		@time best, best_fitness = evolve_chromosomes(config, cands, params)
+		##### EVOLVE CHROMOSOMES #####
+		seconds = @elapsed best, best_fitness = evolve_chromosomes(config, cands, params, false)
+		time_sum += seconds
 
 		#print data
-		@printf "Fitness: %.6f\n" best_fitness # PRINT INSTRUCTIONS DURATIONS AND FITNESS
-		print_instructions(best, config, params)
-		print_durations(best, config, params)
+#		print_instructions(best, config, params)
+#		print_durations(best, config, params)
+
+		if best_fitness > top_fitness top_fitness = best_fitness end
+		
 	end
+	@printf "Total Time: %.6f Optimal Fitness: %.6f\n" time_sum top_fitness
 
 end
