@@ -1,11 +1,18 @@
 using Printf
 
-function get()
-	a = 5
-	a
+function get(instr::Int, mi::Int, ma::Int)
+	instr = (instr + ma - mi) % (ma - mi + 1)
 end
 
-for i in 1:100
-	@time a = get()
-	@printf "This is a test\n"
+a = get(2, 0, 3)
+@printf "%d\n" a
+
+a = Dict{Int, Int}()
+a[1] = 2
+a[3] = 4
+
+print(a)
+
+for (ind, val) in a
+	@printf "Ind %d Val %d\n" ind val
 end
