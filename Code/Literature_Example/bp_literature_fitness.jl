@@ -1,7 +1,7 @@
 ##### FITNESS FUNCTION (Literature Example) ##### Zachary Bowditch 2019 #####
 
 using Printf
-include("bp_structs_2.jl")
+include("bp_literature_structs.jl")
 
 ### key=fitfunc FITNESS FUNCTION ###
 
@@ -90,7 +90,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 				if active == true
 					state.unit_amounts[unit, event + 1] = unit_amount
 				elseif event > 1 && state.unit_active[unit, event - 1] == true
-					for (receiver, fraction) in enumerate(receivers)
+					for (receiver, fraction) in receivers
 						recv_cap = config.storage_capacity[receiver]
 						recv_amount = state.storage_amounts[receiver]
 
@@ -100,7 +100,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 							flush[receiver] = unit_amount * fraction
 						end
 					end
-					for (receiever, fraction) in enumerate(receivers)
+					for (receiever, fraction) in receivers 
 						unit_amount -= flush[receiver]
 						state.storage_amounts[receiver] = flush[receiver]
 					end
@@ -115,7 +115,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 				# Flush contents from completed task if needed
 				if event > 1 && state.unit_amounts[unit, event] > 0.0
-					for (receiver, fraction) in enumerate(receivers)
+					for (receiver, fraction) in  receivers
 						recv_cap = config.storage_capacity[receiver]
 						recv_amount = state.storage_amounts[receiver]
 
@@ -125,7 +125,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 							flush[receiver] = unit_amount * fraction
 						end
 					end
-					for (receiever, fraction) in enumerate(receivers)
+					for (receiever, fraction) in receivers
 						unit_amount -= flush[receiver]
 						state.storage_amounts[receiver] = flush[receiver]
 					end
@@ -145,7 +145,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 					if task_duration >= alpha 
 						active = true
 						amount = (task_duration - alpha) / beta 
-						for (feeder, fraction) in enumerate(feeders)
+						for (feeder, fraction) in feeders
 							if fraction * amount > state.storage_amounts[feeder]
 								amount = state.storage_amounts[feeder]
 							end
@@ -165,7 +165,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 				if active == true
 					state.unit_amounts[unit, event + 1] = amount
-					for (feeder, fraction) in enumerate(feeders)
+					for (feeder, fraction) in feeders
 						state.storage_amounts[feeder] -= fraction * amount
 					end
 

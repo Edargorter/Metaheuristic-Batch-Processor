@@ -20,7 +20,7 @@ using StatsBase
 using Dates
 using Random
 
-include("bp_structs.jl") # Structures for relevent data representations
+include("bp_literature_structs.jl") # Structures for relevent data representations
 
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 

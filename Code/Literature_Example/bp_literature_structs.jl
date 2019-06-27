@@ -17,7 +17,7 @@ struct Unit
 	capacity::Float64
 
 	# IN/OUT storage containments with consumption / production ratios
-	tasks::{Int, Coefs}
+	tasks::Dict{Int, Coefs}
 end
 
 # Parameter configurations for a batch process of this complexity

@@ -22,8 +22,7 @@
 using Random
 using Dates
 
-include("bp_fitness_1.jl")
-#include("bp_fitness_2.jl")
+include("bp_literature_fitness.jl")
 
 #Random seed based on number of milliseconds of current date
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
@@ -37,7 +36,10 @@ function keep_positive(value::Float64) value < 0.0 ? 0.0 : value end
 function bit_flip(bit::Int) bit == 0 ? 1 : 0 end
 
 # Instruction change
-function instr_change(instr::Int, min_num::Int, max_num::Int) instr = (instr + max_num - min_num) % (max_num - min_num + 1) end
+function instr_change(unit::Unit) 
+	instrs = [v.first for v in collect(unit.tasks)]
+	instrs[rand(1:size(instrs)[1])]
+end
 
 ##### End of helping functions #####
 
@@ -83,10 +85,10 @@ end
 ### key=mutfuncs Mutation Functions ###
 
 # Mutation on instruction array
-function mutate_instructions(B::BPS_Program, no_units::Int, no_events::Int)
-	unit::Int = rand(1:no_units)
+function mutate_instructions(B::BPS_Program, config::BPS_Config, no_units::Int, no_events::Int)
+	unit::Int = rand(1:config.no_units)
 	event::Int = rand(1:no_events)
-	B.instructions[unit, event] = bit_flip(B.instructions[unit, event])
+	B.instructions[unit, event] = instr_change(config.units[unit])
 end
 
 # Mutation on duration array
@@ -114,19 +116,28 @@ end
 function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, params::Params, display_info::Bool=true)
 	N::Int = params.population
 	fitness::Array{Float64} = zeros(N)
-	best::BPS_Program = nothing
+	best_index::Int = 0
+	best_fitness::Float64 = 0
 	elite::Int = ceil(params.theta*N) # Number of elite (parents) to be picked
-	no_mutations::Int = ceil(params.mutation_rate*(N - elite)) # Number of progeny to undergo mutation
 	if (N - elite) % 2 != 0 elite -= 1 end # Keep elite even (convenient for reproduction)
+	no_mutations::Int = ceil(params.mutation_rate*(N - elite)) # Number of progeny to undergo mutation
 
 	# Generation loop
 	for generation in 1:params.generations
+
+		# New random seed
+		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
+
 		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s]) end
 		average_fitness::Float64 = sum(fitness)/N
 		indices::Array{Int} = sortperm(fitness, rev=true)
-		best_cand = candidates[indices[1]].copy()
-		best_fitness = fitness[indices[1]]
-		@printf "Generation: %d\t ----- Average Fitness : %.2f \t----- Best: %.2f\n" generation average_fitness best_fitness
+		best_index = indices[1]
+		best_fitness = fitness[best_index]
+
+		if display_info
+			@printf "Generation: %d\t ----- Average Fitness : %.2f \t----- Best: %.2f\n" generation average_fitness best_fitness
+		end
+
 		for new in (elite + 1):2:N
 			i_a::Int, i_b::Int = indices[rand(1:elite)], indices[rand(1:elite)] # Random parents
 			c_point::Int = rand(1:params.no_events)
@@ -136,10 +147,11 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 		end
 		
 		m_indices::Array{Int} = sample((elite + 1):N, no_mutations)
-		for index in m_indices
-			mutate_instructions(candidates[index], config.no_units, params.no_events)
+		for m_index in m_indices
+			index::Int = indices[m_index]	
+			mutate_instructions(candidates[index], config, params.no_events)
 			mutate_durations(candidates[index], params.no_events, params.delta, params.horizon)
 		end
 	end
-	best, best_fitness
+	candidates[best_index], best_fitness
 end

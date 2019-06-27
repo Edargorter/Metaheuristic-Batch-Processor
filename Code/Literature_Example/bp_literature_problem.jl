@@ -2,10 +2,10 @@
 
 using Printf
 
-include("bp_structs_2.jl")
-include("bp_functions.jl")
+include("bp_literature_structs.jl")
+include("bp_literature_functions.jl")
 include("mh_algs.jl")
-include("bp_fitness_2.jl")
+include("bp_literature_fitness.jl")
 
 #Seed
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))

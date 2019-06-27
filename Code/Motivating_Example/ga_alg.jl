@@ -140,11 +140,12 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 		end
 		
 		m_indices::Array{Int} = sample((elite + 1):N, no_mutations)
-		for index in m_indices
+		for m_index in m_indices
+			index::Int = indices[m_index]
 			mutate_instructions(candidates[index], config.no_units, params.no_events)
 			mutate_durations(candidates[index], params.no_events, params.delta, params.horizon)
 		end
 
 	end
-	candidates[best_index], best_fitness
+	candidates[best_index], best_fitness #Return best candidate and fitness
 end
