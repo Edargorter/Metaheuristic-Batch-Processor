@@ -43,7 +43,7 @@ end
 
 ##### Metaheuristic parameters #####
 
-struct Params
+mutable struct Params
 	horizon::Float64
 	no_events::Int
 	population::Int

@@ -27,6 +27,7 @@ struct BPS_Config
 	no_storages::Int
 	no_instructions::Int
 	products::Array{Int}
+	prod_reactions::Dict{Int, Int}
 	prices::Array{Int}
 
 	# Unit constraints

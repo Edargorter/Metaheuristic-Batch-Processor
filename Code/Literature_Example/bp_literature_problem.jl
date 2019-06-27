@@ -92,8 +92,13 @@ push!(units, unit_4)
 #Setup storages
 storage_capacity = [Inf, Inf, Inf, 100, 200, 150, 200, Inf, Inf]
 
+#Setup state reactions
+prod_reactions = Dict{Int, Int}()
+prod_reactions[8] = 3
+prod_reaction[9] = 5
+
 #Setup config
-config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storage_capacity)
+config = BPS_Config(no_units, no_storages, no_instructions, products, prod_reactions, prices, units, tasks, storage_capacity)
 
 ### RUN TESTS ###
 
