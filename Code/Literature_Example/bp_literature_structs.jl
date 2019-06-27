@@ -27,9 +27,13 @@ struct BPS_Config
 	no_storages::Int
 	no_instructions::Int
 	products::Array{Int}
+	prices::Array{Int}
 
 	# Unit constraints
 	units::Array{Unit}
+
+	#Tasks
+	tasks::Array{Task}
 
 	# Storage constraints
 	storage_capacity::Array{Float64}
@@ -39,7 +43,7 @@ end
 struct BPS_State
 	# Volumes
 	unit_amounts::Array{Float64, 2}
-	unit_active::Array{Bool, 2}
+	unit_active::Array{Int, 2}
 	storage_amounts::Array{Float64}
 end
 

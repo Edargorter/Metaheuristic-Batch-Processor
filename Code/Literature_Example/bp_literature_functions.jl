@@ -181,6 +181,7 @@ function get_random_program(config::BPS_Config)
 end
 
 function generate_pool(config::BPS_Config, params::Params)
+	Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 	candidates::Array{BPS_Program} = Array{BPS_Program}(undef, params.population)
 	for i in 1:params.population candidates[i] = get_random_program(config) end
 	candidates

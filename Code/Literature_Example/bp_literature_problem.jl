@@ -4,7 +4,7 @@ using Printf
 
 include("bp_literature_structs.jl")
 include("bp_literature_functions.jl")
-include("mh_algs.jl")
+include("ga_alg.jl")
 include("bp_literature_fitness.jl")
 
 #Seed
@@ -15,10 +15,10 @@ Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 #### CONFIG PARAMETERS ####
 
 no_units = 4
-no_events 5
 no_storages = 9
 no_instructions = 5
 products = [8, 9]
+prices = [10.0, 10.0]
 
 # Setup tasks 
 tasks = []
@@ -93,11 +93,11 @@ push!(units, unit_4)
 storage_capacity = [Inf, Inf, Inf, 100, 200, 150, 200, Inf, Inf]
 
 #Setup config
-config = BPS_Config(no_units, no_storages, no_instructions, products, units, storage_capacity)
+config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storage_capacity)
 
 ### RUN TESTS ###
 
-no_params = 7
+no_params = 9
 no_tests = 30
 top_fitness = 0.0
 
@@ -114,7 +114,6 @@ for p in 1:no_params
 	top_fitness = 0.0
 
 	for test in 1:no_tests
-		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
 		##### GENERATE CANDIDATES #####
 		cands = generate_pool(config, params)
