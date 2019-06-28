@@ -1,3 +1,4 @@
 
 TESTS: 30
 
+Time: 9513.369482 Horizon: 36.00 Events: 14 Population: 500 Generations: 25 Theta: 0.90 Mutation: 1.00 Delta: 1.00 Fitness: 430.194400
