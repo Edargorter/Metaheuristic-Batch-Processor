@@ -13,7 +13,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	
 	# Set initial state parameters
 	unit_amounts::Array{Float64, 2} = zeros(config.no_units, params.no_events + 1)
-	unit_activated::Array{Unit, 2} = zeros(config.no_units, params.no_events + 1)
+	unit_activated::Array{Int, 2} = zeros(config.no_units, params.no_events + 1)
 	storage_amounts::Array{Float64} = zeros(config.no_storages)
 	storage_amounts[1] = Inf
 	storage_amounts[2] = Inf
@@ -22,16 +22,6 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	# Default state
 	state::BPS_State = BPS_State(unit_amounts, unit_activated, storage_amounts)	
 	task_duration::Float64 = 0.0 # Temp variable for task length in unit of time (e.g. hours) 
-
-	if print_data == true
-		@printf "\n\n"
-		for i in 1:config.no_units
-			@printf "Unit %d: %d %d %f %f %f\n" i config.units[i].feeder config.units[i].receiver config.units[i].alpha config.units[i].beta config.units[i].capacity
-		end
-		for i in 1:config.no_storages
-			@printf "Storage %d: %.2f\n" i config.storage_capacity[i]
-		end
-	end
 
 	# Initial declarations 
 
@@ -56,11 +46,8 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 		# Iterate through units
 		for unit in 1:config.no_units
 
-			# in/outgoing units
-			feeders = config.units[unit].feeders
-
 			# Unit parameters
-			tasks = config.units[unit].tasks
+			tasks::Dict{Int, Coefs} = config.units[unit].tasks
 			unit_capacity = config.units[unit].capacity
 			unit_amount = state.unit_amounts[unit, event]
 
@@ -87,7 +74,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 				if active > 0
 
 					# Get feeding/receiving storages
-					feeder = config.tasks[active].feeders
+					feeders = config.tasks[active].feeders
 					receivers = config.tasks[active].receivers
 
 					state.unit_amounts[unit, event + 1] = unit_amount
@@ -103,7 +90,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 							flush[receiver] = unit_amount * fraction
 						end
 					end
-					for (receiever, fraction) in receivers 
+					for (receiver, fraction) in receivers 
 						unit_amount -= flush[receiver]
 						state.storage_amounts[receiver] = flush[receiver]
 					end
@@ -118,7 +105,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 				
 				alpha = tasks[instruction].alpha
 				beta = tasks[instruction].beta
-				flush::Array{Float64} = Array{undef, config.units[unit].no_receivers}
+				flush::Array{Float64} = Array{undef, size(collect(receivers))[1]}
 
 				# Flush contents from completed task if needed
 				if event > 1 && state.unit_amounts[unit, event] > 0.0

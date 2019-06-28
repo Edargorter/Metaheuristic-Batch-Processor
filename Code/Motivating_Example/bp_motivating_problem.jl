@@ -74,15 +74,18 @@ end
 
 crossovers = 0.1:0.1:0.9
 mutations = 0.1:0.1:1.0
-deltas = 0.0:0.25:1.0
+deltas = 0.0:0.025:1.0
 
 best_theta = 0.1
 best_mutation = 0.1
 best_delta = 0.0
 time_of = 0.0
 
+logfile = open("log.txt", "a")
+
 for p in 3:no_params
 	best_fitness = 0.0
+	time_sum = 0.0
 
 	#### METAHEURISTIC PARAMETERS ####
 	parameters_filename = "parameters_$(p).txt"
@@ -92,7 +95,9 @@ for p in 3:no_params
 		for mut in mutations
 			for det in deltas
 
-				time_sum = 0.0
+				to_write = "Theta: $(theta) Mutation: $(mut) Delta: $(det)\n"
+				write(logfile, to_write)
+
 				top_fitness = 0.0
 				params.theta = theta
 				params.mutation_rate = mut
@@ -117,13 +122,14 @@ for p in 3:no_params
 					best_theta = theta
 					best_mutation = mut
 					best_delta = det
-					time_of = time_sum
 				end
 
 			end
 		end
 	end
 
-	@printf "Time: %.6f Horizon: %.2f Events: %d Population: %d Generations: %d Theta: %.2f Mutation: %.2f Delta: %.2f Fitness: %.6f\n" time_of params.horizon params.no_events params.population params.generations params.theta params.mutation_rate params.delta best_fitness
+	@printf "Time: %.6f Horizon: %.2f Events: %d Population: %d Generations: %d Theta: %.2f Mutation: %.2f Delta: %.2f Fitness: %.6f\n" time_sum params.horizon params.no_events params.population params.generations params.theta params.mutation_rate params.delta best_fitness
 					
 end
+
+close(logfile)

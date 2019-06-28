@@ -12,3 +12,11 @@ Literature/Primary: fitness
 					metaheuristics
 					results
 					parameters
+
+TODO:
+
+Debug Literature Fitness
+
+GA with decreasing mutation/crossover on instruction matrix (discrete)
+
+Invasive Weed integration with GA (population reproduction) as expanded in Metaheuristics/iw_alg.jl

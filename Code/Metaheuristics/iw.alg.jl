@@ -20,8 +20,9 @@
 using Random
 using Dates
 using StatsBase
+#Not absolute paths
 
-include("bp_motivating_fitness.jl")
+include("bp_motivating_fitness.jl") 
 include("bp_literature_fitness.jl")
 
 #Random seed based on number of milliseconds of current date
@@ -37,4 +38,12 @@ function get_std_dev(iter_max::Int, iter::Int, n::Int, std_init::Float64, std_fi
 	(((iter_max - iter) / iter_max )^n) * (std_init - std_final) + std_final
 end
 
+#=
 
+Use normal curve to generate progeny integrated with GA 
+
+I.e. highest fitness generates most offspring proportionally to normal distribution with mean 0.
+
+Chop off lower fitness solutions to reach population
+
+=#

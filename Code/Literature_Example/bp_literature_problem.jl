@@ -27,7 +27,7 @@ feeders = Dict{Int, Float64}()
 receivers = Dict{Int, Float64}()
 feeders[1] = 1.0
 receivers[4] = 1.0
-push!(tasks, Task("Heating", feeders, receivers)
+push!(tasks, Task("Heating", feeders, receivers))
 
 feeders = Dict{Int, Float64}()
 receivers = Dict{Int, Float64}()
@@ -95,7 +95,7 @@ storage_capacity = [Inf, Inf, Inf, 100, 200, 150, 200, Inf, Inf]
 #Setup state reactions
 prod_reactions = Dict{Int, Int}()
 prod_reactions[8] = 3
-prod_reaction[9] = 5
+prod_reactions[9] = 5
 
 #Setup config
 config = BPS_Config(no_units, no_storages, no_instructions, products, prod_reactions, prices, units, tasks, storage_capacity)

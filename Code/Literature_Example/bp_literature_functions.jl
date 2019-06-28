@@ -174,7 +174,7 @@ function get_random_durations(config::BPS_Config, params::Params)
 end
 
 # Random BPS_Program structure
-function get_random_program(config::BPS_Config)
+function get_random_program(config::BPS_Config, params::Params)
 	instructions::Array{Int, 2} = get_random_instructions(config, params)
 	durations::Array{Float64} = get_random_durations(config, params)
 	BPS_Program(instructions, durations)
@@ -183,6 +183,6 @@ end
 function generate_pool(config::BPS_Config, params::Params)
 	Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 	candidates::Array{BPS_Program} = Array{BPS_Program}(undef, params.population)
-	for i in 1:params.population candidates[i] = get_random_program(config) end
+	for i in 1:params.population candidates[i] = get_random_program(config, params) end
 	candidates
 end
