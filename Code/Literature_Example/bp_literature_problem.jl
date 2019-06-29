@@ -10,6 +10,9 @@ include("bp_literature_fitness.jl")
 #Seed
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
+function newline(n::Int) for i in 1:n @printf "\n" end end
+function newline() @printf "\n" end
+
 function main_func()
 
 	##### TESTS #####
@@ -99,6 +102,11 @@ function main_func()
 	prod_reactions[8] = 3
 	prod_reactions[9] = 5
 
+	#Get sizes
+	@printf "No. of tasks: %d\n" size(collect(tasks))[1]
+	@printf "No. of units: %d\n" size(collect(units))[1]
+	@printf "No. of storages: %d\n\n" size(collect(storage_capacity))[1]
+
 	#Setup config
 	config = BPS_Config(no_units, no_storages, no_instructions, products, prod_reactions, prices, units, tasks, storage_capacity)
 
@@ -108,18 +116,22 @@ function main_func()
 	no_tests = 30
 	top_fitness = 0.0
 
-	@printf "TESTS: %d\n\n" no_tests
+	@printf "TESTS: %d\n" no_tests
+	newline(1)
 
 	params = read_parameters("parameters_1.txt")
 	cands = generate_pool(config, params)
-	print(cands)
 
 	##### EVOLVE CHROMOSOMES #####
 	seconds = @elapsed best, best_fitness = evolve_chromosomes(config, cands, params, false)
 
-	@printf "\n Best Candidate: \n"
+	newline(1)
+	@printf "Best Candidate: \n"
 
 	print(cands[best])
+	newline(1)
+
+	@printf "Fitness: %.6f\n" best_fitness
 
 	#=
 
