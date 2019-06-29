@@ -160,7 +160,18 @@ end
 
 # Instruction Array
 function get_random_instructions(config::BPS_Config, params::Params)
-	rand(0:config.no_instructions - 1, config.no_units, params.no_events)
+	instr_arr::Array{Int, 2} = zeros(config.no_units, params.no_events) #Initialise instruction array to zeros
+
+	for unit in 1:config.no_units
+		tasks::Array{Int} = [[0]; collect(keys(config.units[unit].tasks))]
+		index_range::Int = size(tasks)[1]
+
+		for event in 1:params.no_events
+			instr_arr[unit, event] = tasks[rand(1:index_range)]
+		end
+	end
+
+	instr_arr
 end
 
 # Time Interval Array
@@ -182,6 +193,7 @@ end
 
 function generate_pool(config::BPS_Config, params::Params)
 	Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
+	print(config.units)
 	candidates::Array{BPS_Program} = Array{BPS_Program}(undef, params.population)
 	for i in 1:params.population candidates[i] = get_random_program(config, params) end
 	candidates

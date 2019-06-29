@@ -73,23 +73,28 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 				# Pass on values 
 				if active > 0
 
+					state.unit_amounts[unit, event + 1] = unit_amount
+
+				elseif event > 1 && state.unit_active[unit, event - 1] > 0
+					active = state.unit_active[unit, event - 1] #Flush from action (task)
+
 					# Get feeding/receiving storages
 					feeders = config.tasks[active].feeders
 					receivers = config.tasks[active].receivers
+					
+					flush = zeros(sum(size(collect(receivers))))
 
-					state.unit_amounts[unit, event + 1] = unit_amount
-
-				elseif event > 1 && state.unit_active[unit, event - 1] == active
 					for (receiver, fraction) in receivers
 						recv_cap = config.storage_capacity[receiver]
 						recv_amount = state.storage_amounts[receiver]
 
-						if recv_cap - recv_amount < unit_amount * fraction
+						if (recv_cap - recv_amount) < (unit_amount * fraction)
 							flush[receiver] = recv_cap
 						else
 							flush[receiver] = unit_amount * fraction
 						end
 					end
+
 					for (receiver, fraction) in receivers 
 						unit_amount -= flush[receiver]
 						state.storage_amounts[receiver] = flush[receiver]
@@ -97,7 +102,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 				end
 
 			# Instruction 1 (Start new task if possible)
-			elseif instruction in tasks
+			elseif instruction in keys(tasks)
 
 				# Get feeding/receiving storages
 				feeders = config.tasks[instruction].feeders
@@ -105,7 +110,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 				
 				alpha = tasks[instruction].alpha
 				beta = tasks[instruction].beta
-				flush::Array{Float64} = Array{undef, size(collect(receivers))[1]}
+				flush = zeros(sum(size(collect(receivers))))
 
 				# Flush contents from completed task if needed
 				if event > 1 && state.unit_amounts[unit, event] > 0.0
@@ -119,7 +124,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 							flush[receiver] = unit_amount * fraction
 						end
 					end
-					for (receiever, fraction) in receivers
+					for (receiver, fraction) in receivers
 						unit_amount -= flush[receiver]
 						state.storage_amounts[receiver] = flush[receiver]
 					end
@@ -185,7 +190,8 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 		tasks = config.units[unit].tasks
 				
 		for prod in config.products
-			if prod in tasks && state.unit_active[params.no_events] == config.prod_reactions[prod]
+
+			if prod in keys(tasks) && state.unit_active[params.no_events] == config.prod_reactions[prod]
 				unit_amount = state.unit_amounts[unit, params.no_events + 1]
 				recv_capacity = state.storage_capacity[prod]
 				recv_amount = state.storage_amounts[prod]
