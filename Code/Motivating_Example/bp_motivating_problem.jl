@@ -20,33 +20,30 @@ params = read_parameters(parameters_filename)
 
 ##### TEST OPTIMAL SOLUTION FITNESS #####
 
-#=
 instructions = [1 1 1 1;0 1 1 1;0 0 1 1]
 durations = [4.665, 3.479, 2.427, 1.429]
 #Test optimal solution
 cand = BPS_Program(instructions, durations)
 objective = get_fitness(config, params, cand, false)
 @printf "\nMotivating example (Optimal): %.2f\n" objective
-=#
 
 print("\n")
 
 ### RUN TESTS ###
 
 no_params = 7
-no_tests = 30
+no_tests = 50
 top_fitness = 0.0
 
-@printf "TESTS: %d\n\n" no_tests
 
-#=
+@printf "TESTS: %d\n\n" no_tests
 
 for p in 1:no_params
 
 	#### METAHEURISTIC PARAMETERS ####
 	parameters_filename = "parameters_$(p).txt"
 	params = read_parameters(parameters_filename)
-	@printf "Horizon: %.1f Events: %d Generations: %d \t--- " params.horizon params.no_events params.generations
+	@printf "Horizon: %.1f Events: %d Population: %d Generations: %d \t--- " params.horizon params.no_events params.population params.generations
 
 	time_sum = 0.0
 	top_fitness = 0.0
@@ -62,13 +59,14 @@ for p in 1:no_params
 		time_sum += seconds
 
 		if best_fitness > top_fitness top_fitness = best_fitness end
-		
 	end
+
 	@printf "Total Time: %.6f Optimal Fitness: %.6f\n" time_sum top_fitness
 
 end
 
-=#
+#=
+
 
 ### PARAMETER SEARCH ###
 
@@ -83,7 +81,8 @@ time_of = 0.0
 
 logfile = open("log.txt", "a")
 
-for p in 1:2
+
+for p in 1:no_params
 	best_fitness = 0.0
 	time_sum = 0.0
 
@@ -128,8 +127,9 @@ for p in 1:2
 		end
 	end
 
-	@printf "Time: %.6f Horizon: %.2f Events: %d Population: %d Generations: %d Theta: %.2f Mutation: %.2f Delta: %.2f Fitness: %.6f\n" time_sum params.horizon params.no_events params.population params.generations params.theta params.mutation_rate params.delta best_fitness
+	@printf "Time: %.6f Horizon: %.2f Events: %d Population: %d Generations: %d Theta: %.2f Mutation: %.2f Delta: %.2f Fitness: %.6f\n" time_sum params.horizon params.no_events params.population params.generations best_theta best_mutation best_delta best_fitness
 					
 end
-
 close(logfile)
+
+=#

@@ -1,14 +1,30 @@
 ##### FITNESS FUNCTION (Literature Example) ##### Zachary Bowditch 2019 #####
 
+#= 
+	
+	Contents (Unique Search Strings):
+
+	Section								Key (search)
+
+	1) Included files/libraries			incl
+	2) Helper functions:				hfuncs
+	3) Fitness Function:				fitfunc
+
+=#
+
+### key=incl Included Files and Libraries ###
+
 using Printf
 include("bp_literature_structs.jl")
 
-### key=fitfunc FITNESS FUNCTION ###
-
 # Evaluate fitness of a candidate Batch Processing Schedule (fitness metric = final state quantity)
+
+### key=hfuncs Helper Functions ###
 
 function newline() @printf "\n" end
 function newline(n::Int) for i in 1:n @printf "\n" end end
+
+### key=fitfunc FITNESS FUNCTION ###
 
 function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program, print_data::Bool=false)
 	# If sum of durations of candidate exceeds horizon, candidate is nullified
@@ -76,7 +92,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 					# Get feeding/receiving storages
 					feeders = config.tasks[active].feeders
 					receivers = config.tasks[active].receivers
-					flush::Array{Float64} = zeros(config.no_storages)
+					flush = zeros(config.no_storages)
 
 					if print_data
 						@printf "Instruction: %d\n" instruction
@@ -118,7 +134,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 			# Instruction > 0 (Start new task if possible)
 			elseif instruction in keys(tasks)
 
-				# Get feeding/receiving storages
+				# Get feeding/receiving storage containments
 				feeders = config.tasks[instruction].feeders
 				receivers = config.tasks[instruction].receivers
 
@@ -138,7 +154,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 					@printf "Beta: %.2f\n" beta
 				end
 
-				flush = zeros(config.no_storages)
+				flush::Array{Float64} = zeros(config.no_storages)
 
 				# Flush contents from completed task if needed
 				if event > 1 && state.unit_amounts[unit, event] > 0.0
