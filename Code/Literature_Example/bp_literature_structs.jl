@@ -6,7 +6,7 @@ struct Coefs
 	beta::Float64
 end
 
-struct Task
+struct RTask
 	name::String
 	feeders::Dict{Int, Float64}
 	receivers::Dict{Int, Float64}
@@ -34,7 +34,7 @@ struct BPS_Config
 	units::Array{Unit}
 
 	#Tasks
-	tasks::Array{Task}
+	tasks::Array{RTask}
 
 	# Storage constraints
 	storage_capacity::Array{Float64}

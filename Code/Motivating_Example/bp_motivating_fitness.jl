@@ -76,7 +76,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 			instruction = candidate.instructions[unit, event]	
 
-			if print_data == true
+			if !print_data
 				@printf "\n\n"
 				@printf "EVENT: %d\n" event
 				@printf "UNIT: %d\n" unit

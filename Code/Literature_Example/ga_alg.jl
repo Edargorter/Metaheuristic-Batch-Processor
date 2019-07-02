@@ -86,7 +86,7 @@ end
 ### key=mutfuncs Mutation Functions ###
 
 # Mutation on instruction array
-function mutate_instructions(B::BPS_Program, config::BPS_Config, no_units::Int, no_events::Int)
+function mutate_instructions(B::BPS_Program, config::BPS_Config, no_events::Int)
 	unit::Int = rand(1:config.no_units)
 	event::Int = rand(1:no_events)
 	B.instructions[unit, event] = instr_change(config.units[unit])
@@ -154,5 +154,5 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 			mutate_durations(candidates[index], params.no_events, params.delta, params.horizon)
 		end
 	end
-	candidates[best_index], best_fitness
+	best_index, best_fitness
 end
