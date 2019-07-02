@@ -83,7 +83,7 @@ time_of = 0.0
 
 logfile = open("log.txt", "a")
 
-for p in 3:no_params
+for p in 1:2
 	best_fitness = 0.0
 	time_sum = 0.0
 
