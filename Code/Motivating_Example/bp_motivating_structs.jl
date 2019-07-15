@@ -12,6 +12,13 @@ struct Unit
 	beta::Float64
 end
 
+# Container struct for intermediate storage units with feeder / receiver reaction unit IDs
+struct Storage
+	capacity::Float64
+	feeder_unit::Int
+	receiver_unit::Int
+end
+
 # Parameter configurations for a batch process of this complexity
 struct BPS_Config
 	# Numbers
@@ -24,7 +31,7 @@ struct BPS_Config
 	units::Array{Unit}
 
 	# Storage constraints
-	storage_capacity::Array{Float64}
+	storages::Array{Storage}
 end
 
 # State tracking for fitness evaluation

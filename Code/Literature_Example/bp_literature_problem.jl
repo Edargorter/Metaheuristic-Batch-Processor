@@ -117,19 +117,19 @@ function main_func()
 	top_fitness = 0.0
 
 	@printf "TESTS: %d\n" no_tests
-	newline(1)
+	newline()
 
 	params = read_parameters("parameters_1.txt")
 	cands = generate_pool(config, params)
 
 	##### EVOLVE CHROMOSOMES #####
-	seconds = @elapsed best, best_fitness = evolve_chromosomes(config, cands, params, false)
+	seconds = @elapsed best, best_fitness = evolve_chromosomes(config, cands, params, true)
 
-	newline(1)
+	newline()
 	@printf "Best Candidate: \n"
 
 	print(cands[best])
-	newline(1)
+	newline()
 
 	@printf "Fitness: %.6f\n" best_fitness
 
