@@ -27,7 +27,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 			@printf "Unit %d: %d %d %f %f %f\n" i config.units[i].feeder config.units[i].receiver config.units[i].alpha config.units[i].beta config.units[i].capacity
 		end
 		for i in 1:config.no_storages
-			@printf "Storage %d: %.2f\n" i config.storage_capacity[i]
+			@printf "Storage %d: %.2f\n" i config.storages[i].capacity
 		end
 	end
 
@@ -35,6 +35,8 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 	feeder::Int = 0
 	feeder_amount::Float64 = 0.0
+	prev_unit::Int = 0
+	prev_unit_amount::Float64 = 0.0
 	receiver::Int = 0
 	recv_amount::Float64 = 0.0
 	recv_capacity::Float64 = 0.0
@@ -55,14 +57,24 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	for event in 1:params.no_events
 
 		# Iterate through units
-		for unit in 1:config.no_units
+		for unit in config.no_units:-1:1
 
 			# in/outgoing units
 			feeder = config.units[unit].feeder
 			feeder_amount = state.storage_amounts[feeder]
+
 			receiver = config.units[unit].receiver
 			recv_amount = state.storage_amounts[receiver]
-			recv_capacity = config.storage_capacity[receiver]
+			recv_capacity = config.storages[receiver].capacity
+
+			prev_unit = config.storages[feeder].feeder_unit
+			if prev_unit == 0
+				prev_unit_amount = 0
+			elseif candidate.instructions[prev_unit, event] == 0
+				prev_unit_amount = 0
+			else
+				prev_unit_amount = state.unit_amounts[prev_unit, event]
+			end
 
 			# Unit parameters
 			alpha = config.units[unit].alpha
@@ -76,13 +88,14 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 			instruction = candidate.instructions[unit, event]	
 
-			if print_data == true
+			if print_data
 				@printf "\n\n"
 				@printf "EVENT: %d\n" event
 				@printf "UNIT: %d\n" unit
 				@printf "UNIT AMOUNT: %.2f\n" unit_amount
 				@printf "INSTRUCTION: %d\n" instruction
-				@printf "FEED: (%d) %.2f\n" feeder feeder_amount
+				@printf "FEED (%d): %.2f\n" feeder feeder_amount
+				@printf "PREV UNIT FEED (%d): %.2f\n" prev_unit prev_unit_amount
 				@printf "RECEIVER: %.2f\n" recv_amount
 				@printf "DURATION: %.2f\n" duration
 				@printf "ALPHA %.2f\n" alpha
@@ -94,17 +107,16 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 			if instruction == 0
 				
 				# Pass on values 
-				if active == true
-					state.unit_amounts[unit, event + 1] = unit_amount
-				elseif event > 1 && state.unit_active[unit, event - 1] == true
+				if !active && event > 1 && state.unit_active[unit, event - 1] == true
 					if recv_capacity - recv_amount < unit_amount
 						state.storage_amounts[receiver] = recv_capacity
-						state.unit_amounts[unit, event] -= unit_amount - (recv_capacity - recv_amount)
+						unit_amount -= unit_amount - (recv_capacity - recv_amount)
 					else
 						state.storage_amounts[receiver] += unit_amount
-						state.unit_amounts[unit, event] = 0.0
+						unit_amount = 0.0
 					end
 				end
+				state.unit_amounts[unit, event + 1] = unit_amount 
 
 			# Instruction 1 (Start new task if possible)
 			elseif instruction == 1
@@ -121,49 +133,69 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 					unit_amount = state.unit_amounts[unit, event]
 				end
 
-				#Iterate through subsequent instructions to determine maximum duration
-				amount::Float64 = 0.0
-				task_duration = 0.0
-				max_reached::Bool = false
-				active = false
+				# Only proceed to another task if unit is empty
+				if unit_amount == 0
 
-				task_end::Int = event # from current event to final event point of task
+					#Iterate through subsequent instructions to determine maximum duration
 
-				while true #Continue until inner conditions break out of the loop
+					amount::Float64 = 0.0
+					max_amount::Float64 = feeder_amount + prev_unit_amount
+					task_duration = 0.0
+					max_reached::Bool = false
+					active = false
 
-					task_duration += candidate.durations[task_end]
-					if task_duration >= alpha 
-						active = true
-						amount = (task_duration - alpha) / beta 
-						if amount > feeder_amount 
-							amount = feeder_amount
-							max_reached = true
+					task_end::Int = event # from current event to final event point of task
+
+					#Consume as much as possible given the event's duration
+					while true
+
+						task_duration += candidate.durations[task_end]
+						if task_duration >= alpha 
+							active = true
+							amount = (task_duration - alpha) / beta 
+							if amount > max_amount 
+								amount = max_amount
+								max_reached = true
+							end
+							if amount > unit_capacity - unit_amount 
+								amount = unit_capacity - unit_amount 
+								max_reached = true
+							end
+							if max_reached break end
 						end
-						if amount > unit_capacity - unit_amount 
-							amount = unit_capacity - unit_amount 
-							max_reached = true
+						task_end += 1
+						if task_end >= params.no_events break end #If time horizon reached
+						if candidate.instructions[unit, task_end] == 1 break end #If next instruction = 1
+					end
+
+					#Substract consumed volume from associated container and unit
+
+					if active == true
+						state.unit_amounts[unit, event + 1] = amount
+
+						if print_data == true
+							@printf "AMOUNT TO BE PROCESSED: %.2f\n" amount
 						end
-						if max_reached break end
+
+						if prev_unit != 0 
+							if amount >= prev_unit_amount
+								state.unit_amounts[prev_unit, event] = 0
+								amount -= prev_unit_amount
+							else
+								state.unit_amounts[prev_unit, event] = prev_unit_amount - amount	
+								amount = 0
+							end
+						end
+
+						state.storage_amounts[feeder] = feeder_amount - amount
+
+						for i in event:task_end
+							state.unit_active[unit, i] = true
+						end
+
 					end
-					task_end += 1
-					if task_end >= params.no_events break end #If time horizon reached
-					if candidate.instructions[unit, task_end] == 1 break end #If next instruction = 1
 
-				end
-
-				if active == true
-					state.unit_amounts[unit, event + 1] = amount
-					state.storage_amounts[feeder] = feeder_amount - amount
-
-					for i in event:task_end
-						state.unit_active[unit, i] = true
-					end
-
-					if print_data == true
-						@printf "AMOUNT TO BE PROCESSED: %.2f\n" amount
-					end
-				end
-
+				end #if amount == 0
 
 			end	 
 			# instruction 1 handled
@@ -174,7 +206,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	# Final flush
 			
 	unit_amount = state.unit_amounts[config.no_units, params.no_events + 1]
-	recv_capacity = config.storage_capacity[config.product] 
+	recv_capacity = config.storages[config.product].capacity
 	recv_amount = state.storage_amounts[config.product] 
 	if recv_capacity - recv_amount < unit_amount
 		state.storage_amounts[config.product] = recv_capacity

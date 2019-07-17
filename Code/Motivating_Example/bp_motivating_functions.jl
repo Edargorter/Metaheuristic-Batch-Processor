@@ -102,6 +102,15 @@ function string_to_unit(unit_string::String)
 	Unit(name, capacity, feeder, receiver, alpha, beta)
 end
 
+#Convert string to storage structure
+function string_to_storage(storage_string::String)
+	info::Array{String} = split(storage_string, ",")
+	capacity::Float64 = parse(Float64, info[1])
+	feeder_unit::Int = parse(Int, info[2])
+	receiver_unit::Int = parse(Int, info[3])
+	Storage(capacity, feeder_unit, receiver_unit)
+end
+
 #Get config data
 function read_config(filename::String)
 	file = open(filename)
@@ -109,11 +118,12 @@ function read_config(filename::String)
 	no_storages::Int = parse(Float64, split(readline(file), ":")[2])
 	no_instructions::Int = parse(Int, split(readline(file), ":")[2])
 	product::Int = parse(Float64, split(readline(file), ":")[2])
-	storage_capacity::Array{Float64} = string_to_float_array(split(readline(file), ":")[2])
+	storages = []
+	for s in 1:no_storages push!(storages, string_to_storage(readline(file))) end
 	initial_storage_amounts::Array{Float64} = string_to_float_array(split(readline(file), ":")[2])
 	units::Array{Unit} = Array{Unit}(undef, no_units)
 	for u in 1:no_units units[u] = string_to_unit(readline(file)) end
-	BPS_Config(no_units, no_storages, no_instructions, product, units, storage_capacity)
+	BPS_Config(no_units, no_storages, no_instructions, product, units, storages)
 end
 
 function read_parameters(filename::String)

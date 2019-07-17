@@ -1,4 +1,4 @@
-# Structures for batch processing problems
+# Structures for batch processing systems
 
 # Reaction duration coefficients
 struct Coefs
@@ -8,16 +8,18 @@ end
 
 struct RTask
 	name::String
-	feeders::Dict{Int, Float64}
-	receivers::Dict{Int, Float64}
+
+	#Associated feeder / receiver storage containments with respective consumption / production ratios
+	feeders::Dict{Int, Float64}    
+	receivers::Dict{Int, Float64} 
 end
 
 # Unit specifications
 struct Unit
 	capacity::Float64
 
-	# IN/OUT storage containments with consumption / production ratios
-	tasks::Dict{Int, Coefs}
+	#Associated tasks with alpha/beta rate coefficients
+	tasks::Dict{Int, Coefs}  
 end
 
 # Parameter configurations for a batch process of this complexity
