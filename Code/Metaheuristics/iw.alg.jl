@@ -27,6 +27,7 @@ include("bp_literature_fitness.jl")
 
 #Random seed based on number of milliseconds of current date
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
+rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
 ##### key=wprod WEED PRODUCTION #####
 
@@ -36,6 +37,11 @@ end
 
 function get_std_dev(iter_max::Int, iter::Int, n::Int, std_init::Float64, std_final::Float64)
 	(((iter_max - iter) / iter_max )^n) * (std_init - std_final) + std_final
+end
+
+function get_cand(mean::Float64, n::Int)
+	index::Int = celi(abs(randn(rng)) * n + mean)
+	index
 end
 
 #=

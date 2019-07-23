@@ -62,6 +62,13 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	# Iterate through events
 	for event in 1:params.no_events
 
+		if print_data
+			for us in 1:config.no_units
+				@printf "%.2f " state.unit_amounts[us, event] 
+			end
+			newline(2)
+		end
+
 		# Iterate through units
 		for unit in 1:config.no_units
 
@@ -95,7 +102,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 					flush = zeros(config.no_storages)
 
 					if print_data
-						@printf "Instruction: %d\n" instruction
+						@printf "\nInstruction: %d\n" instruction
 						@printf "Feeders: \n"
 						print(feeders)
 

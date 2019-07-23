@@ -133,6 +133,9 @@ function main_func()
 
 	@printf "Fitness: %.6f\n" best_fitness
 
+	cal_fitness = get_fitness(config, params, cands[best], true)
+	@printf "Calculated Fitness: %.6f\n" cal_fitness
+
 	#=
 
 	for p in 1:no_params

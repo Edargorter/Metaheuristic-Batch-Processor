@@ -15,12 +15,10 @@ Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
 config_filename = "config_motivating.txt"
 config = read_config(config_filename)
-parameters_filename = "test_parameters.txt"
+parameters_filename = "parameters_1.txt"
 params = read_parameters(parameters_filename)
 
 ##### TEST SOLUTION FITNESS #####
-
-#=
 
 instructions = [1 1 1 1;0 1 1 1;0 0 1 1]
 durations = [4.665, 3.479, 2.427, 1.429]
@@ -29,11 +27,12 @@ cand = BPS_Program(instructions, durations)
 objective = get_fitness(config, params, cand, false)
 @printf "\nMotivating example (Optimal): %.3f\n" objective
 
-=#
+#=
 
 durations = [6.0, 6.0, 3.519, 2.431, 1.47, 4.046, 2.179, 1.901, 1.891, 1.928, 4.635]
 @printf "\nSum: %d" sum(durations)
 instructions = [1 1 1 0 1 0 1 0 1 0 0; 0 1 1 1 0 1 1 0 1 0 1; 0 0 1 1 1 1 1 1 1 1 1]
+@printf "%d\n" size(instructions[1])[1]
 #Test 36-hour solution
 cand = BPS_Program(instructions, durations)
 objective = get_fitness(config, params, cand, false)
@@ -41,14 +40,13 @@ objective = get_fitness(config, params, cand, false)
 
 print("\n")
 
-#=
+=#
 
 ### RUN TESTS ###
 
 no_params = 7
 no_tests = 50
 top_fitness = 0.0
-
 
 @printf "TESTS: %d\n\n" no_tests
 
@@ -79,9 +77,7 @@ for p in 1:no_params
 
 end
 
-=#
 #=
-
 
 ### PARAMETER SEARCH ###
 

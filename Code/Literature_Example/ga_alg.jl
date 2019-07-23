@@ -27,6 +27,7 @@ include("bp_literature_fitness.jl")
 
 #Random seed based on number of milliseconds of current date
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
+rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
 ### key=hfuncs Helping functions ###
 
@@ -128,6 +129,7 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 
 		# New random seed
 		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
+		rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
 		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s]) end
 		average_fitness::Float64 = sum(fitness)/N
@@ -136,7 +138,7 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 		best_fitness = fitness[best_index]
 
 		if display_info
-			@printf "Generation: %d\t ----- Average Fitness : %.2f \t----- Best: %.2f\n" generation average_fitness best_fitness
+			@printf "Generation: %d\t ----- Average Fitness: %.2f \t----- Best: %.2f\n" generation average_fitness best_fitness
 		end
 
 		for new in (elite + 1):2:N
