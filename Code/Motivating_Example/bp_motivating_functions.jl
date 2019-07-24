@@ -23,6 +23,7 @@ using Random
 include("bp_motivating_structs.jl") # Structures for relevent data representations
 
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
+rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
 ### key=hfuncs Helper functions ###
 
@@ -168,7 +169,7 @@ end
 
 # Time Interval Array
 function get_random_durations(horizon::Float64, no_events::Int)
-	stamps = sort(horizon*rand(no_events - 1))
+	stamps = sort(horizon*rand(rng, no_events - 1))
 	time_intervals = Array{Float64}(undef, no_events)
 	time_intervals[end] = horizon - stamps[end]
 	for i in no_events - 1:-1:2 time_intervals[i] = stamps[i] - stamps[i - 1] end

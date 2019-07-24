@@ -8,8 +8,6 @@ include("bp_motivating_functions.jl")
 include("ga_alg.jl")
 include("bp_motivating_fitness.jl")
 
-#Seed
-Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
 #### CONFIG PARAMETERS ####
 
