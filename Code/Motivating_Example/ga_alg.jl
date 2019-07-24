@@ -25,6 +25,7 @@ include("bp_motivating_fitness.jl")
 
 #Random seed based on number of milliseconds of current date
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
+rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
 ### key=hfuncs Helping functions ###
 
@@ -79,15 +80,15 @@ end
 
 # Mutation on instruction array
 function mutate_instructions(B::BPS_Program, no_units::Int, no_events::Int)
-	unit::Int = rand(1:no_units)
-	event::Int = rand(1:no_events)
+	unit::Int = rand(rng, 1:no_units)
+	event::Int = rand(rng, 1:no_events)
 	B.instructions[unit, event] = bit_flip(B.instructions[unit, event])
 end
 
 # Mutation on duration array
 function mutate_durations(B::BPS_Program, no_events::Int, delta::Float64, horizon::Float64)
-	r::Float64 = 2.0*rand() - 1.0
-	index::Int = rand(1:no_events)
+	r::Float64 = 2.0*rand(rng) - 1.0
+	index::Int = rand(rng, 1:no_events)
 	addition::Float64 = r*delta
 	value::Float64 = keep_positive(B.durations[index] + addition)
 	change::Float64 = addition / (no_events - 1.0)
@@ -120,6 +121,7 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 
 		# New random seed
 		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
+		rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
 		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s]) end
 		average_fitness::Float64 = sum(fitness)/N
@@ -132,8 +134,8 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 		end
 
 		for new in (elite + 1):2:N
-			i_a::Int, i_b::Int = indices[rand(1:elite)], indices[rand(1:elite)] # Random parents
-			c_point::Int = rand(1:params.no_events)
+			i_a::Int, i_b::Int = indices[rand(rng, 1:elite)], indices[rand(rng, 1:elite)] # Random parents
+			c_point::Int = rand(rng, 1:params.no_events)
 			A::BPS_Program, B::BPS_Program = crossover(candidates[i_a], candidates[i_b], c_point)
 			candidates[new] = A
 			candidates[new + 1] = B
