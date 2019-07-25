@@ -76,6 +76,11 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 			# Unit parameters
 			tasks::Dict{Int, Coefs} = config.units[unit].tasks
+
+			newline()
+			print(keys(tasks))
+			newline()
+
 			unit_capacity = config.units[unit].capacity
 			unit_amount = state.unit_amounts[unit, event]
 
@@ -105,6 +110,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 						@printf "\nInstruction: %d\n" instruction
 						@printf "Feeders: \n"
 						print(feeders)
+						newline()
 
 						@printf "Receivers: \n"
 						print(receivers)

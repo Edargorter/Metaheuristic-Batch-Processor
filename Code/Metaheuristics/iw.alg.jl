@@ -24,6 +24,7 @@ using StatsBase
 
 include("bp_motivating_fitness.jl") 
 include("bp_literature_fitness.jl")
+include("mh_params.jl")
 
 #Random seed based on number of milliseconds of current date
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
@@ -35,13 +36,27 @@ function weeds_to_produce(fitness::Float64, f_min::Float64, f_max::Float64, para
 	floor(Int, params.s_min + (params.s_max - params.s_min) * (fitness - f_min) / (f_max - params.f_min))
 end
 
-function get_std_dev(iter_max::Int, iter::Int, n::Int, std_init::Float64, std_final::Float64)
-	(((iter_max - iter) / iter_max )^n) * (std_init - std_final) + std_final
+# Get the new standard deviation
+function get_sigma(params::Params, iter::Int)
+	(((params.iter_max - iter) / params.iter_max - 1)^params.n) * (params.sig_init - params.sig_final) + params.sig_final
 end
 
 function get_cand(mean::Float64, n::Int)
 	index::Int = celi(abs(randn(rng)) * n + mean)
 	index
+end
+
+function invade(params::Params)
+	sigma::Float64 = 0
+	for it in 1:params.iterations	
+		sigma = get_sigma(params, it)
+
+		# Get costs of population
+		# Get max cost of population
+		# Get min cost of population
+
+		# Generate new population
+	end
 end
 
 #=

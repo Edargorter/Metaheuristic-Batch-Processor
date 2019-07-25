@@ -31,6 +31,9 @@ rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
 ### key=hfuncs Helping functions ###
 
+function newline() @printf "\n" end
+function newline(n::Int) for i in 1:n @printf "\n" end end
+
 # Round up to 1 if value < 0
 function keep_positive(value::Float64) value < 0.0 ? 0.0 : value end
 
@@ -123,6 +126,10 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 	elite::Int = ceil(params.theta*N) # Number of elite (parents) to be picked
 	if (N - elite) % 2 != 0 elite -= 1 end # Keep elite even (convenient for reproduction)
 	no_mutations::Int = ceil(params.mutation_rate*(N - elite)) # Number of progeny to undergo mutation
+
+	print(candidates[1])
+	newline()
+	print(candidates[end])
 
 	# Generation loop
 	for generation in 1:params.generations
