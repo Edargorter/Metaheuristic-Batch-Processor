@@ -16,6 +16,7 @@ end
 
 # Unit specifications
 struct Unit
+	name::String 
 	capacity::Float64
 
 	#Associated tasks with alpha/beta rate coefficients
@@ -40,6 +41,9 @@ struct BPS_Config
 
 	# Storage constraints
 	storage_capacity::Array{Float64}
+
+	#Initial volumes
+	initial_volumes::Array{Float64}
 end
 
 # State tracking for fitness evaluation

@@ -1,5 +1,5 @@
 horizon:36.0
-no_events:11
+no_events:24
 population:1000
 generations:50
 theta:0.3

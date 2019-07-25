@@ -1,4 +1,4 @@
-##### FITNESS FUNCTION (Literature Example) ##### Zachary Bowditch 2019 #####
+##### FITNESS FUNCTION (Primary Example) ##### Zachary Bowditch 2019 #####
 
 #= 
 	
@@ -15,7 +15,7 @@
 ### key=incl Included Files and Libraries ###
 
 using Printf
-include("bp_literature_structs.jl")
+include("bp_primary_structs.jl")
 
 # Evaluate fitness of a candidate Batch Processing Schedule (fitness metric = final state quantity)
 
@@ -29,17 +29,29 @@ function newline(n::Int) for i in 1:n @printf "\n" end end
 function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program, print_data::Bool=false)
 	# If sum of durations of candidate exceeds horizon, candidate is nullified
 	if sum(candidate.durations) > params.horizon return 0 end
-	
+
+	@printf "Instructions: "
+	print(candidate.instructions)
+	newline()
+	@printf "Durations: "
+	print(candidate.durations)
+	newline(2)
+
 	# Set initial state parameters
 	unit_amounts::Array{Float64, 2} = zeros(config.no_units, params.no_events + 1)
 	unit_activated::Array{Int, 2} = zeros(config.no_units, params.no_events + 1)
-	storage_amounts::Array{Float64} = zeros(config.no_storages)
-	storage_amounts[1] = Inf
-	storage_amounts[2] = Inf
-	storage_amounts[3] = Inf
 
 	# Default state
-	state::BPS_State = BPS_State(unit_amounts, unit_activated, storage_amounts)	
+	state::BPS_State = BPS_State(unit_amounts, unit_activated, config.initial_volumes)	
+
+	@printf "State unit_active size: "
+	print(size(state.unit_active))
+	newline()
+
+	@printf "State unit_amounts size: "
+	print(size(state.unit_amounts))
+	newline()
+
 	task_duration::Float64 = 0.0 # Temp variable for task length in unit of time (e.g. hours) 
 
 	# Initial declarations 
@@ -72,7 +84,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 		# Iterate through units
 		for unit in 1:config.no_units
 
-			if print_data @printf "Event: %d Unit: %d\n" event unit end
+			if print_data @printf "Event: %d Unit: %d Name: %s\n" event unit config.units[unit].name end
 
 			# Unit parameters
 			tasks::Dict{Int, Coefs} = config.units[unit].tasks
@@ -108,11 +120,11 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 					if print_data
 						@printf "\nInstruction: %d\n" instruction
-						@printf "Feeders: \n"
+						@printf "Feeders: "
 						print(feeders)
 						newline()
 
-						@printf "Receivers: \n"
+						@printf "Receivers: "
 						print(receivers)
 						
 						print(flush)
@@ -120,8 +132,6 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 					for (receiver, fraction) in receivers
 					
-						if print_data @printf "\n -> Receiver: %d\n" receiver end
-
 						recv_cap = config.storage_capacity[receiver]
 						recv_amount = state.storage_amounts[receiver]
 
@@ -130,6 +140,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 						else
 							flush[receiver] = unit_amount * fraction
 						end
+
 					end
 
 					for (receiver, fraction) in receivers 
@@ -154,6 +165,14 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 				if print_data
 					@printf "Instruction: %d\n" instruction
 
+					@printf "Feeders: "
+					print(feeders)
+					newline()
+					for f in keys(feeders)
+						@printf "%d: %.3f " f state.storage_amounts[f]
+					end
+					newline()
+
 					@printf "Receivers: "
 					print(receivers)
 					newline()
@@ -162,9 +181,9 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 					newline()
 					
 					alpha = tasks[instruction].alpha
-					@printf "Alpha: %.2f\n" alpha
+					@printf "Alpha: %f\n" alpha
 					beta = tasks[instruction].beta
-					@printf "Beta: %.2f\n" beta
+					@printf "Beta: %f\n" beta
 				end
 
 				flush::Array{Float64} = zeros(config.no_storages)
@@ -185,9 +204,9 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 						unit_amount -= flush[receiver]
 						state.storage_amounts[receiver] = flush[receiver]
 					end
+					if print_data @printf "Flushed contents. \n" end
 				end
 
-				if print_data @printf "Flushed contents. \n" end
 
 				#Iterate through subsequent instructions to determine maximum duration
 				amount::Float64 = 0.0
@@ -205,9 +224,9 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 						amount = (task_duration - alpha) / beta 
 						for (feeder, fraction) in feeders
 							if fraction * amount > state.storage_amounts[feeder]
-								amount = state.storage_amounts[feeder]
+								amount = state.storage_amounts[feeder] / fraction
+								max_reached = true
 							end
-							max_reached = true
 						end
 						if amount > unit_capacity - unit_amount 
 							amount = unit_capacity - unit_amount 
@@ -215,13 +234,15 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 						end
 						if max_reached break end
 					end
+
 					task_end += 1
+
 					if task_end >= params.no_events break end #If time horizon reached
-					if candidate.instructions[unit, task_end] == 1 break end #If next instruction = 1
+					if candidate.instructions[unit, task_end] > 0 break end #If next instuction is a new one
 
 				end
 
-				if active == true
+				if active > 0
 					state.unit_amounts[unit, event + 1] = amount
 					for (feeder, fraction) in feeders
 						state.storage_amounts[feeder] -= fraction * amount
