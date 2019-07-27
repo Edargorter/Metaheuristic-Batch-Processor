@@ -113,7 +113,7 @@ function main_func()
 	storage_capacity = [Inf, Inf, Inf, 100, 200, 150, 200, Inf, Inf]
 
 	#Initial volumes
-	initial_volumes = [Inf, Inf, Inf, 0, 0, 0, 0, 0, 0]	
+	initial_volumes = [Inf, Inf, Inf, 0, 0, 0, 0, 0, 0]
 
 	#Setup state reactions
 	prod_reactions = Dict{Int, Int}()
@@ -133,8 +133,21 @@ function main_func()
 
 	params = read_parameters("test_parameters.txt")
 
-	instructions = [1 0 1 0 0 0 0 0 0 0 0 0; 2 3 0 3 4 4 4 4 3 0 4 3; 2 3 0 2 3 0 2 0 3 0 4 3;0 0 0 0 0 5 5 0 0 5 0 5]
+	instructions = [1 0 1 0 0 0 0 0 0 0 0 0;
+					2 3 0 3 4 4 4 4 3 0 4 3; 
+					2 3 0 2 3 0 2 0 3 0 4 3;
+					0 0 0 0 0 5 5 0 0 5 0 5]
+
 	durations = [2.667, 2.349, 0.327, 2.68, 1.334, 1.38, 1.277, 1.453, 0.845, 2.016, 1.515, 2.157]
+
+	#=
+	instructions = [1 0 0 0 0 0 0 0;
+					2 0 3 0 4 0 3 0;
+					2 0 0 3 0 4 5 0;
+					0 0 0 0 0 0 0 5]
+
+	durations = [1.135, 0.962, 0.514, 2.139, 0.335, 0.992, 0.961, 0.962]
+	=#
 
 	@printf "Size of instructions: "
 	print(size(instructions))

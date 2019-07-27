@@ -24,6 +24,45 @@ include("bp_primary_structs.jl")
 function newline() @printf "\n" end
 function newline(n::Int) for i in 1:n @printf "\n" end end
 
+function flush(config::BPS_Config, state::BPS_State, unit::Int, event::Int)	
+	active::Int = state.unit_active[unit, event - 1] #Flush from action (task)
+
+	# Get feeding/receiving storages
+	feeders::Dict{Int, Float64} = config.tasks[active].feeders
+	receivers::Dict{Int, Float64} = config.tasks[active].receivers
+	unit_amount::Float64 = state.unit_amounts[unit, event]
+	amount::Float64 = unit_amount
+
+	if print_data
+		@printf "\nInstruction: %d\n" instruction
+		@printf "Feeders: "
+		print(feeders)
+		newline()
+
+		@printf "Receivers: "
+		print(receivers)
+		
+		print(flush)
+	end
+
+	for (receiver, fraction) in receivers
+	
+		recv_cap = config.storage_capacity[receiver]
+		recv_amount = state.storage_amounts[receiver]
+
+		if (recv_cap - recv_amount) < (amount * fraction)
+			amount = (recv_cap - recv_amount) / fraction
+		end
+
+	end
+
+	for (receiver, fraction) in receivers 
+		state.storage_amounts[receiver] = fraction * amount
+	end
+
+	state.unit_amounts[unit, event + 1] = unit_amount - amount
+end
+
 ### key=fitfunc FITNESS FUNCTION ###
 
 function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program, print_data::Bool=false)
@@ -70,6 +109,8 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	available::Float64 = 0.0
 
 	instruction::Int = 0
+	amount::Float64 = 0.0
+	max_reached::Bool = false
 
 	# Iterate through events
 	for event in 1:params.no_events
@@ -84,7 +125,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 		# Iterate through units
 		for unit in 1:config.no_units
 
-			if print_data @printf "Event: %d Unit: %d Name: %s\n" event unit config.units[unit].name end
+			if print_data @printf "Event: %d [ %.3f ] Unit: %d Name: %s\n" event candidate.durations[event] unit config.units[unit].name end
 
 			# Unit parameters
 			tasks::Dict{Int, Coefs} = config.units[unit].tasks
@@ -100,23 +141,25 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 			duration = candidate.durations[event]
 			available = unit_capacity
 
+			prev_unit = state.
+
 			instruction = candidate.instructions[unit, event]	
 
 			# Instruction 0 (Continue task if one exists)
 			if instruction == 0
 				
 				# Pass on values 
-				if active > 0
+				if active != 0
 
 					state.unit_amounts[unit, event + 1] = unit_amount
 
-				elseif event > 1 && state.unit_active[unit, event - 1] > 0
+				elseif event > 1 && state.unit_active[unit, event - 1] != 0
 					active = state.unit_active[unit, event - 1] #Flush from action (task)
 
 					# Get feeding/receiving storages
 					feeders = config.tasks[active].feeders
 					receivers = config.tasks[active].receivers
-					flush = zeros(config.no_storages)
+					amount = unit_amount
 
 					if print_data
 						@printf "\nInstruction: %d\n" instruction
@@ -135,22 +178,19 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 						recv_cap = config.storage_capacity[receiver]
 						recv_amount = state.storage_amounts[receiver]
 
-						if (recv_cap - recv_amount) < (unit_amount * fraction)
-							flush[receiver] = recv_cap
-						else
-							flush[receiver] = unit_amount * fraction
+						if (recv_cap - recv_amount) < (amount * fraction)
+							amount = (recv_cap - recv_amount) / fraction
 						end
 
 					end
 
 					for (receiver, fraction) in receivers 
-						unit_amount -= flush[receiver]
-						state.storage_amounts[receiver] = flush[receiver]
+						state.storage_amounts[receiver] = fraction * amount
 					end
 
-					state.unit_amounts[unit, event + 1] = unit_amount
+					state.unit_amounts[unit, event + 1] = unit_amount - amount
 
-					if print_data @printf "Flushed (instruction 0).\n" end
+					if print_data @printf "\nFlushed (instruction = 0).\n" end
 				end
 
 				if print_data newline() end
@@ -186,76 +226,83 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 					@printf "Beta: %f\n" beta
 				end
 
-				flush::Array{Float64} = zeros(config.no_storages)
-
 				# Flush contents from completed task if needed
 				if event > 1 && state.unit_amounts[unit, event] > 0.0
+
+					amount = unit_amount
+
 					for (receiver, fraction) in receivers
 						recv_cap = config.storage_capacity[receiver]
 						recv_amount = state.storage_amounts[receiver]
 
-						if recv_cap - recv_amount < unit_amount * fraction
-							flush[receiver] = recv_cap
-						else
-							flush[receiver] = unit_amount * fraction
+						if recv_cap - recv_amount < amount * fraction
+							amount = (recv_cap - recv_amount) / fraction
 						end
+
 					end
+
 					for (receiver, fraction) in receivers
-						unit_amount -= flush[receiver]
-						state.storage_amounts[receiver] = flush[receiver]
+						state.storage_amounts[receiver] = amount * fraction
 					end
+							
 					if print_data @printf "Flushed contents. \n" end
+
+					unit_amount -= amount
 				end
 
+				# Proceed to new task only if unit is empty 
+				if unit_amount == 0
 
-				#Iterate through subsequent instructions to determine maximum duration
-				amount::Float64 = 0.0
-				task_duration = 0.0
-				max_reached::Bool = false
-				active = 0
+					#Iterate through subsequent instructions to determine maximum duration
+					amount = 0.0
+					task_duration = 0.0
+					max_reached = false
+					active = 0
 
-				task_end::Int = event # from current event to final event point of task
+					task_end::Int = event # from current event to final event point of task
 
-				while true #Continue until inner conditions break out of the loop
+					while true #Continue until inner conditions break out of the loop
 
-					task_duration += candidate.durations[task_end]
-					if task_duration >= alpha 
-						active = instruction
-						amount = (task_duration - alpha) / beta 
-						for (feeder, fraction) in feeders
-							if fraction * amount > state.storage_amounts[feeder]
-								amount = state.storage_amounts[feeder] / fraction
+						task_duration += candidate.durations[task_end]
+						if task_duration >= alpha 
+							active = instruction
+							amount = (task_duration - alpha) / beta 
+							for (feeder, fraction) in feeders
+								if fraction * amount > state.storage_amounts[feeder]
+									amount = state.storage_amounts[feeder] / fraction
+									max_reached = true
+								end
+							end
+							if amount > unit_capacity - unit_amount 
+								amount = unit_capacity - unit_amount 
 								max_reached = true
 							end
+							if max_reached break end
 						end
-						if amount > unit_capacity - unit_amount 
-							amount = unit_capacity - unit_amount 
-							max_reached = true
+
+						task_end += 1
+
+						if task_end >= params.no_events break end #If time horizon reached
+						if candidate.instructions[unit, task_end] != 0 break end #If next instuction is a new one
+
+					end
+
+					if active > 0
+						state.unit_amounts[unit, event + 1] = amount
+						for (feeder, fraction) in feeders
+							state.storage_amounts[feeder] -= fraction * amount
 						end
-						if max_reached break end
+
+						for i in event:task_end
+							state.unit_active[unit, i] = instruction
+						end
+
+						if print_data @printf "AMOUNT TO BE PROCESSED: %.2f\n" amount end
 					end
 
-					task_end += 1
+					if print_data newline() end
 
-					if task_end >= params.no_events break end #If time horizon reached
-					if candidate.instructions[unit, task_end] > 0 break end #If next instuction is a new one
-
-				end
-
-				if active > 0
-					state.unit_amounts[unit, event + 1] = amount
-					for (feeder, fraction) in feeders
-						state.storage_amounts[feeder] -= fraction * amount
-					end
-
-					for i in event:task_end
-						state.unit_active[unit, i] = instruction
-					end
-
-					if print_data @printf "AMOUNT TO BE PROCESSED: %.2f\n" amount end
-				end
-
-				if print_data newline() end
+				end #if unit_amount == 0
 			end
 			# instruction handled
 

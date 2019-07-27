@@ -12,7 +12,7 @@ State unit_active size: (4, 13)
 State unit_amounts size: (4, 13)
 0.00 0.00 0.00 0.00 
 
-Event: 1 Unit: 1 Name: Heater
+Event: 1 [ 2.667 ] Unit: 1 Name: Heater
 
 [1]
 Instruction: 1
@@ -25,7 +25,7 @@ Beta: 0.006670
 AMOUNT TO BE PROCESSED: 100.00
 
 
-Event: 1 Unit: 2 Name: Reactor 1
+Event: 1 [ 2.667 ] Unit: 2 Name: Reactor 1
 
 [4, 2, 3]
 Instruction: 2
@@ -38,7 +38,7 @@ Beta: 0.026640
 AMOUNT TO BE PROCESSED: 50.00
 
 
-Event: 1 Unit: 3 Name: Reactor 2
+Event: 1 [ 2.667 ] Unit: 3 Name: Reactor 2
 
 [4, 2, 3]
 Instruction: 2
@@ -51,23 +51,24 @@ Beta: 0.016650
 AMOUNT TO BE PROCESSED: 80.00
 
 
-Event: 1 Unit: 4 Name: Still
+Event: 1 [ 2.667 ] Unit: 4 Name: Still
 
 [5]
 
 
 100.00 50.00 80.00 0.00 
 
-Event: 2 Unit: 1 Name: Heater
+Event: 2 [ 2.349 ] Unit: 1 Name: Heater
 
 [1]
 
 Instruction: 0
 Feeders: Dict(1=>1.0)
-Receivers: Dict(4=>1.0)[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]Flushed (instruction 0).
+Receivers: Dict(4=>1.0)flush
+Flushed (instruction = 0).
 
 
-Event: 2 Unit: 2 Name: Reactor 1
+Event: 2 [ 2.349 ] Unit: 2 Name: Reactor 1
 
 [4, 2, 3]
 Instruction: 3
@@ -81,7 +82,7 @@ Flushed contents.
 AMOUNT TO BE PROCESSED: 0.00
 
 
-Event: 2 Unit: 3 Name: Reactor 2
+Event: 2 [ 2.349 ] Unit: 3 Name: Reactor 2
 
 [4, 2, 3]
 Instruction: 3
@@ -95,14 +96,14 @@ Flushed contents.
 AMOUNT TO BE PROCESSED: 0.00
 
 
-Event: 2 Unit: 4 Name: Still
+Event: 2 [ 2.349 ] Unit: 4 Name: Still
 
 [5]
 
 
 0.00 0.00 0.00 0.00 
 
-Event: 3 Unit: 1 Name: Heater
+Event: 3 [ 0.327 ] Unit: 1 Name: Heater
 
 [1]
 Instruction: 1
@@ -115,37 +116,39 @@ Beta: 0.006670
 AMOUNT TO BE PROCESSED: 100.00
 
 
-Event: 3 Unit: 2 Name: Reactor 1
+Event: 3 [ 0.327 ] Unit: 2 Name: Reactor 1
 
 [4, 2, 3]
 
 Instruction: 0
 Feeders: Dict(4=>0.4,6=>0.6)
-Receivers: Dict(8=>0.4,5=>0.6)[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]Flushed (instruction 0).
+Receivers: Dict(8=>0.4,5=>0.6)flush
+Flushed (instruction = 0).
 
 
-Event: 3 Unit: 3 Name: Reactor 2
+Event: 3 [ 0.327 ] Unit: 3 Name: Reactor 2
 
 [4, 2, 3]
 
 Instruction: 0
 Feeders: Dict(4=>0.4,6=>0.6)
-Receivers: Dict(8=>0.4,5=>0.6)[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]Flushed (instruction 0).
+Receivers: Dict(8=>0.4,5=>0.6)flush
+Flushed (instruction = 0).
 
 
-Event: 3 Unit: 4 Name: Still
+Event: 3 [ 0.327 ] Unit: 4 Name: Still
 
 [5]
 
 
 100.00 0.00 0.00 0.00 
 
-Event: 4 Unit: 1 Name: Heater
+Event: 4 [ 2.680 ] Unit: 1 Name: Heater
 
 [1]
 
 
-Event: 4 Unit: 2 Name: Reactor 1
+Event: 4 [ 2.680 ] Unit: 2 Name: Reactor 1
 
 [4, 2, 3]
 Instruction: 3
@@ -158,7 +161,7 @@ Beta: 0.026640
 AMOUNT TO BE PROCESSED: 0.00
 
 
-Event: 4 Unit: 3 Name: Reactor 2
+Event: 4 [ 2.680 ] Unit: 3 Name: Reactor 2
 
 [4, 2, 3]
 Instruction: 2
@@ -171,23 +174,24 @@ Beta: 0.016650
 AMOUNT TO BE PROCESSED: 80.00
 
 
-Event: 4 Unit: 4 Name: Still
+Event: 4 [ 2.680 ] Unit: 4 Name: Still
 
 [5]
 
 
 100.00 0.00 80.00 0.00 
 
-Event: 5 Unit: 1 Name: Heater
+Event: 5 [ 1.334 ] Unit: 1 Name: Heater
 
 [1]
 
 Instruction: 0
 Feeders: Dict(1=>1.0)
-Receivers: Dict(4=>1.0)[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]Flushed (instruction 0).
+Receivers: Dict(4=>1.0)flush
+Flushed (instruction = 0).
 
 
-Event: 5 Unit: 2 Name: Reactor 1
+Event: 5 [ 1.334 ] Unit: 2 Name: Reactor 1
 
 [4, 2, 3]
 Instruction: 4
@@ -200,12 +204,12 @@ Beta: 0.013320
 AMOUNT TO BE PROCESSED: 0.00
 
 
-Event: 5 Unit: 3 Name: Reactor 2
+Event: 5 [ 1.334 ] Unit: 3 Name: Reactor 2
 
 [4, 2, 3]
 Instruction: 3
 Feeders: Dict(4=>0.4,6=>0.6)
-4: 100.000 6: 0.000 
+4: 0.000 6: 0.000 
 Receivers: Dict(8=>0.4,5=>0.6)
 Dict(4=>Coefs(0.6667, 0.00833),2=>Coefs(1.3333, 0.01665),3=>Coefs(1.3333, 0.01665))
 Alpha: 1.333300
@@ -214,19 +218,19 @@ Flushed contents.
 AMOUNT TO BE PROCESSED: 0.00
 
 
-Event: 5 Unit: 4 Name: Still
+Event: 5 [ 1.334 ] Unit: 4 Name: Still
 
 [5]
 
 
-0.00 0.00 0.00 0.00 
+100.00 0.00 0.00 0.00 
 
-Event: 6 Unit: 1 Name: Heater
+Event: 6 [ 1.380 ] Unit: 1 Name: Heater
 
 [1]
 
 
-Event: 6 Unit: 2 Name: Reactor 1
+Event: 6 [ 1.380 ] Unit: 2 Name: Reactor 1
 
 [4, 2, 3]
 Instruction: 4
@@ -239,16 +243,17 @@ Beta: 0.013320
 AMOUNT TO BE PROCESSED: 0.00
 
 
-Event: 6 Unit: 3 Name: Reactor 2
+Event: 6 [ 1.380 ] Unit: 3 Name: Reactor 2
 
 [4, 2, 3]
 
 Instruction: 0
 Feeders: Dict(4=>0.4,6=>0.6)
-Receivers: Dict(8=>0.4,5=>0.6)[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]Flushed (instruction 0).
+Receivers: Dict(8=>0.4,5=>0.6)flush
+Flushed (instruction = 0).
 
 
-Event: 6 Unit: 4 Name: Still
+Event: 6 [ 1.380 ] Unit: 4 Name: Still
 
 [5]
 Instruction: 5
@@ -263,12 +268,12 @@ AMOUNT TO BE PROCESSED: 0.00
 
 0.00 0.00 0.00 0.00 
 
-Event: 7 Unit: 1 Name: Heater
+Event: 7 [ 1.277 ] Unit: 1 Name: Heater
 
 [1]
 
 
-Event: 7 Unit: 2 Name: Reactor 1
+Event: 7 [ 1.277 ] Unit: 2 Name: Reactor 1
 
 [4, 2, 3]
 Instruction: 4
@@ -281,7 +286,7 @@ Beta: 0.013320
 AMOUNT TO BE PROCESSED: 0.00
 
 
-Event: 7 Unit: 3 Name: Reactor 2
+Event: 7 [ 1.277 ] Unit: 3 Name: Reactor 2
 
 [4, 2, 3]
 Instruction: 2
@@ -294,7 +299,7 @@ Beta: 0.016650
 AMOUNT TO BE PROCESSED: 80.00
 
 
-Event: 7 Unit: 4 Name: Still
+Event: 7 [ 1.277 ] Unit: 4 Name: Still
 
 [5]
 Instruction: 5
@@ -309,12 +314,12 @@ AMOUNT TO BE PROCESSED: 0.00
 
 0.00 0.00 80.00 0.00 
 
-Event: 8 Unit: 1 Name: Heater
+Event: 8 [ 1.453 ] Unit: 1 Name: Heater
 
 [1]
 
 
-Event: 8 Unit: 2 Name: Reactor 1
+Event: 8 [ 1.453 ] Unit: 2 Name: Reactor 1
 
 [4, 2, 3]
 Instruction: 4
@@ -327,29 +332,29 @@ Beta: 0.013320
 AMOUNT TO BE PROCESSED: 0.00
 
 
-Event: 8 Unit: 3 Name: Reactor 2
+Event: 8 [ 1.453 ] Unit: 3 Name: Reactor 2
 
 [4, 2, 3]
 
 
-Event: 8 Unit: 4 Name: Still
+Event: 8 [ 1.453 ] Unit: 4 Name: Still
 
 [5]
 
 
 0.00 0.00 80.00 0.00 
 
-Event: 9 Unit: 1 Name: Heater
+Event: 9 [ 0.845 ] Unit: 1 Name: Heater
 
 [1]
 
 
-Event: 9 Unit: 2 Name: Reactor 1
+Event: 9 [ 0.845 ] Unit: 2 Name: Reactor 1
 
 [4, 2, 3]
 Instruction: 3
 Feeders: Dict(4=>0.4,6=>0.6)
-4: 100.000 6: 0.000 
+4: 0.000 6: 0.000 
 Receivers: Dict(8=>0.4,5=>0.6)
 Dict(4=>Coefs(0.6667, 0.01332),2=>Coefs(1.3333, 0.02664),3=>Coefs(1.3333, 0.02664))
 Alpha: 1.333300
@@ -357,12 +362,12 @@ Beta: 0.026640
 AMOUNT TO BE PROCESSED: 0.00
 
 
-Event: 9 Unit: 3 Name: Reactor 2
+Event: 9 [ 0.845 ] Unit: 3 Name: Reactor 2
 
 [4, 2, 3]
 Instruction: 3
 Feeders: Dict(4=>0.4,6=>0.6)
-4: 100.000 6: 0.000 
+4: 0.000 6: 0.000 
 Receivers: Dict(8=>0.4,5=>0.6)
 Dict(4=>Coefs(0.6667, 0.00833),2=>Coefs(1.3333, 0.01665),3=>Coefs(1.3333, 0.01665))
 Alpha: 1.333300
@@ -371,33 +376,34 @@ Flushed contents.
 AMOUNT TO BE PROCESSED: 0.00
 
 
-Event: 9 Unit: 4 Name: Still
+Event: 9 [ 0.845 ] Unit: 4 Name: Still
 
 [5]
 
 Instruction: 0
 Feeders: Dict(7=>1.0)
-Receivers: Dict(9=>0.9,5=>0.1)[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]Flushed (instruction 0).
+Receivers: Dict(9=>0.9,5=>0.1)flush
+Flushed (instruction = 0).
 
 
 0.00 0.00 0.00 0.00 
 
-Event: 10 Unit: 1 Name: Heater
+Event: 10 [ 2.016 ] Unit: 1 Name: Heater
 
 [1]
 
 
-Event: 10 Unit: 2 Name: Reactor 1
+Event: 10 [ 2.016 ] Unit: 2 Name: Reactor 1
 
 [4, 2, 3]
 
 
-Event: 10 Unit: 3 Name: Reactor 2
+Event: 10 [ 2.016 ] Unit: 3 Name: Reactor 2
 
 [4, 2, 3]
 
 
-Event: 10 Unit: 4 Name: Still
+Event: 10 [ 2.016 ] Unit: 4 Name: Still
 
 [5]
 Instruction: 5
@@ -412,12 +418,12 @@ AMOUNT TO BE PROCESSED: 0.00
 
 0.00 0.00 0.00 0.00 
 
-Event: 11 Unit: 1 Name: Heater
+Event: 11 [ 1.515 ] Unit: 1 Name: Heater
 
 [1]
 
 
-Event: 11 Unit: 2 Name: Reactor 1
+Event: 11 [ 1.515 ] Unit: 2 Name: Reactor 1
 
 [4, 2, 3]
 Instruction: 4
@@ -430,7 +436,7 @@ Beta: 0.013320
 AMOUNT TO BE PROCESSED: 0.00
 
 
-Event: 11 Unit: 3 Name: Reactor 2
+Event: 11 [ 1.515 ] Unit: 3 Name: Reactor 2
 
 [4, 2, 3]
 Instruction: 4
@@ -443,28 +449,29 @@ Beta: 0.008330
 AMOUNT TO BE PROCESSED: 0.00
 
 
-Event: 11 Unit: 4 Name: Still
+Event: 11 [ 1.515 ] Unit: 4 Name: Still
 
 [5]
 
 Instruction: 0
 Feeders: Dict(7=>1.0)
-Receivers: Dict(9=>0.9,5=>0.1)[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]Flushed (instruction 0).
+Receivers: Dict(9=>0.9,5=>0.1)flush
+Flushed (instruction = 0).
 
 
 0.00 0.00 0.00 0.00 
 
-Event: 12 Unit: 1 Name: Heater
+Event: 12 [ 2.157 ] Unit: 1 Name: Heater
 
 [1]
 
 
-Event: 12 Unit: 2 Name: Reactor 1
+Event: 12 [ 2.157 ] Unit: 2 Name: Reactor 1
 
 [4, 2, 3]
 Instruction: 3
 Feeders: Dict(4=>0.4,6=>0.6)
-4: 100.000 6: 0.000 
+4: 0.000 6: 0.000 
 Receivers: Dict(8=>0.4,5=>0.6)
 Dict(4=>Coefs(0.6667, 0.01332),2=>Coefs(1.3333, 0.02664),3=>Coefs(1.3333, 0.02664))
 Alpha: 1.333300
@@ -472,12 +479,12 @@ Beta: 0.026640
 AMOUNT TO BE PROCESSED: 0.00
 
 
-Event: 12 Unit: 3 Name: Reactor 2
+Event: 12 [ 2.157 ] Unit: 3 Name: Reactor 2
 
 [4, 2, 3]
 Instruction: 3
 Feeders: Dict(4=>0.4,6=>0.6)
-4: 100.000 6: 0.000 
+4: 0.000 6: 0.000 
 Receivers: Dict(8=>0.4,5=>0.6)
 Dict(4=>Coefs(0.6667, 0.00833),2=>Coefs(1.3333, 0.01665),3=>Coefs(1.3333, 0.01665))
 Alpha: 1.333300
@@ -485,7 +492,7 @@ Beta: 0.016650
 AMOUNT TO BE PROCESSED: 0.00
 
 
-Event: 12 Unit: 4 Name: Still
+Event: 12 [ 2.157 ] Unit: 4 Name: Still
 
 [5]
 Instruction: 5
