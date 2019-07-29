@@ -36,8 +36,6 @@ function flush(config::BPS_Config, state::BPS_State, unit::Int, event::Int, inst
 
 	if unit_amount == 0 return end
 
-	if event == 6 @printf "Event point 6 flush\n" end
-
 	receivers::Dict{Int, Float64} = config.tasks[active].receivers
 	amount::Float64 = unit_amount
 
@@ -56,22 +54,22 @@ function flush(config::BPS_Config, state::BPS_State, unit::Int, event::Int, inst
 		state.storage_amounts[receiver] += fraction * amount
 	end
 	state.unit_amounts[unit, event] = unit_amount - amount 
-	if event == 6 @printf "State amount: %.2f\n" state.unit_amounts[unit, event] end
-
 end
 
 ### key=fitfunc FITNESS FUNCTION ###
 
 function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program, print_data::Bool=false)
 	# If sum of durations of candidate exceeds horizon, candidate is nullified
-	if sum(candidate.durations) > params.horizon + 1 return 0 end
+	if sum(candidate.durations) > params.horizon return 0 end
 
-	@printf "Instructions: "
-	print(candidate.instructions)
-	newline()
-	@printf "Durations: "
-	print(candidate.durations)
-	newline(2)
+	if print_data
+		@printf "Instructions: "
+		print(candidate.instructions)
+		newline()
+		@printf "Durations: "
+		print(candidate.durations)
+		newline(2)
+	end
 
 	# Set initial state parameters
 	unit_amounts::Array{Float64, 2} = zeros(config.no_units, params.no_events + 1)
@@ -80,13 +78,15 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	# Default state
 	state::BPS_State = BPS_State(unit_amounts, unit_activated, config.initial_volumes)	
 
-	@printf "State unit_active size: "
-	print(size(state.unit_active))
-	newline()
+	if print_data
+		@printf "State unit_active size: "
+		print(size(state.unit_active))
+		newline()
 
-	@printf "State unit_amounts size: "
-	print(size(state.unit_amounts))
-	newline()
+		@printf "State unit_amounts size: "
+		print(size(state.unit_amounts))
+		newline()
+	end
 
 	task_duration::Float64 = 0.0 # Temp variable for task length in unit of time (e.g. hours) 
 
@@ -112,8 +112,10 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	# Iterate through events
 	for event in 1:params.no_events
 
-		@printf "=============== EVENT %d ===============" event
-		newline(2)
+		if print_data	
+			@printf "=============== EVENT %d ===============" event
+			newline(2)
+		end
 
 		# Flush units if possible
 		if event > 1
@@ -143,9 +145,11 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 			# Unit parameters
 			tasks::Dict{Int, Coefs} = config.units[unit].tasks
 
-			newline()
-			print(keys(tasks))
-			newline()
+			if print_data
+				newline()
+				print(keys(tasks))
+				newline()
+			end
 
 			unit_capacity = config.units[unit].capacity
 			unit_amount = state.unit_amounts[unit, event]
@@ -261,10 +265,12 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 		flush(config, state, unit, params.no_events + 1, 1)
 	end
 
-	for prod in config.products
-		@printf "Prod %d: %.3f  " prod state.storage_amounts[prod]
+	if print_data
+		for prod in config.products
+			@printf "Prod %d: %.3f  " prod state.storage_amounts[prod]
+		end
+		newline(2)
 	end
-	newline(2)
 
 	# Return profit
 	sum(config.prices.*(state.storage_amounts[config.products]))

@@ -96,6 +96,7 @@ end
 
 =#
 
+#=
 
 ### PARAMETER SEARCH ###
 
@@ -108,11 +109,9 @@ best_mutation = 0.1
 best_delta = 0.0
 time_of = 0.0
 
+logfile = open("log.txt", "a")
 
 for p in 1:no_params
-	logfile_name = "log_$(p).txt"
-	logfile = open(logfile_name, "a")
-
 	best_fitness = 0.0
 	time_sum = 0.0
 
@@ -120,9 +119,9 @@ for p in 1:no_params
 	parameters_filename = "parameters_$(p).txt"
 	params = read_parameters(parameters_filename)
 
-	to_write = "Horizon: $(params.horizon) Events: $(params.no_events) Population: $(params.population) Generations: $(params.generations)\n\n\n" 
+	to_write = "Horizon: %.2f Events: %d Population: %d Generations: %d\n" params.horizon params.no_events params.population
 
-	write(logfile, to_write)
+	write(logfile, 
 
 	for theta in crossovers
 		for mut in mutations
@@ -157,16 +156,13 @@ for p in 1:no_params
 					best_delta = det
 				end
 
-				write(logfile, "\n\n")
-
 			end
 		end
 	end
-
-	write(logfile, "\n\n")
 
 	@printf "Time: %.6f Horizon: %.2f Events: %d Population: %d Generations: %d Theta: %.2f Mutation: %.2f Delta: %.2f Fitness: %.6f\n" time_sum params.horizon params.no_events params.population params.generations best_theta best_mutation best_delta best_fitness
 					
 end
 close(logfile)
 
+=#

@@ -20,6 +20,7 @@
 
 using Random
 using Dates
+using Printf 
 
 include("bp_motivating_fitness.jl")
 
@@ -107,7 +108,7 @@ end
 
 ### key=evolfunc Evolution Function ###
 
-function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, params::Params, display_info::Bool=true)
+function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Program}, params::Params, display_info::Bool=true)
 	N::Int = params.population
 	fitness::Array{Float64} = zeros(N)
 	best_index::Int = 0
@@ -124,7 +125,13 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 		rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
 		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s]) end
+
 		average_fitness::Float64 = sum(fitness)/N
+
+		to_write::String = "$(average_fitness),"
+
+		write(logfd, to_write)
+
 		indices::Array{Int} = sortperm(fitness, rev=true)
 		best_index = indices[1]
 		best_fitness = fitness[best_index]

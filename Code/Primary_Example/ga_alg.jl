@@ -118,7 +118,7 @@ end
 
 ### key=evolfunc Evolution Function ###
 
-function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, params::Params, display_info::Bool=true)
+function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Program}, params::Params, display_info::Bool=true)
 	N::Int = params.population
 	fitness::Array{Float64} = zeros(N)
 	best_index::Int = 0
@@ -126,10 +126,6 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 	elite::Int = ceil(params.theta*N) # Number of elite (parents) to be picked
 	if (N - elite) % 2 != 0 elite -= 1 end # Keep elite even (convenient for reproduction)
 	no_mutations::Int = ceil(params.mutation_rate*(N - elite)) # Number of progeny to undergo mutation
-
-	print(candidates[1])
-	newline()
-	print(candidates[end])
 
 	# Generation loop
 	for generation in 1:params.generations
@@ -140,6 +136,10 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 
 		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s]) end
 		average_fitness::Float64 = sum(fitness)/N
+
+		to_write::String = "$(average_fitness),"
+		write(logfd, to_write)
+
 		indices::Array{Int} = sortperm(fitness, rev=true)
 		best_index = indices[1]
 		best_fitness = fitness[best_index]

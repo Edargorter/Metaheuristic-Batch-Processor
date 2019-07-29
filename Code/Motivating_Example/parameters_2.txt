@@ -1,7 +1,7 @@
 horizon:24.0
 no_events:10
-population:1000
-generations:50
+population:500
+generations:25
 theta:0.1
 mutation_rate:0.8
 delta:0.125

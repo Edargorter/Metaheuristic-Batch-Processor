@@ -115,20 +115,22 @@ function main_func()
 	#Initial volumes
 	initial_volumes = [Inf, Inf, Inf, 0, 0, 0, 0, 0, 0]
 
-	print(units)
-	newline()
+	#print(units)
+	#newline()
 
 	#Get sizes
-	@printf "No. of tasks: %d\n" size(collect(tasks))[1]
-	@printf "No. of units: %d\n" size(collect(units))[1]
-	@printf "No. of storages: %d\n\n" size(collect(storage_capacity))[1]
+#	@printf "No. of tasks: %d\n" size(collect(tasks))[1]
+#	@printf "No. of units: %d\n" size(collect(units))[1]
+#	@printf "No. of storages: %d\n\n" size(collect(storage_capacity))[1]
 
 	#Setup config
 	config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storage_capacity, initial_volumes)
 
+	#=
+
 	params = read_parameters("test_parameters.txt")
-	@printf "Horizon: %.2f\n" params.horizon
-	@printf "Events: %d\n" params.no_events
+	#@printf "Horizon: %.2f\n" params.horizon
+	#@printf "Events: %d\n" params.no_events
 
 	instructions = [1 1 1 1 1 1 1;
 					2 0 3 0 4 0 3;
@@ -169,6 +171,8 @@ function main_func()
 	@printf "Fitness: %.6f\n" fitness
 	newline()
 
+	=#
+
 	#=
 
 	# Generate random candidate solutions
@@ -190,17 +194,17 @@ function main_func()
 
 	=#
 
-	#=
 
 	no_params = 9
 	no_tests = 30
 	top_fitness = 0.0
 
+	logfile = open("log.txt", "a")
+
 	### RUN TESTS ###
 
 	@printf "TESTS: %d\n" no_tests
 	newline()
-
 
 	for p in 1:no_params
 
@@ -218,7 +222,7 @@ function main_func()
 			cands = generate_pool(config, params)
 
 			##### EVOLVE CHROMOSOMES #####
-			seconds = @elapsed best, best_fitness = evolve_chromosomes(config, cands, params, false)
+			seconds = @elapsed best, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
 			time_sum += seconds
 
 			#print data
@@ -231,7 +235,6 @@ function main_func()
 		@printf "Total Time: %.6f Optimal Fitness: %.6f\n" time_sum top_fitness
 
 	end
-	=#
 end
 
 main_func()

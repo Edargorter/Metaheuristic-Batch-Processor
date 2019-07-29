@@ -51,7 +51,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	state::BPS_State = BPS_State(unit_amounts, unit_activated, storage_amounts)	
 	task_duration::Float64 = 0.0 # Temp variable for task length in unit of time (e.g. hours) 
 
-	if print_data == true
+	if print_data
 		@printf "\n\n"
 		for i in 1:config.no_units
 			@printf "Unit %d: %d %d %f %f %f\n" i config.units[i].feeder config.units[i].receiver config.units[i].alpha config.units[i].beta config.units[i].capacity
@@ -61,9 +61,11 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 		end
 	end
 
-	newline()
-	print(config.storages)
-	newline()
+	if print_data
+		newline()
+		print(config.storages)
+		newline()
+	end
 
 	# Initial declarations 
 
@@ -90,17 +92,10 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	# Iterate through events
 	for event in 1:params.no_events
 
-		@printf "=============== EVENT %d ===============" event
-		newline(2)
-
-		#=
-		# Flush unit contents if possible
-		if event > 1
-			for unit in 1:config.no_units
-				flush(config, state, unit, event, candidate.instructions[unit, event])
-			end
+		if print_data
+			@printf "=============== EVENT %d ===============" event
+			newline(2)
 		end
-		=#
 
 		# Iterate through units
 		for unit in config.no_units:-1:1
@@ -156,9 +151,11 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 				# Pass on values 
 
 				state.unit_amounts[unit, event + 1] = unit_amount
-				newline()
-				@printf "Tranferring to next event point... Unit: %d Amount: %.3f" unit unit_amount 
-				newline()
+				if print_data
+					newline()
+					@printf "Tranferring to next event point... Unit: %d Amount: %.3f" unit unit_amount 
+					newline()
+				end
 
 			# Instruction 1 (Start new task if possible)
 			elseif instruction == 1
@@ -208,7 +205,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 					if active == true
 						state.unit_amounts[unit, event + 1] = amount
 
-						if print_data == true
+						if print_data
 							@printf "AMOUNT TO BE PROCESSED: %.2f\n" amount
 						end
 
