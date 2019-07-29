@@ -24,6 +24,7 @@ include("bp_primary_structs.jl")
 function newline() @printf "\n" end
 function newline(n::Int) for i in 1:n @printf "\n" end end
 
+# Flush the contents of the unit into receiving storages according to distribution ratio
 function flush(config::BPS_Config, state::BPS_State, unit::Int, event::Int)	
 	active::Int = state.unit_active[unit, event - 1] #Flush from action (task)
 
