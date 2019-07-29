@@ -110,7 +110,7 @@ function main_func()
 	push!(units, unit_4)
 
 	#Setup storages
-	storage_capacity = [Inf, Inf, Inf, 100, 200, 150, 200, Inf, Inf]
+	storage_capacity = [Inf, Inf, Inf, 100.0, 200.0, 150.0, 200.0, Inf, Inf]
 
 	#Initial volumes
 	initial_volumes = [Inf, Inf, Inf, 0, 0, 0, 0, 0, 0]
@@ -133,11 +133,12 @@ function main_func()
 
 	params = read_parameters("test_parameters.txt")
 	@printf "Horizon: %.2f\n" params.horizon
+	@printf "Events: %d\n" params.no_events
 
 	instructions = [1 1 1 1 1 1 1;
-					2 0 3 0 4 0 4;
+					2 0 3 0 4 0 3;
 					2 0 0 3 0 4 3;
-					0 0 0 0 0 0 2]
+					0 0 0 0 0 0 5]
 
 	durations = [1.135, 0.962, 0.514, 2.139, 0.335, 0.992, 1.923]
 

@@ -112,6 +112,9 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	# Iterate through events
 	for event in 1:params.no_events
 
+		@printf "=============== EVENT %d ===============" event
+		newline(2)
+
 		# Flush units if possible
 		if event > 1
 			for unit in 1:config.no_units
@@ -262,7 +265,11 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 		flush(config, state, unit, params.no_events + 1, 1)
 	end
 
+	for prod in config.products
+		@printf "Prod %d: %.3f  " prod state.storage_amounts[prod]
+	end
+	newline(2)
+
 	# Return profit
-	sum(state.storage_amounts[config.products])
-#	sum(config.prices.*(state.storage_amounts[config.products]))
+	sum(config.prices.*(state.storage_amounts[config.products]))
 end
