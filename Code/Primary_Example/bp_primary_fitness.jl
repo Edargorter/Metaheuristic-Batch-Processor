@@ -24,12 +24,20 @@ include("bp_primary_structs.jl")
 function newline() @printf "\n" end
 function newline(n::Int) for i in 1:n @printf "\n" end end
 
-function flush(config::BPS_Config, state::BPS_State, unit::Int, event::Int)	
+function flush(config::BPS_Config, state::BPS_State, unit::Int, event::Int, instruction::Int)	
 	active::Int = state.unit_active[unit, event - 1] #Flush from action (task)
 
+	if active == 0 return end
+	if instruction == 0 return end
+
 	# Get receiving storages
-	receivers::Dict{Int, Float64} = config.tasks[active].receivers
 	unit_amount::Float64 = state.unit_amounts[unit, event]
+
+	if unit_amount == 0 return end
+
+	if event == 6 @printf "Event point 6 flush\n" end
+
+	receivers::Dict{Int, Float64} = config.tasks[active].receivers
 	amount::Float64 = unit_amount
 
 	for (receiver, fraction) in receivers
@@ -44,16 +52,18 @@ function flush(config::BPS_Config, state::BPS_State, unit::Int, event::Int)
 	end
 
 	for (receiver, fraction) in receivers 
-		state.storage_amounts[receiver] = fraction * amount
+		state.storage_amounts[receiver] += fraction * amount
 	end
-	unit_amount - amount
+	state.unit_amounts[unit, event] = unit_amount - amount 
+	if event == 6 @printf "State amount: %.2f\n" state.unit_amounts[unit, event] end
+
 end
 
 ### key=fitfunc FITNESS FUNCTION ###
 
 function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program, print_data::Bool=false)
 	# If sum of durations of candidate exceeds horizon, candidate is nullified
-	if sum(candidate.durations) > params.horizon return 0 end
+	if sum(candidate.durations) > params.horizon + 1 return 0 end
 
 	@printf "Instructions: "
 	print(candidate.instructions)
@@ -101,12 +111,27 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	# Iterate through events
 	for event in 1:params.no_events
 
+		# Flush units if possible
+		if event > 1
+			for unit in 1:config.no_units
+				flush(config, state, unit, event, candidate.instructions[unit, event])
+			end
+		end
+
 		if print_data
+			@printf "Unit amounts: "
 			for us in 1:config.no_units
 				@printf "%.2f " state.unit_amounts[us, event] 
 			end
+			newline()
+			@printf "Storage amounts: "
+			for us in 1:config.no_storages
+				@printf "%.2f " state.storage_amounts[us]
+			end
 			newline(2)
 		end
+
+
 
 		# Iterate through units
 		for unit in 1:config.no_units
@@ -127,19 +152,15 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 			duration = candidate.durations[event]
 			available = unit_capacity
 
-			prev_unit = state.
-
 			instruction = candidate.instructions[unit, event]	
+
+
 
 			# Instruction 0 (Continue task if one exists)
 			if instruction == 0
 				
 				# Pass on values 
-				if active != 0
-					state.unit_amounts[unit, event + 1] = unit_amount
-				elseif event > 1 && state.unit_active[unit, event - 1] != 0
-					state.unit_amounts[unit, event + 1] = flush(config, state, unit, event) #Flush contents of unit
-				end
+				state.unit_amounts[unit, event + 1] = unit_amount
 
 				if print_data newline() end
 
@@ -172,12 +193,6 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 					@printf "Alpha: %f\n" alpha
 					beta = tasks[instruction].beta
 					@printf "Beta: %f\n" beta
-				end
-
-				# Flush contents from completed task if needed
-				if event > 1 && state.unit_amounts[unit, event] > 0.0
-					unit_amount = flush(config, state, unit, event)
-					state.unit_amounts[unit, event + 1] = unit_amount
 				end
 
 				# Proceed to new task only if unit is empty 
@@ -242,25 +257,11 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 	##### Final flush ### FLUSH all relevant feeder units into PRODUCT states #####
 	
-	for unit in config.no_units
-		tasks = config.units[unit].tasks
-				
-		for prod in config.products
-
-			if prod in keys(tasks) && state.unit_active[params.no_events] == config.prod_reactions[prod]
-				unit_amount = state.unit_amounts[unit, params.no_events + 1]
-				recv_capacity = state.storage_capacity[prod]
-				recv_amount = state.storage_amounts[prod]
-				
-				if recv_capacity - recv_amount < unit_amount
-					state.storage_amounts[prod] = recv_capacity
-				else
-					state.storage_amounts[prod] += unit_amount
-				end
-			end
-		end
+	for unit in 1:config.no_units
+		flush(config, state, unit, params.no_events + 1, 1)
 	end
 
 	# Return profit
-	sum(config.prices.*(state.storage_amounts[config.products]))
+	sum(state.storage_amounts[config.products])
+#	sum(config.prices.*(state.storage_amounts[config.products]))
 end

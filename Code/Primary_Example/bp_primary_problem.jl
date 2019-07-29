@@ -52,7 +52,7 @@ function main_func()
 	feeders = Dict{Int, Float64}()
 	receivers = Dict{Int, Float64}()
 	feeders[3] = 0.2
-	feeders[6] = 0.8
+	feeders[5] = 0.8
 	receivers[7] = 1.0
 	push!(tasks, RTask("reaction 3", feeders, receivers))
 
@@ -132,13 +132,23 @@ function main_func()
 	config = BPS_Config(no_units, no_storages, no_instructions, products, prod_reactions, prices, units, tasks, storage_capacity, initial_volumes)
 
 	params = read_parameters("test_parameters.txt")
+	@printf "Horizon: %.2f\n" params.horizon
 
+	instructions = [1 1 1 1 1 1 1;
+					2 0 3 0 4 0 4;
+					2 0 0 3 0 4 3;
+					0 0 0 0 0 0 2]
+
+	durations = [1.135, 0.962, 0.514, 2.139, 0.335, 0.992, 1.923]
+
+	#=
 	instructions = [1 0 1 0 0 0 0 0 0 0 0 0;
 					2 3 0 3 4 4 4 4 3 0 4 3; 
 					2 3 0 2 3 0 2 0 3 0 4 3;
 					0 0 0 0 0 5 5 0 0 5 0 5]
 
 	durations = [2.667, 2.349, 0.327, 2.68, 1.334, 1.38, 1.277, 1.453, 0.845, 2.016, 1.515, 2.157]
+	=#
 
 	#=
 	instructions = [1 0 0 0 0 0 0 0;
