@@ -101,18 +101,6 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 			end
 		end
 		=#
-		for i in 1:config.no_storages
-			@printf "%.2f " state.storage_amounts[i]
-		end
-		newline(2)
-
-		for unit in 1:config.no_units
-			for e in 1:params.no_events
-				@printf "%.2f " state.unit_amounts[unit, e]
-			end			
-			newline()
-		end
-		newline()
 
 		# Iterate through units
 		for unit in config.no_units:-1:1
@@ -169,7 +157,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 				state.unit_amounts[unit, event + 1] = unit_amount
 				newline()
-				@printf "Unit: %d Amount: %.3f" unit unit_amount 
+				@printf "Tranferring to next event point... Unit: %d Amount: %.3f" unit unit_amount 
 				newline()
 
 			# Instruction 1 (Start new task if possible)
@@ -181,7 +169,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 				end
 
 				# Only proceed to another task if unit is empty
-				if true
+				if unit_amount == 0 #Handled in while true clause
 
 					#Iterate through subsequent instructions to determine maximum duration
 
@@ -204,8 +192,8 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 								amount = max_amount
 								max_reached = true
 							end
-							if amount > unit_capacity - unit_amount 
-								amount = unit_capacity - unit_amount 
+							if amount > unit_capacity
+								amount = unit_capacity
 								max_reached = true
 							end
 							if max_reached break end
@@ -224,7 +212,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 							@printf "AMOUNT TO BE PROCESSED: %.2f\n" amount
 						end
 
-						if prev_unit != 0 
+						if prev_unit_amount != 0 
 							if amount >= prev_unit_amount
 								state.unit_amounts[prev_unit, event] = 0
 								amount -= prev_unit_amount
