@@ -115,11 +115,6 @@ function main_func()
 	#Initial volumes
 	initial_volumes = [Inf, Inf, Inf, 0, 0, 0, 0, 0, 0]
 
-	#Setup state reactions
-	prod_reactions = Dict{Int, Int}()
-	prod_reactions[8] = 3
-	prod_reactions[9] = 5
-
 	print(units)
 	newline()
 
@@ -129,7 +124,7 @@ function main_func()
 	@printf "No. of storages: %d\n\n" size(collect(storage_capacity))[1]
 
 	#Setup config
-	config = BPS_Config(no_units, no_storages, no_instructions, products, prod_reactions, prices, units, tasks, storage_capacity, initial_volumes)
+	config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storage_capacity, initial_volumes)
 
 	params = read_parameters("test_parameters.txt")
 	@printf "Horizon: %.2f\n" params.horizon

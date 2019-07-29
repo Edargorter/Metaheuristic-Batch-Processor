@@ -3,10 +3,43 @@
 using Printf
 include("bp_motivating_structs.jl")
 
-### key=fitfunc FITNESS FUNCTION ###
+function newline() @printf "\n" end
+function newline(n::Int) for i in 1:n @printf "\n" end end
+
+#Flush unit contents
+function flush(config::BPS_Config, state::BPS_State, unit::Int, event::Int, instruction::Int)	
+	active::Bool = state.unit_active[unit, event - 1] #Flush from action (task)
+
+	if !active return end
+	if instruction == 0 return end
+
+	unit_amount::Float64 = state.unit_amounts[unit, event]
+
+	if unit_amount == 0 return end
+
+	amount::Float64 = unit_amount
+
+	# in/outgoing units
+
+	receiver = config.units[unit].receiver
+	recv_amount = state.storage_amounts[receiver]
+	recv_capacity = config.storages[receiver].capacity
+
+	if recv_capacity - recv_amount < unit_amount
+		state.storage_amounts[receiver] = recv_capacity
+		unit_amount -= unit_amount - (recv_capacity - recv_amount)
+	else
+		state.storage_amounts[receiver] += unit_amount
+		unit_amount = 0.0
+	end
+
+	state.unit_amounts[unit, event] = unit_amount
+end
 
 # Evaluate fitness of a candidate Batch Processing Schedule (fitness metric = final state quantity)
 
+
+### key=fitfunc FITNESS FUNCTION ###
 function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program, print_data::Bool=false)
 	# If sum of durations of candidate exceeds horizon, candidate is nullified 
 	if sum(candidate.durations) > params.horizon return 0 end
@@ -55,6 +88,27 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 	# Iterate through events
 	for event in 1:params.no_events
+
+		# Flush unit contents if possible
+		if event > 1
+			for unit in 1:config.no_units
+				flush(config, state, unit, event, candidate.instructions[unit, event])
+			end
+		end
+
+		#Storages
+		@printf "Storage amounts: "
+		for st in 1:config.no_storages
+			@printf "%.3f " state.storage_amounts[st]
+		end
+		newline()
+
+		#Units
+		@printf "Unit amounts: " 
+		for unit in 1:config.no_units
+			@printf "%.3f " state.unit_amounts[unit, event]
+		end
+		newline(2)
 
 		# Iterate through units
 		for unit in config.no_units:-1:1
@@ -107,31 +161,11 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 			if instruction == 0
 				
 				# Pass on values 
-				if !active && event > 1 && state.unit_active[unit, event - 1] == true
-					if recv_capacity - recv_amount < unit_amount
-						state.storage_amounts[receiver] = recv_capacity
-						unit_amount -= unit_amount - (recv_capacity - recv_amount)
-					else
-						state.storage_amounts[receiver] += unit_amount
-						unit_amount = 0.0
-					end
-				end
-				state.unit_amounts[unit, event + 1] = unit_amount 
+
+				state.unit_amounts[unit, event + 1] = unit_amount
 
 			# Instruction 1 (Start new task if possible)
 			elseif instruction == 1
-
-				# Flush contents from completed task if needed
-				if event > 1 && state.unit_amounts[unit, event] > 0.0
-					if recv_capacity - recv_amount < unit_amount
-						state.storage_amounts[receiver] = recv_capacity
-						state.unit_amounts[unit, event] -= unit_amount - (recv_capacity - recv_amount)
-					else
-						state.storage_amounts[receiver] += unit_amount
-						state.unit_amounts[unit, event] = 0.0
-					end
-					unit_amount = state.unit_amounts[unit, event]
-				end
 
 				# Only proceed to another task if unit is empty
 				if unit_amount == 0
@@ -205,13 +239,8 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 	# Final flush
 			
-	unit_amount = state.unit_amounts[config.no_units, params.no_events + 1]
-	recv_capacity = config.storages[config.product].capacity
-	recv_amount = state.storage_amounts[config.product] 
-	if recv_capacity - recv_amount < unit_amount
-		state.storage_amounts[config.product] = recv_capacity
-	else
-		state.storage_amounts[config.product] += unit_amount
+	for unit in 1:config.no_units
+		flush(config, state, unit, params.no_events + 1, 1)
 	end
 
 	# Return product amount 

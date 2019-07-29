@@ -135,8 +135,6 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 			newline(2)
 		end
 
-
-
 		# Iterate through units
 		for unit in 1:config.no_units
 
@@ -157,8 +155,6 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 			available = unit_capacity
 
 			instruction = candidate.instructions[unit, event]	
-
-
 
 			# Instruction 0 (Continue task if one exists)
 			if instruction == 0

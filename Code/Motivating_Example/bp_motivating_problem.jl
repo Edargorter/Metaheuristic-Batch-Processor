@@ -1,4 +1,4 @@
-##### Batch Processing first problem ##### GA #####
+##### Batch Processing motivating problem ##### GA #####
 # - s1 -> Mixing - s2 -> Reaction - s3 -> Purification - s4 [Objective value]
 
 using Printf
@@ -8,55 +8,46 @@ include("bp_motivating_functions.jl")
 include("ga_alg.jl")
 include("bp_motivating_fitness.jl")
 
-
 #### CONFIG PARAMETERS ####
 
 config_filename = "config_motivating.txt"
 config = read_config(config_filename)
-<<<<<<< HEAD
 
-##### TEST SOLUTION FITNESS #####
-
-parameters_filename = "parameters_1.txt"
-params = read_parameters(parameters_filename)
-
-=======
-parameters_filename = "parameters_1.txt"
-params = read_parameters(parameters_filename)
-
-##### TEST SOLUTION FITNESS #####
-
->>>>>>> e261bf772e5de3ba9809b5be2355dbe10ff6fd6e
-instructions = [1 1 1 1;0 1 1 1;0 0 1 1]
-durations = [4.665, 3.479, 2.427, 1.429]
-#Test optimal solution
-cand = BPS_Program(instructions, durations)
-objective = get_fitness(config, params, cand, false)
-@printf "\nMotivating example (Optimal): %.3f\n" objective
-
-<<<<<<< HEAD
 parameters_filename = "test_parameters.txt"
 params = read_parameters(parameters_filename)
-=======
-#=
->>>>>>> e261bf772e5de3ba9809b5be2355dbe10ff6fd6e
+
+##### TEST SOLUTION FITNESS #####
+
+instructions = [1 1 1 1;0 1 1 1;0 0 1 1]
+durations = [4.665, 3.479, 2.427, 1.429]
+
+#Test optimal solution
+
+cand = BPS_Program(instructions, durations)
+
+objective = get_fitness(config, params, cand, true)
+@printf "\nMotivating example (Optimal): %.3f\n" objective
+
+parameters_filename = "test_parameters.txt"
+params = read_parameters(parameters_filename)
+
+
+parameters_filename = "36_parameters.txt"
+params = read_parameters(parameters_filename)
 
 instructions = [1 1 1 0 1 0 1 0 1 0 0; 0 1 1 1 0 1 1 0 1 0 1; 0 0 1 1 1 1 1 1 1 1 1]
 durations = [6.0, 6.0, 3.519, 2.431, 1.47, 4.046, 2.179, 1.901, 1.891, 1.928, 4.635]
 @printf "\nSum: %d" sum(durations)
-<<<<<<< HEAD
-=======
-instructions = [1 1 1 0 1 0 1 0 1 0 0; 0 1 1 1 0 1 1 0 1 0 1; 0 0 1 1 1 1 1 1 1 1 1]
-@printf "%d\n" size(instructions[1])[1]
->>>>>>> e261bf772e5de3ba9809b5be2355dbe10ff6fd6e
+
 #Test 36-hour solution
 cand = BPS_Program(instructions, durations)
-objective = get_fitness(config, params, cand, false)
+objective = get_fitness(config, params, cand, true)
 @printf "\n36-hour example: %.3f\n" objective
 
 print("\n")
 
-=#
+
+#=
 
 ### RUN TESTS ###
 
@@ -92,6 +83,8 @@ for p in 1:no_params
 	@printf "Total Time: %.6f Optimal Fitness: %.6f\n" time_sum top_fitness
 
 end
+
+=#
 
 #=
 
