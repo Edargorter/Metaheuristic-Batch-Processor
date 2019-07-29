@@ -8,10 +8,7 @@ function newline(n::Int) for i in 1:n @printf "\n" end end
 
 #Flush unit contents
 function flush(config::BPS_Config, state::BPS_State, unit::Int, event::Int, instruction::Int)	
-	active::Bool = state.unit_active[unit, event - 1] #Flush from action (task)
-
-	if !active return end
-	if instruction == 0 return end
+	if instruction == 0 && state.unit_active[unit, event] return end
 
 	unit_amount::Float64 = state.unit_amounts[unit, event]
 
@@ -27,7 +24,7 @@ function flush(config::BPS_Config, state::BPS_State, unit::Int, event::Int, inst
 
 	if recv_capacity - recv_amount < unit_amount
 		state.storage_amounts[receiver] = recv_capacity
-		unit_amount -= unit_amount - (recv_capacity - recv_amount)
+		unit_amount -= (recv_capacity - recv_amount)
 	else
 		state.storage_amounts[receiver] += unit_amount
 		unit_amount = 0.0
@@ -64,6 +61,10 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 		end
 	end
 
+	newline()
+	print(config.storages)
+	newline()
+
 	# Initial declarations 
 
 	feeder::Int = 0
@@ -89,26 +90,29 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	# Iterate through events
 	for event in 1:params.no_events
 
+		@printf "=============== EVENT %d ===============" event
+		newline(2)
+
+		#=
 		# Flush unit contents if possible
 		if event > 1
 			for unit in 1:config.no_units
 				flush(config, state, unit, event, candidate.instructions[unit, event])
 			end
 		end
-
-		#Storages
-		@printf "Storage amounts: "
-		for st in 1:config.no_storages
-			@printf "%.3f " state.storage_amounts[st]
-		end
-		newline()
-
-		#Units
-		@printf "Unit amounts: " 
-		for unit in 1:config.no_units
-			@printf "%.3f " state.unit_amounts[unit, event]
+		=#
+		for i in 1:config.no_storages
+			@printf "%.2f " state.storage_amounts[i]
 		end
 		newline(2)
+
+		for unit in 1:config.no_units
+			for e in 1:params.no_events
+				@printf "%.2f " state.unit_amounts[unit, e]
+			end			
+			newline()
+		end
+		newline()
 
 		# Iterate through units
 		for unit in config.no_units:-1:1
@@ -122,9 +126,10 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 			recv_capacity = config.storages[receiver].capacity
 
 			prev_unit = config.storages[feeder].feeder_unit
+
 			if prev_unit == 0
 				prev_unit_amount = 0
-			elseif candidate.instructions[prev_unit, event] == 0
+			elseif state.unit_active[prev_unit, event] && candidate.instructions[prev_unit, event] == 0
 				prev_unit_amount = 0
 			else
 				prev_unit_amount = state.unit_amounts[prev_unit, event]
@@ -143,7 +148,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 			instruction = candidate.instructions[unit, event]	
 
 			if print_data
-				@printf "\n\n"
+				newline()
 				@printf "EVENT: %d\n" event
 				@printf "UNIT: %d\n" unit
 				@printf "UNIT AMOUNT: %.2f\n" unit_amount
@@ -163,12 +168,20 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 				# Pass on values 
 
 				state.unit_amounts[unit, event + 1] = unit_amount
+				newline()
+				@printf "Unit: %d Amount: %.3f" unit unit_amount 
+				newline()
 
 			# Instruction 1 (Start new task if possible)
 			elseif instruction == 1
 
+				if event > 1
+					flush(config, state, unit, event, instruction)
+					unit_amount = state.unit_amounts[unit, event]
+				end
+
 				# Only proceed to another task if unit is empty
-				if unit_amount == 0
+				if true
 
 					#Iterate through subsequent instructions to determine maximum duration
 

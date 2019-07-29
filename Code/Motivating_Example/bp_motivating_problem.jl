@@ -35,8 +35,12 @@ params = read_parameters(parameters_filename)
 parameters_filename = "36_parameters.txt"
 params = read_parameters(parameters_filename)
 
-instructions = [1 1 1 0 1 0 1 0 1 0 0; 0 1 1 1 0 1 1 0 1 0 1; 0 0 1 1 1 1 1 1 1 1 1]
+instructions = [1 1 1 0 1 0 1 0 1 0 1;
+				0 1 1 1 0 1 1 0 1 0 1;
+				0 0 1 1 1 1 1 1 1 1 1]
+
 durations = [6.0, 6.0, 3.519, 2.431, 1.47, 4.046, 2.179, 1.901, 1.891, 1.928, 4.635]
+
 @printf "\nSum: %d" sum(durations)
 
 #Test 36-hour solution
