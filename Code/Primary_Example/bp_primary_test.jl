@@ -130,6 +130,11 @@ function main_func()
 	params = read_parameters("test_parameters.txt")
 	@printf "Horizon: %.2f\n" params.horizon
 	@printf "Events: %d\n" params.no_events
+	
+	instructions = [1 1 0 0 1; 3 2 2 4 4; 2 3 3 4 3; 5 5 0 5 5]
+	durations = [1.07211, 5.15514, 0.425817, 0.991171, 0.355765]
+
+	print(sum(durations))
 
 	#=
 	instructions = [1 1 1 0 0;
@@ -167,7 +172,6 @@ function main_func()
 	durations = [1.135, 0.962, 0.514, 2.139, 0.335, 0.992, 0.961, 0.962]
 	=#
 
-	#=
 
 	@printf "Size of instructions: "
 	print(size(instructions))
@@ -183,29 +187,7 @@ function main_func()
 	@printf "Fitness: %.6f\n" fitness
 	newline()
 
-	=#
-	parameters_filename = "test_parameters.txt"
-	cands = generate_pool(config, params)
-
-	fitnesses = zeros(params.population)
-
-	for i in 1:params.population
-		fitness = get_fitness(config, params, cands[i], false)
-		fitnesses[i] = fitness
-	end
-
-	newline()
-	print(fitnesses)
-
-	indices::Array{Int} = sortperm(fitnesses, rev=true)
-	newline()
-
-	for i in 1:10
-		@printf "%.3f " fitnesses[indices[i]]
-	end
-	
-
-#=
+	#=
 
 	no_params = 9
 	no_tests = 30
@@ -222,7 +204,7 @@ function main_func()
 		logfile = open("log_$(p).txt", "a")
 
 		#### METAHEURISTIC PARAMETERS ####
-		parameters_filename = "test_parameters.txt"
+		parameters_filename = "parameters_$(p).txt"
 		params = read_parameters(parameters_filename)
 		
 		#Temporary instructions / duration arrays
@@ -249,8 +231,6 @@ function main_func()
 				durat_arr = copy(cands[best_index].durations)
 			end
 
-			break
-
 		end
 
 		@printf "Total Time: %.6f Optimal Fitness: %.6f " time_sum top_fitness
@@ -258,12 +238,12 @@ function main_func()
 		print(durat_arr)
 		newline()
 
-		break
-
 		close(logfile)
 
 	end
-=#
+
+	=#
+
 end
 
 main_func()

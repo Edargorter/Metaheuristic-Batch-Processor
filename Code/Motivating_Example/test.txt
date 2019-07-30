@@ -1,0 +1,19 @@
+TESTS: 30
+
+Horizon: 12.0 Events: 4 Population: 500 Generations: 25 	--- TESTS: 30
+
+Horizon: 12.0 Events: 4 Population: 500 Generations: 25 	--- Total Time: 1.577728 Optimal Fitness: 71.450912
+Horizon: 24.0 Events: 10 Population: 500 Generations: 25 	--- Total Time: 2.582320 Optimal Fitness: 245.414738
+Horizon: 36.0 Events: 14 Population: 500 Generations: 25 	--- Total Time: 3.393338 Optimal Fitness: 400.641089
+Horizon: 48.0 Events: 23 Population: 1000 Generations: 50 	--- Total Time: 22.019065 Optimal Fitness: 620.446356
+Horizon: 60.0 Events: 27 Population: 1000 Generations: 50 	--- TESTS: 30
+
+Horizon: 36.0 Events: 14 Population: 10000 Generations: 100 	--- TESTS: 1
+
+Horizon: 36.0 Events: 14 Population: 10000 Generations: 100 	--- Total Time: 11.332068 Optimal Fitness: 419.999976
+TESTS: 1
+
+Horizon: 36.0 Events: 14 Population: 10000 Generations: 100 	--- Total Time: 11.239184 Optimal Fitness: 419.999985
+TESTS: 1
+
+Horizon: 36.0 Events: 14 Population: 10000 Generations: 100 	--- Total Time: 11.487248 Optimal Fitness: 421.864961

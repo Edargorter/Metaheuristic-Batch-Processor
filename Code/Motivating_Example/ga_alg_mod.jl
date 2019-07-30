@@ -1,5 +1,5 @@
 ####### METAHEURISTIC #####################
-####### Genetic Algorithm Functions #######
+####### Genetic Algorithm Functions ####### 
 
 
 #= 
@@ -68,9 +68,15 @@ function time_crossover(ti_a::Array{Float64}, ti_b::Array{Float64}, c_index::Int
 end
 
 # Perform crossovers
-function crossover(A::BPS_Program, B::BPS_Program, c_point::Int)
-	instr_a, instr_b = instruction_crossover(A.instructions, B.instructions, c_point)
+function crossover(A::BPS_Program, B::BPS_Program, c_point::Int, cross_instr::Bool)
+	if cross_instr
+		instr_a, instr_b = instruction_crossover(A.instructions, B.instructions, c_point)
+	else
+		instr_a, instr_b = copy(A.instructions), copy(B.instructions)
+	end 
+
 	ti_a, ti_b = time_crossover(A.durations, B.durations, c_point)
+
 	BPS_Program(instr_a, ti_a), BPS_Program(instr_b, ti_b)
 end
 
@@ -112,18 +118,26 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 	best_fitness::Float64 = 0
 	elite::Int = ceil(params.theta*N) # Number of elite (parents) to be picked
 	if (N - elite) % 2 != 0 elite -= 1 end # Keep elite even (convenient for reproduction)
-	instr_mutation::Float64 = params.mutation_rate
-	durat_mutation::Float64 = params.mutation_rate
-	durat_decr::Float64 = params.mutation_rate / params.generations
+
+	instr_cross_rate::Float64 = params.theta
+	instr_mutation_rate::Float64 = params.mutation_rate
+
+	instr_cr_decr::Float64 = params.theta / params.generations
+	instr_mu_decr::Float64 = params.mutation_rate / params.generations
+
+	mutation_rate::Float64 = params.muration_rate 
 
 	# Generation loop
 	for generation in 1:params.generations
 
 		# Number of progeny to undergo mutation
-		instr_no_mutations::Int = ceil(instr_mutation*(N - elite)) 
-		durat_no_mutations::Int = ceil(durat_mutation*(N - elite)) 
+		no_mutations::Int = ceil(mutation_rate * (N - elite))
 
-		durat_mutation -= durat_decr
+		instr_mu_no::Int = ceil(instr_mutation_rate*(N - elite)) 
+		instr_cr_no::Int = ceil(instr_cross_rate*(N - elite))
+
+		instr_cross_rate -= instr_cr_decr
+		instr_mutation_rate -= instr_mu_decr
 
 		# New random seed
 		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
@@ -140,10 +154,14 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 
 		### CROSSOVERS ###
 
+		count_p::Int = 0
+		cr_instr::Bool = true
+
 		for new in (elite + 1):2:N
+			if count_p == instr_cr_no cr_instr = false end
 			i_a::Int, i_b::Int = indices[rand(1:elite)], indices[rand(1:elite)] # Random parents
 			c_point::Int = rand(1:params.no_events)
-			A::BPS_Program, B::BPS_Program = crossover(candidates[i_a], candidates[i_b], c_point)
+			A::BPS_Program, B::BPS_Program = crossover(candidates[i_a], candidates[i_b], c_point, cr_instr)
 			candidates[new] = A
 			candidates[new + 1] = B
 		end
@@ -154,7 +172,7 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 
 		### Instructions 
 
-		m_indices::Array{Int} = sample((elite + 1):N, instr_mutations)
+		m_indices::Array{Int} = sample((elite + 1):N, instr_mu_no)
 		for m_index in m_indices
 			index = indices[m_index]
 			mutate_instructions(candidates[index], config.no_units, params.no_events)
@@ -162,7 +180,7 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 
 		### Durations
 
-		m_indices = sample((elite + 1):N, durat_mutations)
+		m_indices = sample((elite + 1):N, no_mutations)
 		for m_index in m_indices
 			index = indices[m_index]
 			mutate_durations(candidates[index], params.no_events, params.delta, params.horizon)
