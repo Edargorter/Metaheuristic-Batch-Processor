@@ -34,7 +34,22 @@ function keep_positive(value::Float64) value < 0.0 ? 0.0 : value end
 # Bit-flip
 function bit_flip(bit::Int) bit == 0 ? 1 : 0 end
 
+# Instruction change
+function instr_change(unit::Unit) 
+	instrs = [[v.first for v in collect(unit.tasks)]; 0]
+	instrs[rand(1:size(instrs)[1])]
+end
+
 ##### End of helping functions #####
+
+### key=crossfuncs Crossover Functions ###
+
+# Mutation on instruction array
+function mutate_instructions(B::BPS_Program, config::BPS_Config, no_events::Int)
+	unit::Int = rand(1:config.no_units)
+	event::Int = rand(1:no_events)
+	B.instructions[unit, event] = instr_change(config.units[unit])
+end
 
 ### key=crossfuncs Crossover Functions ###
 
@@ -78,33 +93,6 @@ function crossover(A::BPS_Program, B::BPS_Program, c_point::Int, cross_instr::Bo
 	ti_a, ti_b = time_crossover(A.durations, B.durations, c_point)
 
 	BPS_Program(instr_a, ti_a), BPS_Program(instr_b, ti_b)
-end
-
-### key=mutfuncs Mutation Functions ###
-
-# Mutation on instruction array
-function mutate_instructions(B::BPS_Program, no_units::Int, no_events::Int)
-	unit::Int = rand(1:no_units)
-	event::Int = rand(1:no_events)
-	B.instructions[unit, event] = bit_flip(B.instructions[unit, event])
-end
-
-# Mutation on duration array
-function mutate_durations(B::BPS_Program, no_events::Int, delta::Float64, horizon::Float64)
-	r::Float64 = 2.0*rand() - 1.0
-	index::Int = rand(1:no_events)
-	addition::Float64 = r*delta
-	value::Float64 = keep_positive(B.durations[index] + addition)
-	change::Float64 = addition / (no_events - 1.0)
-	for i in 1:no_events B.durations[i] = keep_positive(B.durations[i] - change) end
-	B.durations[index] = value
-
-	# Check horizon
-	sum_values::Float64 = sum(B.durations)
-	if sum_values > horizon
-		diff::Float64 = (sum_values - horizon) / no_events
-		for i in 1:no_events B.durations[i] -= diff end
-	end
 end
 
 ##### EVOLUTION OF CANDIDATE SOLUTIONS #####
