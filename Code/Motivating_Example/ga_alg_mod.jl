@@ -114,7 +114,7 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 	if (N - elite) % 2 != 0 elite -= 1 end # Keep elite even (convenient for reproduction)
 	instr_mutation::Float64 = params.mutation_rate
 	durat_mutation::Float64 = params.mutation_rate
-	durat_decr::Float64 = params.mutation_rate / params.generations
+	instr_decr::Float64 = params.mutation_rate / params.generations
 
 	# Generation loop
 	for generation in 1:params.generations
@@ -123,7 +123,7 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 		instr_no_mutations::Int = ceil(instr_mutation*(N - elite)) 
 		durat_no_mutations::Int = ceil(durat_mutation*(N - elite)) 
 
-		durat_mutation -= durat_decr
+		instr_mutation -= durat_decr
 
 		# New random seed
 		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 

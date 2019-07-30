@@ -42,7 +42,7 @@ function bit_flip(bit::Int) bit == 0 ? 1 : 0 end
 
 # Instruction change
 function instr_change(unit::Unit) 
-	instrs = [v.first for v in collect(unit.tasks)]
+	instrs = [[v.first for v in collect(unit.tasks)]; 0]
 	instrs[rand(1:size(instrs)[1])]
 end
 

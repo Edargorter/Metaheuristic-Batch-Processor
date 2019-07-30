@@ -1,5 +1,4 @@
 TESTS: 30
 
-Horizon: 8.0 Events: 5 Generations: 25 	--- Total Time: 1.925288 Optimal Fitness: 0.000000
-Horizon: 10.0 Events: 8 Generations: 50 	--- Total Time: 9.791376 Optimal Fitness: 0.000000
-Horizon: 12.0 Events: 8 Generations: 50 	--- 
+Horizon: 8.0 Events: 5 Generations: 25 	--- Total Time: 2.056749 Optimal Fitness: 138595512.160798
+Horizon: 10.0 Events: 8 Generations: 50 	--- 

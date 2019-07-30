@@ -1,1 +1,6 @@
 
+TESTS: 30
+
+Time: 3656.438041 Horizon: 12.00 Events: 4 Population: 500 Generations: 25 Theta: 0.10 Mutation: 0.10 Delta: 0.00 Fitness: 71.450919
+Time: 8156.078263 Horizon: 24.00 Events: 10 Population: 500 Generations: 25 Theta: 0.10 Mutation: 0.10 Delta: 0.00 Fitness: 249.561486
+Time: 11121.245388 Horizon: 36.00 Events: 14 Population: 500 Generations: 25 Theta: 0.10 Mutation: 0.10 Delta: 0.00 Fitness: 435.790952

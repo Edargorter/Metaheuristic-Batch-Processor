@@ -273,5 +273,5 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	end
 
 	# Return profit
-	sum(config.prices.*(state.storage_amounts[config.products]))
+	sum(10.0*(state.storage_amounts[config.products]))
 end
