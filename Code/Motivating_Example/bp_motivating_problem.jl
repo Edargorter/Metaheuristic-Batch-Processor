@@ -60,17 +60,18 @@ print("\n")
 ### RUN TESTS ###
 
 no_params = 6
-no_tests = 30
+no_tests = 1 
 top_fitness = 0.0
 
 @printf "TESTS: %d\n\n" no_tests
 
-#=
+logfile = open("logfile.txt", "a")
+
 
 for p in 1:no_params
 
 	#### METAHEURISTIC PARAMETERS ####
-	parameters_filename = "parameters_$(p).txt"
+	parameters_filename = "parameters_3.txt"
 	params = read_parameters(parameters_filename)
 	@printf "Horizon: %.1f Events: %d Population: %d Generations: %d \t--- " params.horizon params.no_events params.population params.generations
 
@@ -84,7 +85,7 @@ for p in 1:no_params
 		cands = generate_pool(config, params)
 
 		##### EVOLVE CHROMOSOMES #####
-		seconds = @elapsed best, best_fitness = evolve_chromosomes(config, cands, params, false)
+		seconds = @elapsed best, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
 		time_sum += seconds
 
 		if best_fitness > top_fitness top_fitness = best_fitness end
@@ -92,9 +93,12 @@ for p in 1:no_params
 
 	@printf "Total Time: %.6f Optimal Fitness: %.6f\n" time_sum top_fitness
 
+	break
+
 end
 
-=#
+
+#=
 
 
 ### PARAMETER SEARCH ###
@@ -169,4 +173,5 @@ for p in 1:no_params
 					
 end
 close(logfile)
+=#
 

@@ -22,6 +22,7 @@
 
 using Random
 using Dates
+using Distributions
 
 include("bp_primary_fitness.jl")
 
@@ -34,7 +35,10 @@ rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
 function newline() @printf "\n" end
 function newline(n::Int) for i in 1:n @printf "\n" end end
 
-# Round up to 1 if value < 0
+# Set equal to 1 if 0
+function keep_one(value::Int) value == 0 ? 1 : value end
+
+# Round up to 0 if value < 0
 function keep_positive(value::Float64) value < 0.0 ? 0.0 : value end
 
 # Bit-flip
@@ -130,9 +134,17 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 	# Generation loop
 	for generation in 1:params.generations
 
-		# New random seed
-		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
-		rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
+		# New random seeds
+		seed_val = Dates.value(convert(Dates.Millisecond, Dates.now()))
+		Random.seed!(seed_val) 
+		srand(seed_val)
+		rng = MersenneTwister(seed_val)
+
+		std_dev::Float64 = 3.0
+
+		d = Normal(0, std_dev)
+
+
 
 		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s]) end
 		average_fitness::Float64 = sum(fitness)/N
@@ -148,12 +160,19 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 			@printf "Generation: %d\t ----- Average Fitness: %.2f \t----- Best: %.2f\n" generation average_fitness best_fitness
 		end
 
+		vals::Array{Float64} = rand(d, N - elite)
+		for i in 1:length(vals) vals[i] = abs(vals[i]) end
+		max_val::Float64 = maximum(vals)
+
+		index::Int = 1
+
 		for new in (elite + 1):2:N
-			i_a::Int, i_b::Int = indices[rand(1:elite)], indices[rand(1:elite)] # Random parents
+			i_a::Int, i_b::Int = indices[ keep_one(ceil(vals[index]/max_val) * elite) ], indices[ keep_one(ceil(vals[index + 1]/max_val)) ] # Random parents
 			c_point::Int = rand(1:params.no_events)
 			A::BPS_Program, B::BPS_Program = crossover(candidates[i_a], candidates[i_b], c_point)
 			candidates[new] = A
 			candidates[new + 1] = B
+			index += 2
 		end
 		
 		m_indices::Array{Int} = sample((elite + 1):N, no_mutations)

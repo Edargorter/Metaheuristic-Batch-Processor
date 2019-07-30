@@ -124,7 +124,9 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
 		rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
-		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s]) end
+		for s in 1:N 
+			fitness[s] = get_fitness(config, params, candidates[s])
+		end
 
 		average_fitness::Float64 = sum(fitness)/N
 
@@ -156,5 +158,4 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 		end
 
 	end
-	best_index, best_fitness #Return best candidate index and fitness
-end
+	best_index, best_fitness #Return best candidate index and fitness end

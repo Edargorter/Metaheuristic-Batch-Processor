@@ -1,108 +1,109 @@
-##### FITNESS FUNCTION (Primary Example) ##### Zachary Bowditch 2019 #####
+	##### FITNESS FUNCTION (Primary Example) ##### Zachary Bowditch 2019 #####
 
-#= 
-	
-	Contents (Unique Search Strings):
+	#= 
+		
+		Contents (Unique Search Strings):
 
-	Section								Key (search)
+		Section								Key (search)
 
-	1) Included files/libraries			incl
-	2) Helper functions:				hfuncs
-	3) Fitness Function:				fitfunc
+		1) Included files/libraries			incl
+		2) Helper functions:				hfuncs
+		3) Fitness Function:				fitfunc
 
-=#
+	=#
 
-### key=incl Included Files and Libraries ###
+	### key=incl Included Files and Libraries ###
 
-using Printf
-include("bp_primary_structs.jl")
+	using Printf
+	include("bp_primary_structs.jl")
 
-# Evaluate fitness of a candidate Batch Processing Schedule (fitness metric = final state quantity)
+	# Evaluate fitness of a candidate Batch Processing Schedule (fitness metric = final state quantity)
 
-### key=hfuncs Helper Functions ###
+	### key=hfuncs Helper Functions ###
 
-function newline() @printf "\n" end
-function newline(n::Int) for i in 1:n @printf "\n" end end
+	function newline() @printf "\n" end
+	function newline(n::Int) for i in 1:n @printf "\n" end end
 
-# Flush the contents of the unit into receiving storages according to distribution ratio
-function flush(config::BPS_Config, state::BPS_State, unit::Int, event::Int, instruction::Int)	
-	active::Int = state.unit_active[unit, event - 1] #Flush from action (task)
+	# Flush the contents of the unit into receiving storages according to distribution ratio
+	function flush(config::BPS_Config, state::BPS_State, unit::Int, event::Int, instruction::Int)	
+		active::Int = state.unit_active[unit, event - 1] #Flush from action (task)
 
-	if active == 0 return end
-	if instruction == 0 return end
+		if active == 0 return end
+		if instruction == 0 return end
 
-	# Get receiving storages
-	unit_amount::Float64 = state.unit_amounts[unit, event]
+		# Get receiving storages
+		unit_amount::Float64 = state.unit_amounts[unit, event]
 
-	if unit_amount == 0 return end
+		if unit_amount == 0 return end
 
-	receivers::Dict{Int, Float64} = config.tasks[active].receivers
-	amount::Float64 = unit_amount
+		receivers::Dict{Int, Float64} = config.tasks[active].receivers
+		amount::Float64 = unit_amount
 
-	for (receiver, fraction) in receivers
-	
-		recv_cap = config.storage_capacity[receiver]
-		recv_amount = state.storage_amounts[receiver]
+		for (receiver, fraction) in receivers
+		
+			recv_cap = config.storage_capacity[receiver]
+			recv_amount = state.storage_amounts[receiver]
 
-		if (recv_cap - recv_amount) < (amount * fraction)
-			amount = (recv_cap - recv_amount) / fraction
+			if (recv_cap - recv_amount) < (amount * fraction)
+				amount = (recv_cap - recv_amount) / fraction
+			end
+
 		end
 
+		for (receiver, fraction) in receivers 
+			state.storage_amounts[receiver] += fraction * amount
+		end
+		state.unit_amounts[unit, event] = unit_amount - amount 
 	end
 
-	for (receiver, fraction) in receivers 
-		state.storage_amounts[receiver] += fraction * amount
-	end
-	state.unit_amounts[unit, event] = unit_amount - amount 
-end
+	### key=fitfunc FITNESS FUNCTION ###
 
-### key=fitfunc FITNESS FUNCTION ###
+	function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program, print_data::Bool=false)
+		# If sum of durations of candidate exceeds horizon, candidate is nullified
 
-function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program, print_data::Bool=false)
-	# If sum of durations of candidate exceeds horizon, candidate is nullified
-	if sum(candidate.durations) > params.horizon return 0 end
+		if round(sum(candidate.durations), digits=4) > params.horizon return 0 end
 
-	if print_data
-		@printf "Instructions: "
-		print(candidate.instructions)
-		newline()
-		@printf "Durations: "
-		print(candidate.durations)
-		newline(2)
-	end
+		if print_data
+			@printf "Instructions: "
+			print(candidate.instructions)
+			newline()
+			@printf "Durations: "
+			print(candidate.durations)
+			newline(2)
+		end
 
-	# Set initial state parameters
-	unit_amounts::Array{Float64, 2} = zeros(config.no_units, params.no_events + 1)
-	unit_activated::Array{Int, 2} = zeros(config.no_units, params.no_events + 1)
+		# Set initial state parameters
+		unit_amounts::Array{Float64, 2} = zeros(config.no_units, params.no_events + 1)
+		unit_activated::Array{Int, 2} = zeros(config.no_units, params.no_events + 1)
 
-	# Default state
-	state::BPS_State = BPS_State(unit_amounts, unit_activated, config.initial_volumes)	
+		# Default state
+		state::BPS_State = BPS_State(unit_amounts, unit_activated, copy(config.initial_volumes))
 
-	if print_data
-		@printf "State unit_active size: "
-		print(size(state.unit_active))
-		newline()
+		if print_data
+			@printf "State unit_active size: "
+			print(size(state.unit_active))
+			newline()
 
-		@printf "State unit_amounts size: "
-		print(size(state.unit_amounts))
-		newline()
-	end
+			@printf "State unit_amounts size: "
+			print(size(state.unit_amounts))
+			newline()
+		end
 
-	task_duration::Float64 = 0.0 # Temp variable for task length in unit of time (e.g. hours) 
+		task_duration::Float64 = 0.0 # Temp variable for task length in unit of time (e.g. hours) 
 
-	# Initial declarations 
+		# Initial declarations 
 
-	recv_amount::Float64 = 0.0
-	recv_cap::Float64 = 0.0
+		recv_amount::Float64 = 0.0
+		recv_cap::Float64 = 0.0
 
-	# Unit parameters
-	alpha::Float64 = 0.0
-	beta::Float64 = 0.0
-	unit_capacity::Float64 = 0.0
-	unit_amount::Float64 = 0.0
+		# Unit parameters
+		alpha::Float64 = 0.0
+		beta::Float64 = 0.0
+		unit_capacity::Float64 = 0.0
+		unit_amount::Float64 = 0.0
 
-	active::Int = 0
-	duration::Float64 = 0.0
+		active::Int = 0
+		duration::Float64 = 0.0
 	available::Float64 = 0.0
 
 	instruction::Int = 0
@@ -273,5 +274,14 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	end
 
 	# Return profit
-	sum(10.0*(state.storage_amounts[config.products]))
+	print(candidate.instructions)
+	print(candidate.durations)
+
+	result::Float64 = 10.0 * (state.storage_amounts[8] + state.storage_amounts[9])
+	newline()
+	@printf "States: " 
+	print(state.storage_amounts)
+	newline()
+	@printf "Fitness: %.3f\n" result
+	return result
 end

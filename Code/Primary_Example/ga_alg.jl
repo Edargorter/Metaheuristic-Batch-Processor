@@ -67,7 +67,7 @@ function time_crossover(ti_a::Array{Float64}, ti_b::Array{Float64}, c_index::Int
 	new_ta = copy(ti_a)
 	new_tb = copy(ti_b)
 	size_arr::Int = length(new_ta)
-	avg::Float64 = 0.50000 * (new_ta[c_index] + new_tb[c_index])
+	avg::Float64 = 0.5 * (new_ta[c_index] + new_tb[c_index])
 	diff_a::Float64 = (new_ta[c_index] - avg) / (size_arr - 1.0)
 	diff_b::Float64 = (new_tb[c_index] - avg) / (size_arr - 1.0)
 	for i in 1:size_arr
@@ -123,6 +123,7 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 	fitness::Array{Float64} = zeros(N)
 	best_index::Int = 0
 	best_fitness::Float64 = 0
+
 	elite::Int = ceil(params.theta*N) # Number of elite (parents) to be picked
 	if (N - elite) % 2 != 0 elite -= 1 end # Keep elite even (convenient for reproduction)
 	no_mutations::Int = ceil(params.mutation_rate*(N - elite)) # Number of progeny to undergo mutation
@@ -130,23 +131,34 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 	# Generation loop
 	for generation in 1:params.generations
 
+		@printf "========== Generation %d ================================================\n\n\n" generation
+
 		# New random seed
 		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
 		rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
-		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s]) end
-		average_fitness::Float64 = sum(fitness)/N
+		fitness = zeros(N)
+		newline()
+		print(fitness)
+		newline()
 
-		to_write::String = "$(average_fitness),"
-		write(logfd, to_write)
+		for s in 1:N
+			newline()
+			print(fitness)
+			newline()
+			@printf "%d -> " s
+			fitness[s] = get_fitness(config, params, candidates[s], true) 
+		#	@printf "Fitness: %.3f\n" fitness[s]
+		end
+
+		average_fitness::Float64 = round(sum(fitness)/N, digits=4)
 
 		indices::Array{Int} = sortperm(fitness, rev=true)
 		best_index = indices[1]
-		best_fitness = fitness[best_index]
+		best_fitness = round(fitness[best_index], digits=4)
 
-		if display_info
-			@printf "Generation: %d\t ----- Average Fitness: %.2f \t----- Best: %.2f\n" generation average_fitness best_fitness
-		end
+		to_write::String = "Generation: $(generation)\t ----- Average Fitness: $(average_fitness) \t----- Best: $(best_fitness)\n" 
+		write(logfd, to_write)
 
 		for new in (elite + 1):2:N
 			i_a::Int, i_b::Int = indices[rand(1:elite)], indices[rand(1:elite)] # Random parents
@@ -162,6 +174,7 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 			mutate_instructions(candidates[index], config, params.no_events)
 			mutate_durations(candidates[index], params.no_events, params.delta, params.horizon)
 		end
+
 	end
 	best_index, best_fitness
 end
