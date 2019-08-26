@@ -130,9 +130,11 @@ function main_func()
 	params = read_parameters("test_parameters.txt")
 	@printf "Horizon: %.2f\n" params.horizon
 	@printf "Events: %d\n" params.no_events
-	
-	instructions = [1 1 0 0 1; 3 2 2 4 4; 2 3 3 4 3; 5 5 0 5 5]
-	durations = [1.07211, 5.15514, 0.425817, 0.991171, 0.355765]
+
+	# ont 
+
+	instructions = [0 1 1 1 0; 4 0 3 3 3; 2 4 2 3 4; 5 5 5 0 5]
+	durations = [1.61628, 0.259128, 2.45099, 2.76313, 0.910468]
 
 	print(sum(durations))
 
@@ -183,7 +185,7 @@ function main_func()
 
 	bps_program = BPS_Program(instructions, durations)
 
-	fitness = get_fitness(config, params, bps_program, true)
+	fitness = get_fitness(config, params, bps_program, false)
 	@printf "Fitness: %.6f\n" fitness
 	newline()
 

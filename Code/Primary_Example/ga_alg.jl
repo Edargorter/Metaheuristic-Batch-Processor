@@ -143,10 +143,12 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 		newline()
 
 		for s in 1:N
+			#=
 			newline()
 			print(fitness)
 			newline()
 			@printf "%d -> " s
+			=#
 			fitness[s] = get_fitness(config, params, candidates[s], true) 
 		#	@printf "Fitness: %.3f\n" fitness[s]
 		end

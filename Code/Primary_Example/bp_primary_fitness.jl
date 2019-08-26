@@ -175,6 +175,8 @@
 				# Get feeding/receiving storage containments
 				feeders = config.tasks[instruction].feeders
 				receivers = config.tasks[instruction].receivers
+				alpha = tasks[instruction].alpha
+				beta = tasks[instruction].beta
 
 				if print_data
 					@printf "Instruction: %d\n" instruction
@@ -194,9 +196,7 @@
 					print(tasks)
 					newline()
 					
-					alpha = tasks[instruction].alpha
 					@printf "Alpha: %f\n" alpha
-					beta = tasks[instruction].beta
 					@printf "Beta: %f\n" beta
 				end
 
@@ -274,13 +274,15 @@
 	end
 
 	# Return profit
-	print(candidate.instructions)
-	print(candidate.durations)
 
 	result::Float64 = 10.0 * (state.storage_amounts[8] + state.storage_amounts[9])
+	print(candidate.instructions)
+	print(candidate.durations)
 	newline()
 	@printf "States: " 
-	print(state.storage_amounts)
+	print(state)
+	newline(2)
+	print(unit_amounts)
 	newline()
 	@printf "Fitness: %.3f\n" result
 	return result

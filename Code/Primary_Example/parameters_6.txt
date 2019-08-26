@@ -1,6 +1,6 @@
 horizon:18.0
 no_events:14
-population:2000
+population:1000
 generations:75
 theta:0.1
 mutation:0.6
