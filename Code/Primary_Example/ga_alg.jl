@@ -120,7 +120,7 @@ end
 
 function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Program}, params::Params, display_info::Bool=true)
 	N::Int = params.population
-	fitness::Array{Float64} = zeros(N)
+	fitness::Array{Float32} = zeros(Float32, N)
 	best_index::Int = 0
 	best_fitness::Float64 = 0
 
