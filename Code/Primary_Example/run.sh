@@ -1,6 +1,7 @@
 #!/bin/bash
 
-threads=2
+echo "Running 'julia bp_primary_problem.jl' -> output: $1"
+julia bp_primary_problem.jl > $1
 
-echo "Running 'julia -p $threads bp_primary_problem.jl' -> output: $1"
-julia -p $threads bp_primary_problem.jl | sudo tee $1
+echo "Running 'julia bp_primary_problem_rates.jl' -> output: $2"
+julia bp_primary_problem_rates.jl > $2

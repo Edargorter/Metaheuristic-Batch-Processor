@@ -131,27 +131,11 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 	# Generation loop
 	for generation in 1:params.generations
 
-		@printf "========== Generation %d ================================================\n\n\n" generation
-
 		# New random seed
 		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
 		rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
-		fitness = zeros(N)
-		newline()
-		print(fitness)
-		newline()
-
-		for s in 1:N
-			#=
-			newline()
-			print(fitness)
-			newline()
-			@printf "%d -> " s
-			=#
-			fitness[s] = get_fitness(config, params, candidates[s], true) 
-		#	@printf "Fitness: %.3f\n" fitness[s]
-		end
+		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s], false) end
 
 		average_fitness::Float64 = round(sum(fitness)/N, digits=4)
 

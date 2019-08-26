@@ -144,12 +144,10 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 
 		d = Normal(0, std_dev)
 
-
-
 		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s]) end
 		average_fitness::Float64 = sum(fitness)/N
 
-		to_write::String = "$(average_fitness),"
+		to_write::String = "Generation: $(generation)\t ----- Average Fitness: $(average_fitness) \t----- Best: $(best_fitness)\n"
 		write(logfd, to_write)
 
 		indices::Array{Int} = sortperm(fitness, rev=true)
