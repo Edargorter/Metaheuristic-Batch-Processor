@@ -236,10 +236,8 @@ function main_func()
 		print(durat_arr)
 		newline()
 
-		break
-
 		close(logfile)
 
 	end
 end
-
+main_func()

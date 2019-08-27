@@ -195,7 +195,7 @@ function main_func()
 
 	for p in 1:no_params
 
-		logfile = open("log_$(p).txt", "a")
+		logfile = open("log_rates_$(p).txt", "a")
 
 		#### METAHEURISTIC PARAMETERS ####
 		parameters_filename = "test_parameters.txt"
@@ -235,10 +235,9 @@ function main_func()
 		print(durat_arr)
 		newline()
 
-		break
-
 		close(logfile)
 
 	end
 end
 
+main_func()

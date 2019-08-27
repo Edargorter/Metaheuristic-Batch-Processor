@@ -51,6 +51,24 @@ function mutate_instructions(B::BPS_Program, config::BPS_Config, no_events::Int)
 	B.instructions[unit, event] = instr_change(config.units[unit])
 end
 
+# Mutation on duration array
+function mutate_durations(B::BPS_Program, no_events::Int, delta::Float64, horizon::Float64)
+	r::Float64 = 2.0*rand() - 1.0
+	index::Int = rand(1:no_events)
+	addition::Float64 = r*delta
+	value::Float64 = keep_positive(B.durations[index] + addition)
+	change::Float64 = addition / (no_events - 1.0)
+	for i in 1:no_events B.durations[i] = keep_positive(B.durations[i] - change) end
+	B.durations[index] = value
+
+	# Check horizon
+	sum_values::Float64 = sum(B.durations)
+	if sum_values > horizon
+		diff::Float64 = (sum_values - horizon) / no_events
+		for i in 1:no_events B.durations[i] -= diff end
+	end
+end
+
 ### key=crossfuncs Crossover Functions ###
 
 # Instruction Crossover
@@ -99,7 +117,7 @@ end
 
 ### key=evolfunc Evolution Function ###
 
-function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, params::Params, display_info::Bool=true)
+function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Program}, params::Params, display_info::Bool=true)
 	N::Int = params.population
 	fitness::Array{Float64} = zeros(N)
 	best_index::Int = 0
@@ -113,7 +131,7 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 	instr_cr_decr::Float64 = params.theta / params.generations
 	instr_mu_decr::Float64 = params.mutation_rate / params.generations
 
-	mutation_rate::Float64 = params.muration_rate 
+	mutation_rate::Float64 = params.mutation_rate 
 
 	# Generation loop
 	for generation in 1:params.generations
@@ -166,7 +184,7 @@ function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, 
 		m_indices::Array{Int} = sample((elite + 1):N, instr_mu_no)
 		for m_index in m_indices
 			index = indices[m_index]
-			mutate_instructions(candidates[index], config.no_units, params.no_events)
+			mutate_instructions(candidates[index], config, params.no_events)
 		end
 
 		### Durations

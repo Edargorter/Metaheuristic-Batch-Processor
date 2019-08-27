@@ -37,6 +37,7 @@ function newline(n::Int) for i in 1:n @printf "\n" end end
 
 # Set equal to 1 if 0
 function keep_one(value::Int) value == 0 ? 1 : value end
+function keep_one(value::Float64) value == 0 ? 1 : value end
 
 # Round up to 0 if value < 0
 function keep_positive(value::Float64) value < 0.0 ? 0.0 : value end
@@ -137,7 +138,6 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 		# New random seeds
 		seed_val = Dates.value(convert(Dates.Millisecond, Dates.now()))
 		Random.seed!(seed_val) 
-		srand(seed_val)
 		rng = MersenneTwister(seed_val)
 
 		std_dev::Float64 = 3.0
@@ -165,7 +165,7 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 		index::Int = 1
 
 		for new in (elite + 1):2:N
-			i_a::Int, i_b::Int = indices[ keep_one(ceil(vals[index]/max_val) * elite) ], indices[ keep_one(ceil(vals[index + 1]/max_val)) ] # Random parents
+			i_a::Int, i_b::Int = indices[ keep_one(ceil(Int, vals[index]/max_val) * elite) ], indices[ keep_one(ceil(Int, vals[index + 1]/max_val)) ] # Random parents
 			c_point::Int = rand(1:params.no_events)
 			A::BPS_Program, B::BPS_Program = crossover(candidates[i_a], candidates[i_b], c_point)
 			candidates[new] = A
