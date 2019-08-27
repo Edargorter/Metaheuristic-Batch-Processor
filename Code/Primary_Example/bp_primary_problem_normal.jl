@@ -4,7 +4,7 @@ using Printf
 
 include("bp_primary_structs.jl")
 include("bp_primary_functions.jl")
-include("ga_alg_rates.jl")
+include("ga_alg_normal.jl")
 include("bp_primary_fitness.jl")
 
 #Seed

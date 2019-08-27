@@ -175,7 +175,7 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 		
 		m_indices::Array{Int} = sample((elite + 1):N, no_mutations)
 		for m_index in m_indices
-			index::Int = indices[m_index]	
+			index = indices[m_index]	
 			mutate_instructions(candidates[index], config, params.no_events)
 			mutate_durations(candidates[index], params.no_events, params.delta, params.horizon)
 		end
