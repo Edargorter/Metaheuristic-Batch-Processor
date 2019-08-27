@@ -194,9 +194,6 @@ function main_func()
 		fitnesses[i] = fitness
 	end
 
-	newline()
-	print(fitnesses)
-
 	indices::Array{Int} = sortperm(fitnesses, rev=true)
 	newline()
 

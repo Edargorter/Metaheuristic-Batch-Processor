@@ -158,4 +158,5 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 		end
 
 	end
-	best_index, best_fitness #Return best candidate index and fitness end
+	best_index, best_fitness #Return best candidate index and fitness
+end
