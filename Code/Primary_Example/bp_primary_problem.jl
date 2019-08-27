@@ -184,30 +184,43 @@ function main_func()
 	newline()
 
 	=#
+	#=
+	# ont
+
 	parameters_filename = "test_parameters.txt"
 	cands = generate_pool(config, params)
+
+	@printf "%d\n" sizeof(cands)
 
 	fitnesses = zeros(params.population)
 
 	for i in 1:params.population
-		fitness = get_fitness(config, params, cands[i], false)
+		fitness = get_fitness(config, params, cands[i], true)
 		fitnesses[i] = fitness
+		#@printf "%d %.3f " i fitness
+		#print(cands[i])
+		#newline()
 	end
 
+<<<<<<< HEAD
+=======
+	newline()
+>>>>>>> b5bcc9183c8b69386a09f5be23778b158a291be6
 	indices::Array{Int} = sortperm(fitnesses, rev=true)
 	newline()
 
 	for i in 1:10
 		@printf "%.3f " fitnesses[indices[i]]
+		print(cands[indices[i]])
+		newline(2)
 	end
-	
+	=#
 
 #=
 
 	no_params = 9
 	no_tests = 30
 	top_fitness = 0.0
-
 
 	### RUN TESTS ###
 
@@ -233,6 +246,9 @@ function main_func()
 
 		for test in 1:no_tests
 
+			#### Test No. ####
+			write(logfile, "Test: $(test)\n")
+
 			##### GENERATE CANDIDATES #####
 			cands = generate_pool(config, params)
 
@@ -245,8 +261,6 @@ function main_func()
 				instr_arr = copy(cands[best_index].instructions)
 				durat_arr = copy(cands[best_index].durations)
 			end
-
-			break
 
 		end
 
@@ -263,4 +277,3 @@ function main_func()
 =#
 end
 
-main_func()

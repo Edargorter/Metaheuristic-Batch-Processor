@@ -21,7 +21,7 @@
 using Random
 using Dates
 
-include("bp_motivating_fitness.jl")
+include("bp_primary_fitness.jl")
 
 #Random seed based on number of milliseconds of current date
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
