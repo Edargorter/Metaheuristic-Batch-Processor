@@ -199,7 +199,7 @@ function main_func()
 		logfile = open("log_$(p).txt", "a")
 
 		#### METAHEURISTIC PARAMETERS ####
-		parameters_filename = "test_parameters.txt"
+		parameters_filename = "parameters_$(p).txt"
 		params = read_parameters(parameters_filename)
 		
 		#Temporary instructions / duration arrays
