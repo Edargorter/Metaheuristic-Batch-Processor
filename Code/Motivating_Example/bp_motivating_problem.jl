@@ -60,43 +60,57 @@ print("\n")
 ### RUN TESTS ###
 
 no_params = 6
-no_tests = 1 
+no_tests = 30
 top_fitness = 0.0
 
-@printf "TESTS: %d\n\n" no_tests
-
-logfile = open("logfile.txt", "a")
-
+@printf "TESTS: %d" no_tests
+newline(2)
 
 for p in 1:no_params
 
+	logfile = open("log_$(p).txt", "a")
+
 	#### METAHEURISTIC PARAMETERS ####
-	parameters_filename = "parameters_3.txt"
+	parameters_filename = "parameters_$(p).txt"
 	params = read_parameters(parameters_filename)
-	@printf "Horizon: %.1f Events: %d Population: %d Generations: %d \t--- " params.horizon params.no_events params.population params.generations
+	
+	#Temporary instructions / duration arrays
+	instr_arr::Array{Int, 2} = zeros(config.no_units, params.no_events)	
+	durat_arr::Array{Float64} = zeros(params.no_events)
+
+	@printf "Horizon: %.1f Events: %d Generations: %d Population: %d \t--- " params.horizon params.no_events params.generations params.population
 
 	time_sum = 0.0
 	top_fitness = 0.0
 
 	for test in 1:no_tests
-		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
+
+		#### Test No. ####
+		write(logfile, "Test: $(test)\n")
 
 		##### GENERATE CANDIDATES #####
 		cands = generate_pool(config, params)
 
 		##### EVOLVE CHROMOSOMES #####
-		seconds = @elapsed best, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
+		seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
 		time_sum += seconds
 
-		if best_fitness > top_fitness top_fitness = best_fitness end
+		if best_fitness > top_fitness
+			top_fitness = best_fitness
+			instr_arr = copy(cands[best_index].instructions)
+			durat_arr = copy(cands[best_index].durations)
+		end
+
 	end
 
-	@printf "Total Time: %.6f Optimal Fitness: %.6f\n" time_sum top_fitness
+	@printf "Total Time: %.6f Optimal Fitness: %.6f " time_sum top_fitness
+	print(instr_arr)
+	print(durat_arr)
+	newline()
 
-	break
+	close(logfile)
 
 end
-
 
 #=
 

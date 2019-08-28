@@ -1,4 +1,6 @@
 ####### METAHEURISTIC #####################
+####### LITERATURE EXAMPLE ################
+
 ####### Genetic Algorithm Functions #######
 
 
@@ -20,9 +22,9 @@
 
 using Random
 using Dates
-using Printf 
+using Distributions
 
-include("bp_motivating_fitness.jl")
+include("bp_primary_fitness.jl")
 
 #Random seed based on number of milliseconds of current date
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
@@ -30,11 +32,24 @@ rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
 ### key=hfuncs Helping functions ###
 
-# Round up to 1 if value < 0
+function newline() @printf "\n" end
+function newline(n::Int) for i in 1:n @printf "\n" end end
+
+# Set equal to 1 if 0
+function keep_one(value::Int) value == 0 ? 1 : value end
+function keep_one(value::Float64) value == 0 ? 1 : value end
+
+# Round up to 0 if value < 0
 function keep_positive(value::Float64) value < 0.0 ? 0.0 : value end
 
 # Bit-flip
 function bit_flip(bit::Int) bit == 0 ? 1 : 0 end
+
+# Instruction change
+function instr_change(unit::Unit) 
+	instrs = [[v.first for v in collect(unit.tasks)]; 0]
+	instrs[rand(1:size(instrs)[1])]
+end
 
 ##### End of helping functions #####
 
@@ -79,16 +94,16 @@ end
 ### key=mutfuncs Mutation Functions ###
 
 # Mutation on instruction array
-function mutate_instructions(B::BPS_Program, no_units::Int, no_events::Int)
-	unit::Int = rand(rng, 1:no_units)
-	event::Int = rand(rng, 1:no_events)
-	B.instructions[unit, event] = bit_flip(B.instructions[unit, event])
+function mutate_instructions(B::BPS_Program, config::BPS_Config, no_events::Int)
+	unit::Int = rand(1:config.no_units)
+	event::Int = rand(1:no_events)
+	B.instructions[unit, event] = bit_flip(config.units[unit])
 end
 
 # Mutation on duration array
 function mutate_durations(B::BPS_Program, no_events::Int, delta::Float64, horizon::Float64)
-	r::Float64 = 2.0*rand(rng) - 1.0
-	index::Int = rand(rng, 1:no_events)
+	r::Float64 = 2.0*rand() - 1.0
+	index::Int = rand(1:no_events)
 	addition::Float64 = r*delta
 	value::Float64 = keep_positive(B.durations[index] + addition)
 	change::Float64 = addition / (no_events - 1.0)
@@ -119,17 +134,19 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 	# Generation loop
 	for generation in 1:params.generations
 
-		# New random seed
-		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
-		rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
+		# New random seeds
+		seed_val = Dates.value(convert(Dates.Millisecond, Dates.now()))
+		Random.seed!(seed_val) 
+		rng = MersenneTwister(seed_val)
 
-		for s in 1:N 
-			fitness[s] = get_fitness(config, params, candidates[s])
-		end
+		std_dev::Float64 = 3.0
 
+		d = Normal(0, std_dev)
+
+		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s]) end
 		average_fitness::Float64 = sum(fitness)/N
 
-		to_write::String = "Generation: $(generation)\t ----- Average Fitness: $(average_fitness) \t----- Best: $(best_fitness)\n" 
+		to_write::String = "Generation: $(generation)\t ----- Average Fitness: $(average_fitness) \t----- Best: $(best_fitness)\n"
 		write(logfd, to_write)
 
 		indices::Array{Int} = sortperm(fitness, rev=true)
@@ -137,24 +154,30 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 		best_fitness = fitness[best_index]
 
 		if display_info
-			@printf "Generation: %d\t ----- Average Fitness : %.2f \t----- Best: %.2f\n" generation average_fitness best_fitness
+			@printf "Generation: %d\t ----- Average Fitness: %.2f \t----- Best: %.2f\n" generation average_fitness best_fitness
 		end
 
+		vals::Array{Float64} = rand(d, N - elite)
+		for i in 1:length(vals) vals[i] = abs(vals[i]) end
+		max_val::Float64 = maximum(vals)
+
+		index::Int = 1
+
 		for new in (elite + 1):2:N
-			i_a::Int, i_b::Int = indices[rand(rng, 1:elite)], indices[rand(rng, 1:elite)] # Random parents
-			c_point::Int = rand(rng, 1:params.no_events)
+			i_a::Int, i_b::Int = indices[ keep_one(ceil(Int, vals[index]/max_val) * elite) ], indices[ keep_one(ceil(Int, vals[index + 1]/max_val)) ] # Random parents
+			c_point::Int = rand(1:params.no_events)
 			A::BPS_Program, B::BPS_Program = crossover(candidates[i_a], candidates[i_b], c_point)
 			candidates[new] = A
 			candidates[new + 1] = B
+			index += 2
 		end
 		
 		m_indices::Array{Int} = sample((elite + 1):N, no_mutations)
 		for m_index in m_indices
-			index::Int = indices[m_index]
-			mutate_instructions(candidates[index], config.no_units, params.no_events)
+			index = indices[m_index]	
+			mutate_instructions(candidates[index], config, params.no_events)
 			mutate_durations(candidates[index], params.no_events, params.delta, params.horizon)
 		end
-
 	end
-	best_index, best_fitness #Return best candidate index and fitness
+	best_index, best_fitness
 end
