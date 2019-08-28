@@ -276,14 +276,5 @@
 	# Return profit
 
 	result::Float64 = 10.0 * (state.storage_amounts[8] + state.storage_amounts[9])
-	print(candidate.instructions)
-	print(candidate.durations)
-	newline()
-	@printf "States: " 
-	print(state)
-	newline(2)
-	print(unit_amounts)
-	newline()
-	@printf "Fitness: %.3f\n" result
 	return result
 end

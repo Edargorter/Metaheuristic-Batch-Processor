@@ -4,7 +4,7 @@ using Printf
 
 include("bp_primary_structs.jl")
 include("bp_primary_functions.jl")
-include("ga_alg_rates.jl")
+include("ga_alg_normal.jl")
 include("bp_primary_fitness.jl")
 
 #Seed
@@ -195,7 +195,7 @@ function main_func()
 
 	for p in 1:no_params
 
-		logfile = open("log_rates_$(p).txt", "a")
+		logfile = open("log_normal_$(p).txt", "a")
 
 		#### METAHEURISTIC PARAMETERS ####
 		parameters_filename = "test_parameters.txt"

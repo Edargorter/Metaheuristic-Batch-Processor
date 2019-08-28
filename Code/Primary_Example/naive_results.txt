@@ -1,0 +1,6 @@
+Horizon: 8.00
+Events: 5
+TESTS: 30
+
+Horizon: 8.0 Events: 5 Generations: 75 Population: 1000 	--- Total Time: 12.152635 Optimal Fitness: 1569.818970 [0 1 1 0 1; 3 2 3 4 3; 0 2 3 4 3; 5 5 5 5 5][0.0, 2.42902, 2.53092, 1.12351, 1.94768]
+Horizon: 8.0 Events: 5 Generations: 75 Population: 1000 	--- 
