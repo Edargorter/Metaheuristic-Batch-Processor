@@ -38,13 +38,17 @@ no_tests = int(argv[1])
 generations = int(argv[2])
 filename = argv[3]
 milp_val = float(argv[4])
+print(milp_val)
 
-get_error = True
+plt.ylabel("Fitness (Tonnage)")
+
+get_error = False
 
 for t in range(no_tests):
+	avg_fitnesses = []
+	best_fitnesses = []
+
 	with open(filename, 'r') as f:
-		avg_fitnesses = []
-		best_fitnesses = []
 		f.readline()
 
 		for i in range(generations):	
@@ -53,7 +57,11 @@ for t in range(no_tests):
 			avg_fitnesses.append(float(data[5]))
 			best_fitnesses.append(float(data[8]))
 
+		print(avg_fitnesses)
+		print(best_fitnesses)
+
 		if get_error:
+			plt.ylabel("Error from S&M")
 			for a in range(len(avg_fitnesses)):
 				avg_fitnesses[i] /= milp_val
 				best_fitnesses[i] /= milp_val
@@ -61,5 +69,5 @@ for t in range(no_tests):
 	plt.plot(get_values(generations), avg_fitnesses)
 
 plt.xlabel("Generations")
-plt.ylabel("Error from S&M")
 plt.savefig("30_trials_graph.png")
+plt.show()

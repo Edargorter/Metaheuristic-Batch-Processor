@@ -38,10 +38,10 @@ for line in f:
 	linesm = sm.readline()
 	sml = linesm.split()
 
-	row_1 = [one, int(sml[0]), int(sml[1]), float(sml[2]), float(sml[3])]
-	row_2 = [two, int(float(data[1])), int(data[3]), float(data[11]), float(data[14])]
-	row_2 = [three, int(float(data1[1])), int(data1[3]), float(data1[11]), float(data1[14])]
-	row_2 = [four, int(float(data2[1])), int(data2[3]), float(data2[11]), float(data2[14])]
+	row1 = [one, int(sml[0]), int(sml[1]), float(sml[2]), float(sml[3])]
+	row2 = [two, int(float(data[1])), int(data[3]), float(data[11]), float(data[14])]
+	row3 = [three, int(float(data1[1])), int(data1[3]), float(data1[11]), float(data1[14])]
+	row4 = [four, int(float(data2[1])), int(data2[3]), float(data2[11]), float(data2[14])]
 
 	first_table_data.append(row1)
 	first_table_data.append(row2)
@@ -69,10 +69,10 @@ for line in f:
 	linesm = sm.readline()
 	sml = linesm.split()
 
-	row_1 = [one, int(sml[0]), int(sml[1]), float(sml[2]), float(sml[3])]
-	row_2 = [two, int(float(data[1])), int(data[3]), float(data[11]), float(data[14])]
-	row_2 = [three, int(float(data1[1])), int(data1[3]), float(data1[11]), float(data1[14])]
-	row_2 = [four, int(float(data2[1])), int(data2[3]), float(data2[11]), float(data2[14])]
+	row1 = [one, int(sml[0]), int(sml[1]), float(sml[2]), float(sml[3])]
+	row2 = [two, int(float(data[1])), int(data[3]), float(data[11]), float(data[14])]
+	row3 = [three, int(float(data1[1])), int(data1[3]), float(data1[11]), float(data1[14])]
+	row4 = [four, int(float(data2[1])), int(data2[3]), float(data2[11]), float(data2[14])]
 
 	second_table_data.append(row1)
 	second_table_data.append(row2)
@@ -89,13 +89,13 @@ sm.close()
 with open(first_out, 'w') as cf:
 	writer = csv.writer(cf)
 	for row in first_table_data:
-		write.writerow(row)
+		writer.writerow(row)
 
 cf.close()
 
 with open(second_out, 'w') as cf:
 	writer = csv.writer(cf)
 	for row in first_table_data:
-		write.writerow(row)
+		writer.writerow(row)
 
 cf.close()

@@ -197,7 +197,7 @@ function main_func()
 
 	for p in 1:no_params
 		
-		logfile = open("log_test_$(p).txt", "a")
+		logfile = open("log_$(p).txt", "a")
 
 		#### METAHEURISTIC PARAMETERS ####
 		parameters_filename = "parameters_$(p).txt"
@@ -223,7 +223,6 @@ function main_func()
 			##### EVOLVE CHROMOSOMES #####
 			seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
 			time_sum += seconds
-			@printf "%.3f\n" best_fitness
 
 			if best_fitness > top_fitness
 				top_fitness = best_fitness
