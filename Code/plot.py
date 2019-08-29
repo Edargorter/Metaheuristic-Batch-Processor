@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import csv
 from sys import argv
 
 #Example format of log
@@ -38,17 +39,28 @@ no_tests = int(argv[1])
 generations = int(argv[2])
 filename = argv[3]
 milp_val = float(argv[4])
+
+avgs = []
+bests = []
+
 print(milp_val)
 
-plt.ylabel("Fitness (Tonnage)")
+get_error = True
 
-get_error = False
+if get_error:
+	plt.ylabel("Error (from S&M value)")
+	plt.title("Error of Solutions (30) vs Generations")
+else: 
+	plt.ylabel("Fitness (Tonnage)")
+	plt.title("Fitness of Solutions (30) vs Generations")
 
-for t in range(no_tests):
-	avg_fitnesses = []
-	best_fitnesses = []
+xs = get_values(generations)
 
-	with open(filename, 'r') as f:
+with open(filename, 'r') as f:
+
+	for t in range(no_tests):
+		avg_fitnesses = []
+		best_fitnesses = []
 		f.readline()
 
 		for i in range(generations):	
@@ -57,16 +69,29 @@ for t in range(no_tests):
 			avg_fitnesses.append(float(data[5]))
 			best_fitnesses.append(float(data[8]))
 
-		print(avg_fitnesses)
-		print(best_fitnesses)
+		avgs.append(avg_fitnesses.copy())
+		bests.append(best_fitnesses.copy())
 
 		if get_error:
-			plt.ylabel("Error from S&M")
 			for a in range(len(avg_fitnesses)):
-				avg_fitnesses[i] /= milp_val
-				best_fitnesses[i] /= milp_val
+				avg_fitnesses[a] = 1.0 - avg_fitnesses[a] / milp_val
+				best_fitnesses[a] = 1.0 -  best_fitnesses[a] / milp_val
 
-	plt.plot(get_values(generations), avg_fitnesses)
+		plt.plot(xs, avg_fitnesses)
+
+f.close()
+
+output = "dummy.csv"
+of = open(output, 'w')
+writer = csv.writer(of)
+
+for i in range(generations):
+	row = [i]
+	for j in range(no_tests):
+		row.append(avgs[j][i])
+	writer.writerow(row)
+
+of.close()
 
 plt.xlabel("Generations")
 plt.savefig("30_trials_graph.png")

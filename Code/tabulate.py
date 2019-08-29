@@ -16,7 +16,7 @@ second_out = "primary_out.csv"
 
 first_table_data = []
 
-one = "S&M"
+one = "S\&M"
 two = "GA1"
 three = "GA2"
 four = "GA3"
@@ -39,10 +39,17 @@ for line in f:
 	sml = linesm.split()
 
 	row1 = [one, int(sml[0]), int(sml[1]), float(sml[2]), float(sml[3])]
-	row2 = [two, int(float(data[1])), int(data[3]), float(data[11]), float(data[14])]
-	row3 = [three, int(float(data1[1])), int(data1[3]), float(data1[11]), float(data1[14])]
-	row4 = [four, int(float(data2[1])), int(data2[3]), float(data2[11]), float(data2[14])]
+	row2 = [two, int(float(data[1])), int(data[3]), float(data[11]), "1/5/10"]
+	row3 = [three, int(float(data1[1])), int(data1[3]), float(data1[11]), "1/5/10"]
+	row4 = [four, int(float(data2[1])), int(data2[3]), float(data2[11]), "1/5/10"]
 
+
+	'''
+	row1 = [one, int(sml[0]), int(sml[1]), float(sml[2]), float(sml[3]), "-", "-"]
+	row2 = [two, int(float(data[1])), int(data[3]), float(data[11]), float(data[14]), int(data[7]), int(data[5])]
+	row3 = [three, int(float(data1[1])), int(data1[3]), float(data1[11]), float(data1[14]), int(data1[7]), int(data1[5])]
+	row4 = [four, int(float(data2[1])), int(data2[3]), float(data2[11]), float(data2[14]), int(data2[7]), int(data2[5])]
+	'''
 	first_table_data.append(row1)
 	first_table_data.append(row2)
 	first_table_data.append(row3)
@@ -70,9 +77,16 @@ for line in f:
 	sml = linesm.split()
 
 	row1 = [one, int(sml[0]), int(sml[1]), float(sml[2]), float(sml[3])]
-	row2 = [two, int(float(data[1])), int(data[3]), float(data[11]), float(data[14])]
-	row3 = [three, int(float(data1[1])), int(data1[3]), float(data1[11]), float(data1[14])]
-	row4 = [four, int(float(data2[1])), int(data2[3]), float(data2[11]), float(data2[14])]
+	row2 = [two, int(float(data[1])), int(data[3]), float(data[11]), "1/5/10"]
+	row3 = [three, int(float(data1[1])), int(data1[3]), float(data1[11]), "1/5/10"]
+	row4 = [four, int(float(data2[1])), int(data2[3]), float(data2[11]), "1/5/10"]
+
+	'''
+	row1 = [one, int(sml[0]), int(sml[1]), float(sml[2]), float(sml[3]), "-", "-"]
+	row2 = [two, int(float(data[1])), int(data[3]), float(data[11]), float(data[14]), int(data[7]), int(data[5])]
+	row3 = [three, int(float(data1[1])), int(data1[3]), float(data1[11]), float(data1[14]), int(data1[7]), int(data1[5])]
+	row4 = [four, int(float(data2[1])), int(data2[3]), float(data2[11]), float(data2[14]), int(data2[7]), int(data2[5])]
+	'''
 
 	second_table_data.append(row1)
 	second_table_data.append(row2)
@@ -95,7 +109,7 @@ cf.close()
 
 with open(second_out, 'w') as cf:
 	writer = csv.writer(cf)
-	for row in first_table_data:
+	for row in second_table_data:
 		writer.writerow(row)
 
 cf.close()
