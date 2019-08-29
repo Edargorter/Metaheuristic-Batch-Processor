@@ -170,9 +170,7 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 			if count_p == instr_cr_no cr_instr = false end
 			i_a::Int, i_b::Int = indices[rand(1:elite)], indices[rand(1:elite)] # Random parents
 			c_point::Int = rand(1:params.no_events)
-			A::BPS_Program, B::BPS_Program = crossover(candidates[i_a], candidates[i_b], c_point, cr_instr)
-			candidates[new] = A
-			candidates[new + 1] = B
+			candidates[indices[new]], candidates[indices[new + 1]] = crossover(candidates[i_a], candidates[i_b], c_point, cr_instr)
 		end
 		
 		### MUTATIONS ###

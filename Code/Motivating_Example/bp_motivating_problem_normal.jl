@@ -126,7 +126,7 @@ newline(2)
 
 for p in 1:no_params
 
-	logfile = open("log_$(p).txt", "a")
+	logfile = open("log_normal_$(p).txt", "a")
 
 	#### METAHEURISTIC PARAMETERS ####
 	parameters_filename = "parameters_$(p).txt"

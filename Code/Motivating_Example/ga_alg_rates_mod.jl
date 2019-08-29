@@ -21,7 +21,7 @@
 using Random
 using Dates
 
-include("bp_primary_fitness.jl")
+include("bp_motivating_fitness.jl")
 
 #Random seed based on number of milliseconds of current date
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
@@ -48,7 +48,7 @@ end
 function mutate_instructions(B::BPS_Program, config::BPS_Config, no_events::Int)
 	unit::Int = rand(1:config.no_units)
 	event::Int = rand(1:no_events)
-	B.instructions[unit, event] = instr_change(config.units[unit])
+	B.instructions[unit, event] = bit_flip(B.instructions[unit, event])
 end
 
 # Mutation on duration array
@@ -65,7 +65,7 @@ function mutate_durations(B::BPS_Program, no_events::Int, delta::Float64, horizo
 	sum_values::Float64 = sum(B.durations)
 	if sum_values > horizon
 		diff::Float64 = (sum_values - horizon) / no_events
-		for i in 1:no_events B.durations[i] = keep_positive(B.durations[i] - diff) end
+		for i in 1:no_events B.durations[i] -= diff end
 	end
 end
 
@@ -170,7 +170,9 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 			if count_p == instr_cr_no cr_instr = false end
 			i_a::Int, i_b::Int = indices[rand(1:elite)], indices[rand(1:elite)] # Random parents
 			c_point::Int = rand(1:params.no_events)
-			candidates[indices[new]], candidates[indices[new + 1]] = crossover(candidates[i_a], candidates[i_b], c_point, cr_instr)
+			A::BPS_Program, B::BPS_Program = crossover(candidates[i_a], candidates[i_b], c_point, cr_instr)
+			candidates[indices[new]] = A
+			candidates[indices[new + 1]] = B
 		end
 		
 		### MUTATIONS ###

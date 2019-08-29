@@ -110,7 +110,7 @@ function mutate_durations(B::BPS_Program, no_events::Int, delta::Float64, horizo
 	sum_values::Float64 = sum(B.durations)
 	if sum_values > horizon
 		diff::Float64 = (sum_values - horizon) / no_events
-		for i in 1:no_events B.durations[i] -= diff end
+		for i in 1:no_events B.durations[i] = keep_positive(B.durations[i] - diff) end
 	end
 end
 
@@ -150,8 +150,8 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 			i_a::Int, i_b::Int = indices[rand(1:elite)], indices[rand(1:elite)] # Random parents
 			c_point::Int = rand(1:params.no_events)
 			A::BPS_Program, B::BPS_Program = crossover(candidates[i_a], candidates[i_b], c_point)
-			candidates[new] = A
-			candidates[new + 1] = B
+			candidates[indices[new]] = A
+			candidates[indices[new + 1]] = B
 		end
 		
 		m_indices::Array{Int} = sample((elite + 1):N, no_mutations)

@@ -122,7 +122,8 @@ end
 
 ### key=evolfunc Evolution Function ###
 
-function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Program}, params::Params, display_info::Bool=true)
+function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Program}, params::Params, display_info::Bool=true, std_dev::Float64 = 3.0)
+
 	N::Int = params.population
 	fitness::Array{Float64} = zeros(N)
 	best_index::Int = 0
@@ -138,8 +139,6 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 		seed_val = Dates.value(convert(Dates.Millisecond, Dates.now()))
 		Random.seed!(seed_val) 
 		rng = MersenneTwister(seed_val)
-
-		std_dev::Float64 = 3.0
 
 		d = Normal(0, std_dev)
 
@@ -164,11 +163,9 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 		index::Int = 1
 
 		for new in (elite + 1):2:N
-			i_a::Int, i_b::Int = indices[ keep_one(ceil(Int, vals[index]/max_val) * elite) ], indices[ keep_one(ceil(Int, vals[index + 1]/max_val)) ] # Random parents
+			i_a::Int, i_b::Int = indices[ keep_one(ceil(Int, (1.0 - vals[index]/max_val) * elite)) ], indices[ keep_one(ceil(Int, (1.0 - vals[index + 1]/max_val) * elite )) ] # Random parents
 			c_point::Int = rand(1:params.no_events)
-			A::BPS_Program, B::BPS_Program = crossover(candidates[i_a], candidates[i_b], c_point)
-			candidates[new] = A
-			candidates[new + 1] = B
+			candidates[indices[new]], candidates[indices[new + 1]] = crossover(candidates[i_a], candidates[i_b], c_point)
 			index += 2
 		end
 		
