@@ -149,9 +149,7 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 		for new in (elite + 1):2:N
 			i_a::Int, i_b::Int = indices[rand(1:elite)], indices[rand(1:elite)] # Random parents
 			c_point::Int = rand(1:params.no_events)
-			A::BPS_Program, B::BPS_Program = crossover(candidates[i_a], candidates[i_b], c_point)
-			candidates[indices[new]] = A
-			candidates[indices[new + 1]] = B
+			candidates[indices[new]], candidates[indices[new + 1]] = crossover(candidates[i_a], candidates[i_b], c_point)
 		end
 		
 		m_indices::Array{Int} = sample((elite + 1):N, no_mutations)
