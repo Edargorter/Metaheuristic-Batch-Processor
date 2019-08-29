@@ -21,7 +21,7 @@
 using Random
 using Dates
 
-include("bp_primary_fitness.jl")
+include("bp_motivating_fitness.jl")
 
 #Random seed based on number of milliseconds of current date
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
@@ -48,7 +48,7 @@ end
 function mutate_instructions(B::BPS_Program, config::BPS_Config, no_events::Int)
 	unit::Int = rand(1:config.no_units)
 	event::Int = rand(1:no_events)
-	B.instructions[unit, event] = bit_flip(config.units[unit])
+	B.instructions[unit, event] = bit_flip(B.instructions[unit, event])
 end
 
 # Mutation on duration array

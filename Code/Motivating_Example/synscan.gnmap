@@ -1,0 +1,4 @@
+# Nmap 7.60 scan initiated Thu Aug 29 00:19:42 2019 as: nmap -sCSV -oA synscan 10.100.11.1
+Host: 10.100.11.1 (_gateway)	Status: Up
+Host: 10.100.11.1 (_gateway)	Ports: 22/open/tcp//ssh//Cisco SSH 1.25 (protocol 2.0)/, 443/open/tcp//ssl|http//Cisco IOS http config/	Ignored State: closed (998)
+# Nmap done at Thu Aug 29 00:21:27 2019 -- 1 IP address (1 host up) scanned in 105.02 seconds

@@ -1,0 +1,20 @@
+# Nmap 7.60 scan initiated Thu Aug 29 00:19:42 2019 as: nmap -sCSV -oA synscan 10.100.11.1
+Nmap scan report for _gateway (10.100.11.1)
+Host is up (0.0023s latency).
+Not shown: 998 closed ports
+PORT    STATE SERVICE  VERSION
+22/tcp  open  ssh      Cisco SSH 1.25 (protocol 2.0)
+| ssh-hostkey: 
+|_  1024 bc:15:5d:58:85:8e:8c:74:66:70:ab:2c:bf:12:22:1b (RSA)
+443/tcp open  ssl/http Cisco IOS http config
+|_http-server-header: cisco-IOS
+|_http-title: Site doesn't have a title (text/html).
+| ssl-cert: Subject: commonName=IOS-Self-Signed-Certificate-3650147407
+| Not valid before: 2018-03-21T12:10:24
+|_Not valid after:  2020-01-01T00:00:00
+|_ssl-date: 2019-08-28T22:21:26+00:00; 0s from scanner time.
+MAC Address: 00:38:DF:F9:34:F6 (Cisco Systems)
+Service Info: OS: IOS; CPE: cpe:/o:cisco:ios
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Thu Aug 29 00:21:27 2019 -- 1 IP address (1 host up) scanned in 105.02 seconds

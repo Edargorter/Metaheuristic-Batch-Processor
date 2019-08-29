@@ -1,7 +1,10 @@
 #!/bin/bash
 
-echo "Running 'julia bp_motivating_problem.jl' -> output: $1"
+echo "Running 'julia bp_motivating_problem.jl' -> output: naive_results.txt"
+time julia bp_motivating_problem.jl > naive_results.txt
 
-julia -p 2 bp_motivating_problem.jl | tee -a $1
+echo "Running 'julia bp_motivating_problem_rates.jl' -> output: rates_results.txt"
+time julia bp_motivating_problem_rates.jl > rates_results.txt 
 
-echo "Done. Output -> $1"
+ echo "Running 'julia bp_motivating_problem_normal.jl' -> output: normal_results.txt"
+time julia bp_motivating_problem_normal.jl > normal_results.txt

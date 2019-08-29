@@ -1,0 +1,106 @@
+Running 'julia bp_motivating_problem.jl' -> output: naive_results.txt
+
+real	1m34.800s
+user	1m34.879s
+sys	0m0.380s
+Running 'julia bp_motivating_problem_rates.jl' -> output: rates_results.txt
+ERROR: LoadError: LoadError: could not open file /home/elijah/BP_Project/Code/Motivating_Example/bp_primary_fitness.jl
+Stacktrace:
+ [1] include at ./boot.jl:317 [inlined]
+ [2] include_relative(::Module, ::String) at ./loading.jl:1038
+ [3] include(::Module, ::String) at ./sysimg.jl:29
+ [4] include(::String) at ./client.jl:388
+ [5] top-level scope at none:0
+ [6] include at ./boot.jl:317 [inlined]
+ [7] include_relative(::Module, ::String) at ./loading.jl:1038
+ [8] include(::Module, ::String) at ./sysimg.jl:29
+ [9] include(::String) at ./client.jl:388
+ [10] top-level scope at none:0
+ [11] include at ./boot.jl:317 [inlined]
+ [12] include_relative(::Module, ::String) at ./loading.jl:1038
+ [13] include(::Module, ::String) at ./sysimg.jl:29
+ [14] exec_options(::Base.JLOptions) at ./client.jl:229
+ [15] _start() at ./client.jl:421
+in expression starting at /home/elijah/BP_Project/Code/Motivating_Example/ga_alg_rates.jl:24
+in expression starting at /home/elijah/BP_Project/Code/Motivating_Example/bp_motivating_problem_rates.jl:8
+
+real	0m1.968s
+user	0m2.113s
+sys	0m0.323s
+Running 'julia bp_motivating_problem_normal.jl' -> output: normal_results.txt
+ERROR: LoadError: LoadError: could not open file /home/elijah/BP_Project/Code/Motivating_Example/bp_primary_fitness.jl
+Stacktrace:
+ [1] include at ./boot.jl:317 [inlined]
+ [2] include_relative(::Module, ::String) at ./loading.jl:1038
+ [3] include(::Module, ::String) at ./sysimg.jl:29
+ [4] include(::String) at ./client.jl:388
+ [5] top-level scope at none:0
+ [6] include at ./boot.jl:317 [inlined]
+ [7] include_relative(::Module, ::String) at ./loading.jl:1038
+ [8] include(::Module, ::String) at ./sysimg.jl:29
+ [9] include(::String) at ./client.jl:388
+ [10] top-level scope at none:0
+ [11] include at ./boot.jl:317 [inlined]
+ [12] include_relative(::Module, ::String) at ./loading.jl:1038
+ [13] include(::Module, ::String) at ./sysimg.jl:29
+ [14] exec_options(::Base.JLOptions) at ./client.jl:229
+ [15] _start() at ./client.jl:421
+in expression starting at /home/elijah/BP_Project/Code/Motivating_Example/ga_alg_normal.jl:27
+in expression starting at /home/elijah/BP_Project/Code/Motivating_Example/bp_motivating_problem_normal.jl:8
+
+real	0m2.667s
+user	0m2.750s
+sys	0m0.379s
+Running 'julia bp_motivating_problem.jl' -> output: naive_results.txt
+
+real	1m36.937s
+user	1m37.038s
+sys	0m0.364s
+Running 'julia bp_motivating_problem_rates.jl' -> output: rates_results.txt
+ERROR: LoadError: LoadError: could not open file /home/elijah/BP_Project/Code/Motivating_Example/bp_primary_fitness.jl
+Stacktrace:
+ [1] include at ./boot.jl:317 [inlined]
+ [2] include_relative(::Module, ::String) at ./loading.jl:1038
+ [3] include(::Module, ::String) at ./sysimg.jl:29
+ [4] include(::String) at ./client.jl:388
+ [5] top-level scope at none:0
+ [6] include at ./boot.jl:317 [inlined]
+ [7] include_relative(::Module, ::String) at ./loading.jl:1038
+ [8] include(::Module, ::String) at ./sysimg.jl:29
+ [9] include(::String) at ./client.jl:388
+ [10] top-level scope at none:0
+ [11] include at ./boot.jl:317 [inlined]
+ [12] include_relative(::Module, ::String) at ./loading.jl:1038
+ [13] include(::Module, ::String) at ./sysimg.jl:29
+ [14] exec_options(::Base.JLOptions) at ./client.jl:229
+ [15] _start() at ./client.jl:421
+in expression starting at /home/elijah/BP_Project/Code/Motivating_Example/ga_alg_rates.jl:24
+in expression starting at /home/elijah/BP_Project/Code/Motivating_Example/bp_motivating_problem_rates.jl:8
+
+real	0m2.036s
+user	0m2.136s
+sys	0m0.294s
+Running 'julia bp_motivating_problem_normal.jl' -> output: normal_results.txt
+ERROR: LoadError: LoadError: could not open file /home/elijah/BP_Project/Code/Motivating_Example/bp_primary_fitness.jl
+Stacktrace:
+ [1] include at ./boot.jl:317 [inlined]
+ [2] include_relative(::Module, ::String) at ./loading.jl:1038
+ [3] include(::Module, ::String) at ./sysimg.jl:29
+ [4] include(::String) at ./client.jl:388
+ [5] top-level scope at none:0
+ [6] include at ./boot.jl:317 [inlined]
+ [7] include_relative(::Module, ::String) at ./loading.jl:1038
+ [8] include(::Module, ::String) at ./sysimg.jl:29
+ [9] include(::String) at ./client.jl:388
+ [10] top-level scope at none:0
+ [11] include at ./boot.jl:317 [inlined]
+ [12] include_relative(::Module, ::String) at ./loading.jl:1038
+ [13] include(::Module, ::String) at ./sysimg.jl:29
+ [14] exec_options(::Base.JLOptions) at ./client.jl:229
+ [15] _start() at ./client.jl:421
+in expression starting at /home/elijah/BP_Project/Code/Motivating_Example/ga_alg_normal.jl:27
+in expression starting at /home/elijah/BP_Project/Code/Motivating_Example/bp_motivating_problem_normal.jl:8
+
+real	0m2.759s
+user	0m2.799s
+sys	0m0.355s

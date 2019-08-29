@@ -11,8 +11,65 @@ include("bp_motivating_fitness.jl")
 
 #### CONFIG PARAMETERS ####
 
+#=
 config_filename = "config_motivating.txt"
 config = read_config(config_filename)
+=#
+
+### Create Config parameters ###
+
+no_units = 3
+no_storages = 4
+no_instructions = 2
+product = 4
+
+### Load in Units
+
+Units = []
+
+feeder = 1
+receiver = 2
+alpha = 3.0
+beta = 0.03
+push!(Units, Unit("Mixer", 100, feeder, receiver, alpha, beta))
+
+feeder = 2
+receiver = 3
+alpha = 2.0
+beta = 2/75
+push!(Units, Unit("Reaction", 75, feeder, receiver, alpha, beta))
+
+feeder = 3
+receiver = 4
+alpha = 1.0
+beta = 0.02
+push!(Units, Unit("Purification", 50, feeder, receiver, alpha, beta))
+
+### Load in storages
+
+Storages = []
+
+capacity = Inf
+feeder_unit = 0
+receiver_unit = 1
+push!(Storages, Storage(capacity, feeder_unit, receiver_unit))
+
+capacity = 100.0
+feeder_unit = 1
+receiver_unit = 2
+push!(Storages, Storage(capacity, feeder_unit, receiver_unit))
+
+capacity = 100.0
+feeder_unit = 2
+receiver_unit = 3
+push!(Storages, Storage(capacity, feeder_unit, receiver_unit))
+
+capacity = Inf
+feeder_unit = 3
+receiver_unit = 4
+push!(Storages, Storage(capacity, feeder_unit, receiver_unit))
+
+config = BPS_Config(no_units, no_storages, no_instructions, product, Units, Storages)
 
 #=
 
@@ -62,6 +119,7 @@ print("\n")
 no_params = 6
 no_tests = 30
 top_fitness = 0.0
+time_recorded = 0.0
 
 @printf "TESTS: %d" no_tests
 newline(2)
@@ -99,6 +157,7 @@ for p in 1:no_params
 			top_fitness = best_fitness
 			instr_arr = copy(cands[best_index].instructions)
 			durat_arr = copy(cands[best_index].durations)
+			time_recorded = seconds
 		end
 
 	end
