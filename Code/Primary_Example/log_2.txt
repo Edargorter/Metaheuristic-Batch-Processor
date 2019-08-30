@@ -1,4 +1,3 @@
-
 Test: 1
 Generation: 1	 ----- Average Fitness: 42.063201904296875 	----- Best: 860.0
 Generation: 2	 ----- Average Fitness: 153.31320190429688 	----- Best: 958.5048828125

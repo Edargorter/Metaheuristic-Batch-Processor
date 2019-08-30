@@ -35,6 +35,13 @@ Generation: 25	 ----- Average Fitness: 58.40518333615799 	----- Best: 71.4733515
 def get_values(n):
 	return [i for i in range(1, n + 1)]
 
+def get_col_labels(n):
+	return ["col{}".format(i) for i in range(1, n + 1)]
+
+if len(argv) < 5:
+	print("Usage: python3 {} [no_tests] [generations] [filename] [val] ".format(argv[0]))
+	exit(1)
+
 no_tests = int(argv[1])
 generations = int(argv[2])
 filename = argv[3]
@@ -43,12 +50,10 @@ milp_val = float(argv[4])
 avgs = []
 bests = []
 
-print(milp_val)
-
 get_error = True
 
 if get_error:
-	plt.ylabel("Error (from S&M value)")
+	plt.ylabel("Error (from S&M value) (percent)")
 	plt.title("Error of Solutions (30) vs Generations")
 else: 
 	plt.ylabel("Fitness (Tonnage)")
@@ -69,24 +74,27 @@ with open(filename, 'r') as f:
 			avg_fitnesses.append(float(data[5]))
 			best_fitnesses.append(float(data[8]))
 
-		avgs.append(avg_fitnesses.copy())
-		bests.append(best_fitnesses.copy())
 
 		if get_error:
 			for a in range(len(avg_fitnesses)):
-				avg_fitnesses[a] = 1.0 - avg_fitnesses[a] / milp_val
-				best_fitnesses[a] = 1.0 -  best_fitnesses[a] / milp_val
+				avg_fitnesses[a] = 100 * (1.0 - avg_fitnesses[a] / milp_val)
+				best_fitnesses[a] = 100 * (1.0 -  best_fitnesses[a] / milp_val)
+
+		avgs.append(avg_fitnesses.copy())
+		bests.append(best_fitnesses.copy())
 
 		plt.plot(xs, avg_fitnesses)
 
 f.close()
 
-output = "dummy.csv"
+output = "plot3.csv"
 of = open(output, 'w')
 writer = csv.writer(of)
+cl = get_col_labels(no_tests + 1)
+writer.writerow(cl)
 
 for i in range(generations):
-	row = [i]
+	row = [i + 1]
 	for j in range(no_tests):
 		row.append(avgs[j][i])
 	writer.writerow(row)
