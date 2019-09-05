@@ -1,4 +1,4 @@
-# batch_processing
+# (Chemical) Batch Processing Simulator
 Applying selected metaheuristics to the optimisation of chemical batch process scheduling.
 
 Motivating Example: fitness
@@ -10,4 +10,3 @@ Literature/Primary: fitness
 					metaheuristics
 					results
 					parameters
-
