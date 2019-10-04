@@ -82,29 +82,29 @@ function main_func()
 	units = []
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[1] = Coefs(2/3, 2/300)
+	unit_tasks[1] = Coefs(2/3, 1/150)
 
 	unit_1 = Unit("Heater", 100.0, unit_tasks)
 	push!(units, unit_1)
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[2] = Coefs(4/3, 0.02664)
-	unit_tasks[3] = Coefs(4/3, 0.02664)
-	unit_tasks[4] = Coefs(2/3, 0.01332)
+	unit_tasks[2] = Coefs(4/3, 2/75)
+	unit_tasks[3] = Coefs(4/3, 2/75)
+	unit_tasks[4] = Coefs(2/3, 1/75)
 
 	unit_2 = Unit("Reactor 1", 50.0, unit_tasks)
 	push!(units, unit_2)
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[2] = Coefs(4/3, 0.01665)
-	unit_tasks[3] = Coefs(4/3, 0.01665)
-	unit_tasks[4] = Coefs(2/3, 0.00833)
+	unit_tasks[2] = Coefs(4/3, 1/60)
+	unit_tasks[3] = Coefs(4/3, 1/60)
+	unit_tasks[4] = Coefs(2/3, 1/120)
 
 	unit_3 = Unit("Reactor 2", 80.0, unit_tasks)
 	push!(units, unit_3)
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[5] = Coefs(1.3342, 2/300)
+	unit_tasks[5] = Coefs(4/3, 1/150)
 
 	unit_4 = Unit("Still", 200.0, unit_tasks)
 	push!(units, unit_4)
