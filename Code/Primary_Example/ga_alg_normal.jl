@@ -3,7 +3,6 @@
 
 ####### Genetic Algorithm Functions #######
 
-
 #= 
 	
 	Contents (Unique Search Strings):
