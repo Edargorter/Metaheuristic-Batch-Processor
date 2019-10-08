@@ -1,5 +1,0 @@
-Running 'julia bp_motivating_problem.jl' -> output: 
-TESTS: 1
-
-Horizon: 36.0 Events: 14 Population: 10000 Generations: 100 	--- Total Time: 11.808487 Optimal Fitness: 425.000000
-Done. Output -> 

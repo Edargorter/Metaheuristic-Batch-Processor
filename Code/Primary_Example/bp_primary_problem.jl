@@ -77,34 +77,33 @@ function main_func()
 	#####################
 
 
-
 	#Setup units
 	units = []
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[1] = Coefs(2/3, 1/150)
+	unit_tasks[1] = Coefs(2/3, 2/300)
 
 	unit_1 = Unit("Heater", 100.0, unit_tasks)
 	push!(units, unit_1)
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[2] = Coefs(4/3, 2/75)
-	unit_tasks[3] = Coefs(4/3, 2/75)
-	unit_tasks[4] = Coefs(2/3, 1/75)
+	unit_tasks[2] = Coefs(4/3, 0.02664)
+	unit_tasks[3] = Coefs(4/3, 0.02664)
+	unit_tasks[4] = Coefs(2/3, 0.01332)
 
 	unit_2 = Unit("Reactor 1", 50.0, unit_tasks)
 	push!(units, unit_2)
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[2] = Coefs(4/3, 1/60)
-	unit_tasks[3] = Coefs(4/3, 1/60)
-	unit_tasks[4] = Coefs(2/3, 1/120)
+	unit_tasks[2] = Coefs(4/3, 0.01665)
+	unit_tasks[3] = Coefs(4/3, 0.01665)
+	unit_tasks[4] = Coefs(2/3, 0.00833)
 
 	unit_3 = Unit("Reactor 2", 80.0, unit_tasks)
 	push!(units, unit_3)
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[5] = Coefs(4/3, 1/150)
+	unit_tasks[5] = Coefs(1.3342, 2/300)
 
 	unit_4 = Unit("Still", 200.0, unit_tasks)
 	push!(units, unit_4)
@@ -115,99 +114,50 @@ function main_func()
 	#Initial volumes
 	initial_volumes = [Inf, Inf, Inf, 0, 0, 0, 0, 0, 0]
 
-	#print(units)
-	#newline()
-
-	#Get sizes
-#	@printf "No. of tasks: %d\n" size(collect(tasks))[1]
-#	@printf "No. of units: %d\n" size(collect(units))[1]
-#	@printf "No. of storages: %d\n\n" size(collect(storage_capacity))[1]
-
-	#Setup config
-	config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storage_capacity, initial_volumes)
-
-
-	params = read_parameters("test_parameters.txt")
-	@printf "Horizon: %.2f\n" params.horizon
-	@printf "Events: %d\n" params.no_events
-
-	#=
-	instructions = [1 1 1 0 0;
-					2 3 3 2 3;
-					2 3 4 4 3;
-					5 0 5 0 5]
-
-	durations = [2.41758, 2.30218, 1.14237, 0.952221, 1.18564]
-	=#
-
-	#=
-	instructions = [1 1 1 1 1 1 1;
-					2 0 3 0 4 0 3;
-					2 0 0 3 0 4 3;
-					0 0 0 0 0 0 5]
-
-	durations = [1.135, 0.962, 0.514, 2.139, 0.335, 0.992, 1.923]
-	=#
-
-	#=
-	instructions = [1 0 1 0 0 0 0 0 0 0 0 0;
-					2 3 0 3 4 4 4 4 3 0 4 3; 
-					2 3 0 2 3 0 2 0 3 0 4 3;
-					0 0 0 0 0 5 5 0 0 5 0 5]
-
-	durations = [2.667, 2.349, 0.327, 2.68, 1.334, 1.38, 1.277, 1.453, 0.845, 2.016, 1.515, 2.157]
-	=#
-
-	#=
-	instructions = [1 0 0 0 0 0 0 0;
-					2 0 3 0 4 0 3 0;
-					2 0 0 3 0 4 5 0;
-					0 0 0 0 0 0 0 5]
-
-	durations = [1.135, 0.962, 0.514, 2.139, 0.335, 0.992, 0.961, 0.962]
-	=#
-
-	#=
-
-	@printf "Size of instructions: "
-	print(size(instructions))
-	newline()
-
-	@printf "Size of durations: "
-	print(size(durations))
-	newline()
-
-	bps_program = BPS_Program(instructions, durations)
-
-	fitness = get_fitness(config, params, bps_program, true)
-	@printf "Fitness: %.6f\n" fitness
-	newline()
-
-	=#
-
 	no_params = 9
-	no_tests = 30
-	top_fitness = 0.0
-	time_recorded = 0.0
+	no_tests = 5
 
 	### RUN TESTS ###
 
 	@printf "TESTS: %d\n" no_tests
 	newline()
 
+	#Grid searches 
+	thetas = 0:0.1:1.0
+	mutations = 0:0.1:1.0
+	deltas = 0:0.025:1.0
+
+	# Metaheuristic parameters 
+
+	overall_top_fitness = 0
+
+	#Keep track of best combination of metaheuristic parameters
+	best_theta = 0
+	best_mutation = 0
+	best_delta = 0
+
+	combinations = size(deltas)[1] * size(mutations)[1] * size(deltas)[1]
+	comb = 0
+
+	for t in thetas
+	for m in mutations
+	for d in deltas
+	
 	for p in 1:no_params
-		
-		logfile = open("log_$(p).txt", "a")
+
+		#logfile = open("log_$(p).txt", "a")
 
 		#### METAHEURISTIC PARAMETERS ####
-		parameters_filename = "parameters_$(p).txt"
-		params = read_parameters(parameters_filename)
+		#parameters_filename = "parameters_$(p).txt"
+		param_file = read_parameters(parameters_filename)
+
+		params = Params(params_file.horizon, params_file.no_events, params_file.population, params_file.generations, t, m, d)
 		
 		#Temporary instructions / duration arrays
-		instr_arr::Array{Int, 2} = zeros(config.no_units, params.no_events)	
-		durat_arr::Array{Float64} = zeros(params.no_events)
+		#instr_arr::Array{Int, 2} = zeros(config.no_units, params.no_events)	
+		#durat_arr::Array{Float64} = zeros(params.no_events)
 
-		@printf "Horizon: %.1f Events: %d Generations: %d Population: %d \t--- " params.horizon params.no_events params.generations params.population
+		#@printf "Horizon: %.1f Events: %d Generations: %d Population: %d \t--- " params.horizon params.no_events params.generations params.population
 
 		time_sum = 0.0
 		top_fitness = 0.0
@@ -215,31 +165,47 @@ function main_func()
 		for test in 1:no_tests
 
 			#### Test No. ####
-			write(logfile, "Test: $(test)\n")
+			#write(logfile, "Test: $(test)\n")
 
 			##### GENERATE CANDIDATES #####
 			cands = generate_pool(config, params)
 
 			##### EVOLVE CHROMOSOMES #####
 			seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
-			time_sum += seconds
+			#time_sum += seconds
 
 			if best_fitness > top_fitness
 				top_fitness = best_fitness
-				instr_arr = copy(cands[best_index].instructions)
-				durat_arr = copy(cands[best_index].durations)
-				time_recorded = seconds
+				#instr_arr = copy(cands[best_index].instructions)
+				#durat_arr = copy(cands[best_index].durations)
 			end
 
 		end
 
-		@printf "Total Time: %.6f Optimal Fitness: %.6f " time_sum top_fitness
-		print(instr_arr)
-		print(durat_arr)
-		newline()
+		if top_fitness > overall_top_fitness
+			overall_top_fitness = top_fitness
+			best_theta = t
+			best_mutation = m
+			best_delta = d
+		end
 
-		close(logfile)
+		#@printf "Total Time: %.6f Optimal Fitness: %.6f " time_sum top_fitness
+		#print(instr_arr)
+		#print(durat_arr)
+		#newline()
+
+		#close(logfile)
 
 	end
+
+	comb += 1
+
+	@printf "[%d / %d] Theta: %.2f Mutation: %.2f Delta: %.3f Best_t: %.2f Best_m: %.2f Best_d: %.3f \n" comb, combinations t, m, d, best_theta, best_mutation, best_delta
+	
+	end
+	end
+	end
+
 end
+
 main_func()

@@ -74,7 +74,6 @@ with open(filename, 'r') as f:
 			avg_fitnesses.append(float(data[5]))
 			best_fitnesses.append(float(data[8]))
 
-
 		if get_error:
 			for a in range(len(avg_fitnesses)):
 				avg_fitnesses[a] = 100 * (1.0 - avg_fitnesses[a] / milp_val)
