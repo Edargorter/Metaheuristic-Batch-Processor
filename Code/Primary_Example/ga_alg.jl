@@ -143,8 +143,10 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 		best_index = indices[1]
 		best_fitness = round(fitness[best_index], digits=4)
 
+		#=
 		to_write::String = "Generation: $(generation)\t ----- Average Fitness: $(average_fitness) \t----- Best: $(best_fitness)\n" 
 		write(logfd, to_write)
+		=#
 
 		for new in (elite + 1):2:N
 			i_a::Int, i_b::Int = indices[rand(1:elite)], indices[rand(1:elite)] # Random parents
