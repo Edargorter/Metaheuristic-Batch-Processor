@@ -26,8 +26,15 @@ Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
 ### key=hfuncs Helper functions ###
 
+
 function set_array(a::Array{Float64}, b::Array{Float64})
 	for i in 1:length(a) a[i] = b[i] end
+end
+
+# alpha / beta calculation
+function get_duration_parameters(var::Float64, mean::Float64, max_vol::Float64, min_vol::Float64=, max_vol::Float64, min_vol::Float64=0.0)
+	alpha::Float64 = (1.0 - var) * mean
+	beta::Float64 = ((1.0 + var)*mean - alpha) / (max_vol - min_vol)
 end
 
 # Copy state
