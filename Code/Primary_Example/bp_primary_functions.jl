@@ -183,7 +183,7 @@ end
 
 # Time Interval Array
 function get_random_durations(config::BPS_Config, params::Params)
-	stamps = sort(params.horizon*rand(params.no_events - 1))
+	stamps = sort(params.horizon * rand(params.no_events - 1))
 	time_intervals = Array{Float64}(undef, params.no_events)
 	time_intervals[end] = params.horizon - stamps[end]
 	for i in params.no_events - 1:-1:2 time_intervals[i] = stamps[i] - stamps[i - 1] end

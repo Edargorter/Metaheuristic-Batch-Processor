@@ -154,8 +154,10 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 		best_index = indices[1]
 		best_fitness = fitness[best_index]
 
+		#=
 		to_write::String = "Generation: $(generation)\t ----- Average Fitness: $(average_fitness) \t----- Best: $(best_fitness)\n" 
 		write(logfd, to_write)
+		=#
 
 		if display_info
 			@printf "Generation: %d\t ----- Average Fitness : %.2f \t----- Best: %.2f\n" generation average_fitness best_fitness

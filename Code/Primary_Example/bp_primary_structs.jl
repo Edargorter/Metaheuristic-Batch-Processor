@@ -1,4 +1,4 @@
-# Structures for batch processing systems
+# Structures for batch processing systems representations 
 
 # Reaction duration coefficients
 struct Coefs

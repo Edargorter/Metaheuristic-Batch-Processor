@@ -114,6 +114,8 @@ function main_func()
 	#Initial volumes
 	initial_volumes = [Inf, Inf, Inf, 0, 0, 0, 0, 0, 0]
 
+	config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storage_capacity, initial_volumes)
+
 	no_params = 9
 	no_tests = 5
 
@@ -123,8 +125,8 @@ function main_func()
 	newline()
 
 	#Grid searches 
-	thetas = 0:0.1:1.0
-	mutations = 0:0.1:1.0
+	thetas = 0.1:0.1:1.0
+	mutations = 0.1:0.1:1.0
 	deltas = 0:0.025:1.0
 
 	# Metaheuristic parameters 
@@ -145,11 +147,11 @@ function main_func()
 	
 	for p in 1:no_params
 
-		#logfile = open("log_rates_$(p).txt", "a")
+		logfile = open("log_rates_$(p).txt", "a")
 
 		#### METAHEURISTIC PARAMETERS ####
-		#parameters_filename = "parameters_$(p).txt"
-		param_file = read_parameters(parameters_filename)
+		parameters_filename = "parameters_$(p).txt"
+		params_file = read_parameters(parameters_filename)
 
 		params = Params(params_file.horizon, params_file.no_events, params_file.population, params_file.generations, t, m, d)
 		
@@ -200,7 +202,7 @@ function main_func()
 
 	comb += 1
 
-	@printf "[%d / %d] Theta: %.2f Mutation: %.2f Delta: %.3f Best_t: %.2f Best_m: %.2f Best_d: %.3f \n" comb, combinations t, m, d, best_theta, best_mutation, best_delta
+	@printf "[%d / %d] Theta: %.2f Mutation: %.2f Delta: %.3f Best_t: %.2f Best_m: %.2f Best_d: %.3f \n" comb combinations t m d best_theta best_mutation best_delta
 	
 	end
 	end

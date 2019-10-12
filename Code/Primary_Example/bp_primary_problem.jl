@@ -4,8 +4,8 @@ using Printf
 
 include("bp_primary_structs.jl")
 include("bp_primary_functions.jl")
-include("ga_alg.jl")
 include("bp_primary_fitness.jl")
+include("ga_alg.jl")
 
 #Seed
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
@@ -81,29 +81,29 @@ function main_func()
 	units = []
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[1] = Coefs(2/3, 2/300)
+	unit_tasks[1] = Coefs(2/3, 1/150)
 
 	unit_1 = Unit("Heater", 100.0, unit_tasks)
 	push!(units, unit_1)
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[2] = Coefs(4/3, 0.02664)
-	unit_tasks[3] = Coefs(4/3, 0.02664)
-	unit_tasks[4] = Coefs(2/3, 0.01332)
+	unit_tasks[2] = Coefs(4/3, 2/75)
+	unit_tasks[3] = Coefs(4/3, 2/75)
+	unit_tasks[4] = Coefs(2/3, 1/75)
 
 	unit_2 = Unit("Reactor 1", 50.0, unit_tasks)
 	push!(units, unit_2)
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[2] = Coefs(4/3, 0.01665)
-	unit_tasks[3] = Coefs(4/3, 0.01665)
-	unit_tasks[4] = Coefs(2/3, 0.00833)
+	unit_tasks[2] = Coefs(4/3, 1/60)
+	unit_tasks[3] = Coefs(4/3, 1/60)
+	unit_tasks[4] = Coefs(2/3, 1/120)
 
 	unit_3 = Unit("Reactor 2", 80.0, unit_tasks)
 	push!(units, unit_3)
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[5] = Coefs(1.3342, 2/300)
+	unit_tasks[5] = Coefs(4/3, 1/150)
 
 	unit_4 = Unit("Still", 200.0, unit_tasks)
 	push!(units, unit_4)
@@ -114,8 +114,10 @@ function main_func()
 	#Initial volumes
 	initial_volumes = [Inf, Inf, Inf, 0, 0, 0, 0, 0, 0]
 
+	config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storage_capacity, initial_volumes)
+
 	no_params = 9
-	no_tests = 5
+	no_tests = 3
 
 	### RUN TESTS ###
 
@@ -123,8 +125,8 @@ function main_func()
 	newline()
 
 	#Grid searches 
-	thetas = 0:0.1:1.0
-	mutations = 0:0.1:1.0
+	thetas = 0.1:0.1:1.0
+	mutations = 0.1:0.1:1.0
 	deltas = 0:0.025:1.0
 
 	# Metaheuristic parameters 
@@ -145,11 +147,12 @@ function main_func()
 	
 	for p in 1:no_params
 
-		#logfile = open("log_$(p).txt", "a")
+		@printf "Theta: %.3 Mutation Rate: %.3f Delta: %.3f P: %d\n" t m d p
+		logfile = open("log_$(p).txt", "a")
 
 		#### METAHEURISTIC PARAMETERS ####
-		#parameters_filename = "parameters_$(p).txt"
-		param_file = read_parameters(parameters_filename)
+		parameters_filename = "parameters_$(p).txt"
+		params_file = read_parameters(parameters_filename)
 
 		params = Params(params_file.horizon, params_file.no_events, params_file.population, params_file.generations, t, m, d)
 		
@@ -171,8 +174,10 @@ function main_func()
 			cands = generate_pool(config, params)
 
 			##### EVOLVE CHROMOSOMES #####
-			seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
+			#seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
 			#time_sum += seconds
+
+			best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
 
 			if best_fitness > top_fitness
 				top_fitness = best_fitness
@@ -200,7 +205,7 @@ function main_func()
 
 	comb += 1
 
-	@printf "[%d / %d] Theta: %.2f Mutation: %.2f Delta: %.3f Best_t: %.2f Best_m: %.2f Best_d: %.3f \n" comb, combinations t, m, d, best_theta, best_mutation, best_delta
+	@printf "[%d / %d] Theta: %.2f Mutation: %.2f Delta: %.3f Best_t: %.2f Best_m: %.2f Best_d: %.3f \n" comb combinations t m d best_theta best_mutation best_delta
 	
 	end
 	end
