@@ -25,9 +25,7 @@ end
 
 struct BPS_Storage
 	name::String
-	capacity::Float64 
-
-	# Task feeders / receivers 
+	capacity::Float64
 	feeders::Array{Int}
 	receivers::Array{Int}
 end
@@ -47,8 +45,8 @@ struct BPS_Config
 	#Tasks
 	tasks::Array{RTask}
 
-	# Storages
-	storages::Array{BPS_Storage}
+	# Storage constraints
+	storage_capacity::Array{Float64}
 
 	#Initial volumes
 	initial_volumes::Array{Float64}

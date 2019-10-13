@@ -4,8 +4,24 @@ using Printf
 
 include("bp_primary_structs.jl")
 include("bp_primary_functions.jl")
-include("ga_alg_rates.jl")
 include("bp_primary_fitness.jl")
+include("ga_alg.jl")
+
+#=
+
+Storages:
+
+1: Feed A
+2: Feed B
+3: Feed C
+4: Hot A
+5: Int AB
+6: Int BC
+7: Impure E
+8: Product 1
+9: Product 2
+
+=#
 
 #Seed
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
@@ -25,7 +41,8 @@ function main_func()
 	products = [8, 9]
 	prices = [10.0, 10.0]
 
-	# Setup tasks 
+	#### Setup tasks ####
+
 	tasks = []
 
 	feeders = Dict{Int, Float64}()
@@ -63,6 +80,54 @@ function main_func()
 	receivers[9] = 0.9
 	push!(tasks, RTask("still", feeders, receivers))
 
+	#### Setup storages ####	
+	
+	storages = []
+	
+	feeders = []
+	receivers = [1]
+	feed_A = BPS_Storage("Feed_A", Inf, feeders, receivers)
+	push!(storages, feed_A)
+
+	feeders = []
+	receivers = [2]
+	feed_B = BPS_Storage("Feed_B", Inf, feeders, receivers)
+	push!(storages, feed_B)
+
+	feeders = []
+	receivers = [2, 4]
+	feed_C = BPS_Storage("Feed_C", Inf, feeders, receivers)
+	push!(storages, feed_C)
+
+	feeders = [1]
+	receivers = [3]
+	hot_A = BPS_Storage("Hot A", 100, feeders, receivers)
+	push!(storages, hot_A)
+
+	feeders = [4]
+	receivers = [3, 5]
+	int_AB = BPS_Storage("Int AB", 200, feeders, receivers)
+	push!(storages, int_AB)
+
+	feeders = [3]
+	receivers = [2]
+	int_BC = BPS_Storage("Int BC", 150, feeders, receivers)
+	push!(storages, int_BC)
+
+	feeders = [4]
+	receivers = [5]
+	impure_E = BPS_Storage("Impure E", 200, feeders, receivers)
+	push!(storages, impure_E)
+
+	feeders = [3]
+	receivers = []
+	product_1 = BPS_Storage("Product 1", Inf, feeders, receivers)
+	push!(storages, product_1)
+
+	feeders = [5]
+	receivers = []
+	product_2 = BPS_Storage("Product 2", Inf, feeders, receivers)
+	push!(storages, product_2)
 
 	##### Reactions #####
 	#=
@@ -75,7 +140,6 @@ function main_func()
 	
 	=#
 	#####################
-
 
 	#Setup units
 	units = []
@@ -108,16 +172,13 @@ function main_func()
 	unit_4 = Unit("Still", 200.0, unit_tasks)
 	push!(units, unit_4)
 
-	#Setup storages
-	storage_capacity = [Inf, Inf, Inf, 100.0, 200.0, 150.0, 200.0, Inf, Inf]
-
 	#Initial volumes
 	initial_volumes = [Inf, Inf, Inf, 0, 0, 0, 0, 0, 0]
 
-	config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storage_capacity, initial_volumes)
+	config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storages, initial_volumes)
 
 	no_params = 9
-	no_tests = 5
+	no_tests = 3
 
 	### RUN TESTS ###
 
@@ -147,7 +208,8 @@ function main_func()
 	
 	for p in 1:no_params
 
-		logfile = open("log_rates_$(p).txt", "a")
+		@printf "Theta: %.3 Mutation Rate: %.3f Delta: %.3f P: %d\n" t m d p
+		logfile = open("log_$(p).txt", "a")
 
 		#### METAHEURISTIC PARAMETERS ####
 		parameters_filename = "parameters_$(p).txt"
@@ -173,8 +235,10 @@ function main_func()
 			cands = generate_pool(config, params)
 
 			##### EVOLVE CHROMOSOMES #####
-			seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
+			#seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
 			#time_sum += seconds
+
+			best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
 
 			if best_fitness > top_fitness
 				top_fitness = best_fitness

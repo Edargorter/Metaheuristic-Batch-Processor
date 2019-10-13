@@ -4,7 +4,7 @@ using Printf
 
 include("bp_primary_structs.jl")
 include("bp_primary_functions.jl")
-include("ga_alg_rates.jl")
+include("ga_alg.jl")
 include("bp_primary_fitness.jl")
 
 #Seed
@@ -20,9 +20,9 @@ function main_func()
 	#### CONFIG PARAMETERS ####
 
 	no_units = 4
-	no_storages = 9
-	no_instructions = 5
-	products = [8, 9]
+	no_storages = 6
+	no_tasks = 4
+	products = [6]
 	prices = [10.0, 10.0]
 
 	# Setup tasks 
@@ -31,47 +31,37 @@ function main_func()
 	feeders = Dict{Int, Float64}()
 	receivers = Dict{Int, Float64}()
 	feeders[1] = 1.0
+	receivers[2] = 0.5
+	receivers[3] = 0.5
+	push!(tasks, RTask("Reaction 1", feeders, receivers))
+
+	feeders = Dict{Int, Float64}()
+	receivers = Dict{Int, Float64}()
+	feeders[2] = 1.0
 	receivers[4] = 1.0
-	push!(tasks, RTask("Heating", feeders, receivers))
-
-	feeders = Dict{Int, Float64}()
-	receivers = Dict{Int, Float64}()
-	feeders[2] = 0.5
-	feeders[3] = 0.5
-	receivers[6] = 1.0
-	push!(tasks, RTask("reaction 1", feeders, receivers))
-
-	feeders = Dict{Int, Float64}()
-	receivers = Dict{Int, Float64}()
-	feeders[4] = 0.4
-	feeders[6] = 0.6
-	receivers[8] = 0.4
-	receivers[5] = 0.6
 	push!(tasks, RTask("reaction 2", feeders, receivers))
 
 	feeders = Dict{Int, Float64}()
 	receivers = Dict{Int, Float64}()
-	feeders[3] = 0.2
-	feeders[5] = 0.8
-	receivers[7] = 1.0
+	feeders[3] = 1.0
+	receivers[5] = 1.0
 	push!(tasks, RTask("reaction 3", feeders, receivers))
 
 	feeders = Dict{Int, Float64}()
 	receivers = Dict{Int, Float64}()
-	feeders[7] = 1.0
-	receivers[5] = 0.1
-	receivers[9] = 0.9
-	push!(tasks, RTask("still", feeders, receivers))
+	feeders[4] = 0.5
+	feeders[5] = 0.5
+	receivers[6] = 1.0
+	push!(tasks, RTask("reaction 4", feeders, receivers))
 
 
 	##### Reactions #####
 	#=
 
-	Mixing		: 1
-	Reaction 1	: 2
-	Reaction 2	: 3
-	Reaction 3	: 4
-	Seperation	: 5
+	Reaction 1	: 1
+	Reaction 2	: 2
+	Reaction 3	: 3
+	Reaction 5	: 4
 	
 	=#
 	#####################
@@ -81,52 +71,51 @@ function main_func()
 	units = []
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[1] = Coefs(2/3, 1/150)
+	unit_tasks[1] = Coefs(5/3, 1/30)
 
-	unit_1 = Unit("Heater", 100.0, unit_tasks)
+	unit_1 = Unit("Heater", 40, unit_tasks)
 	push!(units, unit_1)
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[2] = Coefs(4/3, 2/75)
-	unit_tasks[3] = Coefs(4/3, 2/75)
-	unit_tasks[4] = Coefs(2/3, 1/75)
+	unit_tasks[2] = Coefs(7/3, 1/12)
 
-	unit_2 = Unit("Reactor 1", 50.0, unit_tasks)
+	unit_2 = Unit("Reactor 1", 20, unit_tasks)
 	push!(units, unit_2)
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[2] = Coefs(4/3, 1/60)
-	unit_tasks[3] = Coefs(4/3, 1/60)
-	unit_tasks[4] = Coefs(2/3, 1/120)
+	unit_tasks[3] = Coefs(2/3, 1/15)
 
-	unit_3 = Unit("Reactor 2", 80.0, unit_tasks)
+	unit_3 = Unit("Reactor 2", 5, unit_tasks)
 	push!(units, unit_3)
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[5] = Coefs(4/3, 1/150)
+	unit_tasks[5] = Coefs(8/3, 1/120)
 
-	unit_4 = Unit("Still", 200.0, unit_tasks)
+	unit_4 = Unit("Still", 40, unit_tasks)
 	push!(units, unit_4)
 
 	#Setup storages
-	storage_capacity = [Inf, Inf, Inf, 100.0, 200.0, 150.0, 200.0, Inf, Inf]
+	storage_capacity = [Inf, 10, 15, 10, 15, Inf]
 
 	#Initial volumes
-	initial_volumes = [Inf, Inf, Inf, 0, 0, 0, 0, 0, 0]
-
-	config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storage_capacity, initial_volumes)
+	initial_volumes = [Inf, 0, 0, 0, 0, 0]
 
 	no_params = 9
 	no_tests = 5
 
 	### RUN TESTS ###
 
+	parameters_filename = "parameters_5.txt"
+
 	@printf "TESTS: %d\n" no_tests
 	newline()
 
-	#Grid searches 
-	thetas = 0.1:0.1:1.0
-	mutations = 0.1:0.1:1.0
+	
+	### GRID SEARCH ###
+
+
+	thetas = 0:0.1:1.0
+	mutations = 0:0.1:1.0
 	deltas = 0:0.025:1.0
 
 	# Metaheuristic parameters 
@@ -147,11 +136,11 @@ function main_func()
 	
 	for p in 1:no_params
 
-		logfile = open("log_rates_$(p).txt", "a")
+		#logfile = open("log_$(p).txt", "a")
 
 		#### METAHEURISTIC PARAMETERS ####
-		parameters_filename = "parameters_$(p).txt"
-		params_file = read_parameters(parameters_filename)
+		#parameters_filename = "parameters_$(p).txt"
+		param_file = read_parameters(parameters_filename)
 
 		params = Params(params_file.horizon, params_file.no_events, params_file.population, params_file.generations, t, m, d)
 		
@@ -202,7 +191,7 @@ function main_func()
 
 	comb += 1
 
-	@printf "[%d / %d] Theta: %.2f Mutation: %.2f Delta: %.3f Best_t: %.2f Best_m: %.2f Best_d: %.3f \n" comb combinations t m d best_theta best_mutation best_delta
+	@printf "[%d / %d] Theta: %.2f Mutation: %.2f Delta: %.3f Best_t: %.2f Best_m: %.2f Best_d: %.3f \n" comb, combinations t, m, d, best_theta, best_mutation, best_delta
 	
 	end
 	end
