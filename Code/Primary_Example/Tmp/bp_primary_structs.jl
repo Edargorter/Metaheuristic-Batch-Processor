@@ -1,4 +1,4 @@
-# Structures for batch processing systems
+# Structures for batch processing systems representations 
 
 # Reaction duration coefficients
 struct Coefs
@@ -21,6 +21,13 @@ struct Unit
 
 	#Associated tasks with alpha/beta rate coefficients
 	tasks::Dict{Int, Coefs}  
+end
+
+struct BPS_Storage
+	name::String
+	capacity::Float64
+	feeders::Array{Int}
+	receivers::Array{Int}
 end
 
 # Parameter configurations for a batch process of this complexity

@@ -23,6 +23,15 @@ struct Unit
 	tasks::Dict{Int, Coefs}  
 end
 
+struct BPS_Storage
+	name::String
+	capacity::Float64 
+
+	# Task feeders / receivers 
+	feeders::Array{Int}
+	receivers::Array{Int}
+end
+
 # Parameter configurations for a batch process of this complexity
 struct BPS_Config
 	# Numbers
@@ -38,8 +47,8 @@ struct BPS_Config
 	#Tasks
 	tasks::Array{RTask}
 
-	# Storage constraints
-	storage_capacity::Array{Float64}
+	# Storages
+	storages::Array{BPS_Storage}
 
 	#Initial volumes
 	initial_volumes::Array{Float64}
