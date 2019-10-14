@@ -131,11 +131,10 @@ function main_func()
 
 	# Metaheuristic parameters 
 
-	overall_top_fitness = 0
 
 	#Keep track of best combination of metaheuristic parameters
-	best_theta = 0
-	best_mutation = 0
+	best_theta = 0.1
+	best_mutation = 0.1
 	best_delta = 0
 
 	combinations = size(deltas)[1] * size(mutations)[1] * size(thetas)[1]
@@ -147,6 +146,7 @@ function main_func()
 		#### METAHEURISTIC PARAMETERS ####
 		parameters_filename = "parameters_$(p).txt"
 		params_file = read_parameters(parameters_filename)
+		overall_top_fitness = 0
 
 		##### GENERATE CANDIDATES #####
 		cands = generate_pool(config, params_file)

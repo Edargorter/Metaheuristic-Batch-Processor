@@ -131,7 +131,6 @@ function main_func()
 
 	# Metaheuristic parameters 
 
-	overall_top_fitness = 0
 
 	#Keep track of best combination of metaheuristic parameters
 	best_theta = 0
@@ -151,6 +150,8 @@ function main_func()
 
 		##### GENERATE CANDIDATES #####
 		cands = generate_pool(config, params_file)
+
+		overall_top_fitness = 0
 
 		for t in thetas
 		for m in mutations

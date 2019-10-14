@@ -114,12 +114,10 @@ print("\n")
 
 =#
 
+
 ### RUN TESTS ###
 
-no_params = 6
-no_tests = 30
-top_fitness = 0.0
-time_recorded = 0.0
+#=
 
 @printf "TESTS: %d" no_tests
 newline(2)
@@ -171,80 +169,96 @@ for p in 1:no_params
 
 end
 
-#=
+=#
+
+#Grid searches 
+
+no_params = 6
+no_tests = 30
+top_fitness = 0.0 
+time_recorded = 0.0
 
 
-### PARAMETER SEARCH ###
-
-crossovers = 0.1:0.1:0.9
+thetas = 0.1:0.1:1.0
 mutations = 0.1:0.1:1.0
-deltas = 0.0:0.025:1.0
+deltas = 0:0.125:1.0
 
-best_theta = 0.1
-best_mutation = 0.1
-best_delta = 0.0
-time_of = 0.0
+# Metaheuristic parameters 
 
+
+combinations = size(deltas)[1] * size(mutations)[1] * size(thetas)[1]
+
+logfile = open("default.txt", "a")
 
 for p in 1:no_params
-	logfile_name = "log_$(p).txt"
-	logfile = open(logfile_name, "a")
-
-	best_fitness = 0.0
-	time_sum = 0.0
 
 	#### METAHEURISTIC PARAMETERS ####
 	parameters_filename = "parameters_$(p).txt"
-	params = read_parameters(parameters_filename)
+	params_file = read_parameters(parameters_filename)
 
-	to_write = "Horizon: $(params.horizon) Events: $(params.no_events) Population: $(params.population) Generations: $(params.generations)\n\n\n" 
+	overall_top_fitness = 0
+	#Keep track of best combination of metaheuristic parameters
+	best_theta = 0.1
+	best_mutation = 0.1
+	best_delta = 0
 
-	write(logfile, to_write)
+	##### GENERATE CANDIDATES #####
+	cands = generate_pool(config, params_file)
+	comb = 0
 
-	for theta in crossovers
-		for mut in mutations
-			for det in deltas
+for t in thetas
+for m in mutations
+for d in deltas
 
-				to_write = "Theta: $(theta) Mutation: $(mut) Delta: $(det)\n"
-				write(logfile, to_write)
+	params = Params(params_file.horizon, params_file.no_events, params_file.population, params_file.generations, t, m, d)
+	
+	#Temporary instructions / duration arrays
+	#instr_arr::Array{Int, 2} = zeros(config.no_units, params.no_events)	
+	#durat_arr::Array{Float64} = zeros(params.no_events)
 
-				top_fitness = 0.0
-				params.theta = theta
-				params.mutation_rate = mut
-				params.delta = det
-				
-				for test in 1:no_tests
+	#@printf "Horizon: %.1f Events: %d Generations: %d Population: %d \t--- " params.horizon params.no_events params.generations params.population
 
-					Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
+	time_sum = 0.0
+	top_fitness = 0.0
 
-					##### GENERATE CANDIDATES #####
-					cands = generate_pool(config, params)
+	for test in 1:no_tests
 
-					##### EVOLVE CHROMOSOMES #####
-					seconds = @elapsed index, fitness = evolve_chromosomes(logfile, config, cands, params, false)
-					time_sum += seconds
+		#### Test No. ####
+		#write(logfile, "Test: $(test)\n")
 
-					if fitness > top_fitness top_fitness = fitness end
-				end
+		##### EVOLVE CHROMOSOMES #####
+		#seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
+		#time_sum += seconds
 
-				if top_fitness > best_fitness 
-					best_fitness = top_fitness
-					best_theta = theta
-					best_mutation = mut
-					best_delta = det
-				end
+		best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
 
-				write(logfile, "\n\n")
-
-			end
+		if best_fitness > top_fitness
+			top_fitness = best_fitness
+			#instr_arr = copy(cands[best_index].instructions)
+			#durat_arr = copy(cands[best_index].durations)
 		end
+
 	end
 
-	write(logfile, "\n\n")
+	if top_fitness > overall_top_fitness
+		overall_top_fitness = top_fitness
+		best_theta = t
+		best_mutation = m
+		best_delta = d
+	end
 
-	@printf "Time: %.6f Horizon: %.2f Events: %d Population: %d Generations: %d Theta: %.2f Mutation: %.2f Delta: %.2f Fitness: %.6f\n" time_sum params.horizon params.no_events params.population params.generations best_theta best_mutation best_delta best_fitness
-					
-end
-close(logfile)
-=#
+	#@printf "Total Time: %.6f Optimal Fitness: %.6f " time_sum top_fitness
+	#print(instr_arr)
+	#print(durat_arr)
+	#newline()
 
+	#close(logfile)
+
+	comb += 1 #increment combination counter 
+	@printf "For P: %d [%d / %d] Theta: %.2f Mutation: %.2f Delta: %.3f Best_t: %.2f Best_m: %.2f Best_d: %.3f \n" p comb combinations t m d best_theta best_mutation best_delta
+
+end #thetas 
+end #mutations
+end #Deltas 
+
+end #P for end
