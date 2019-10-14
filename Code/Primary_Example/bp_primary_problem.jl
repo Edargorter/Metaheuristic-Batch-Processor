@@ -127,7 +127,7 @@ function main_func()
 	#Grid searches 
 	thetas = 0.1:0.1:1.0
 	mutations = 0.1:0.1:1.0
-	deltas = 0:0.025:1.0
+	deltas = 0:0.125:1.0
 
 	# Metaheuristic parameters 
 
@@ -138,21 +138,23 @@ function main_func()
 	best_mutation = 0
 	best_delta = 0
 
-	combinations = size(deltas)[1] * size(mutations)[1] * size(deltas)[1]
-	comb = 0
+	combinations = size(deltas)[1] * size(mutations)[1] * size(thetas)[1]
 
-	for t in thetas
-	for m in mutations
-	for d in deltas
+	logfile = open("default.txt", "a")
 	
 	for p in 1:no_params
-
-		@printf "Theta: %.3 Mutation Rate: %.3f Delta: %.3f P: %d\n" t m d p
-		logfile = open("log_$(p).txt", "a")
 
 		#### METAHEURISTIC PARAMETERS ####
 		parameters_filename = "parameters_$(p).txt"
 		params_file = read_parameters(parameters_filename)
+
+		##### GENERATE CANDIDATES #####
+		cands = generate_pool(config, params_file)
+		comb = 0
+
+	for t in thetas
+	for m in mutations
+	for d in deltas
 
 		params = Params(params_file.horizon, params_file.no_events, params_file.population, params_file.generations, t, m, d)
 		
@@ -169,9 +171,6 @@ function main_func()
 
 			#### Test No. ####
 			#write(logfile, "Test: $(test)\n")
-
-			##### GENERATE CANDIDATES #####
-			cands = generate_pool(config, params)
 
 			##### EVOLVE CHROMOSOMES #####
 			#seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
@@ -200,16 +199,16 @@ function main_func()
 		#newline()
 
 		#close(logfile)
-
-	end
-
-	comb += 1
-
-	@printf "[%d / %d] Theta: %.2f Mutation: %.2f Delta: %.3f Best_t: %.2f Best_m: %.2f Best_d: %.3f \n" comb combinations t m d best_theta best_mutation best_delta
 	
-	end
-	end
-	end
+		comb += 1 #increment combination counter 
+		@printf "For P: %d [%d / %d] Theta: %.2f Mutation: %.2f Delta: %.3f Best_t: %.2f Best_m: %.2f Best_d: %.3f \n" p comb combinations t m d best_theta best_mutation best_delta
+
+	end #thetas 
+	end #mutations
+	end #Deltas 
+
+	end #P for end
+
 
 end
 
