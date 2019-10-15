@@ -28,7 +28,7 @@ rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
 ### key=hfuncs Helper functions ###
 
 # alpha / beta calculation (GIVEN Mean processing time, tau)
-function get_duration_parameters(var::Float64, mean::Float64, max_vol::Float64, min_vol::Float64=, max_vol::Float64, min_vol::Float64=0.0)
+function get_duration_parameters(var::Float64, mean::Float64, max_vol::Float64, min_vol::Float64=0.0)
 	alpha::Float64 = (1.0 - var) * mean
 	beta::Float64 = ((1.0 + var)*mean - alpha) / (max_vol - min_vol)
 end

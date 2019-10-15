@@ -1,0 +1,6 @@
+Generation: 1	 ----- Average Fitness: 0.5759751352617001 	----- Best: 50.0
+Generation: 2	 ----- Average Fitness: 3.886232936450747 	----- Best: 50.0
+Generation: 3	 ----- Average Fitness: 23.64780395285751 	----- Best: 61.944278979234646
+Generation: 4	 ----- Average Fitness: 37.09201345388461 	----- Best: 67.58663027757163
+Generation: 5	 ----- Average Fitness: 36.56105315268039 	----- Best: 68.61286307472744
+Generation: 6	 ----- Average Fitness: 53.314962747995466 	----- Best: 69.66219804941704

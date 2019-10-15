@@ -71,44 +71,42 @@ push!(Storages, Storage(capacity, feeder_unit, receiver_unit))
 
 config = BPS_Config(no_units, no_storages, no_instructions, product, Units, Storages)
 
-#=
-
-### RUN TESTS ###
+#Grid searches 
 
 no_params = 6
-no_tests = 30
-top_fitness = 0.0
+no_tests = 5
+top_fitness = 0.0 
 time_recorded = 0.0
 
-@printf "TESTS: %d" no_tests
-newline(2)
-thetas = 0:0.1:1.0
-mutations = 0:0.1:1.0
-deltas = 0:0.025:0.5
+thetas = 0.1:0.1:1.0
+mutations = 0.1:0.1:1.0
+deltas = 0:0.125:1.0
 
 # Metaheuristic parameters 
 
-overall_top_fitness = 0
+combinations = size(deltas)[1] * size(mutations)[1] * size(thetas)[1]
 
-#Keep track of best combination of metaheuristic parameters
-best_theta = 0
-best_mutation = 0
-best_delta = 0
+logfile = open("default.txt", "a")
 
-combinations = size(deltas)[1] * size(mutations)[1] * size(deltas)[1]
-comb = 0
+for p in 1:no_params
+
+	#### METAHEURISTIC PARAMETERS ####
+	parameters_filename = "parameters_$(p).txt"
+	params_file = read_parameters(parameters_filename)
+
+	overall_top_fitness = 0
+	#Keep track of best combination of metaheuristic parameters
+	best_theta = 0.1
+	best_mutation = 0.1
+	best_delta = 0
+
+	##### GENERATE CANDIDATES #####
+	cands = generate_pool(config, params_file)
+	comb = 0
 
 for t in thetas
 for m in mutations
 for d in deltas
-
-for p in 1:no_params
-
-	#logfile = open("log_$(p).txt", "a")
-
-	#### METAHEURISTIC PARAMETERS ####
-	#parameters_filename = "parameters_$(p).txt"
-	param_file = read_parameters(parameters_filename)
 
 	params = Params(params_file.horizon, params_file.no_events, params_file.population, params_file.generations, t, m, d)
 	
@@ -126,12 +124,11 @@ for p in 1:no_params
 		#### Test No. ####
 		#write(logfile, "Test: $(test)\n")
 
-		##### GENERATE CANDIDATES #####
-		cands = generate_pool(config, params)
-
 		##### EVOLVE CHROMOSOMES #####
-		seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
+		#seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
 		#time_sum += seconds
+
+		best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
 
 		if best_fitness > top_fitness
 			top_fitness = best_fitness
@@ -155,12 +152,11 @@ for p in 1:no_params
 
 	#close(logfile)
 
-end
+	comb += 1 #increment combination counter 
+	@printf "For P: %d [%d / %d] Theta: %.2f Mutation: %.2f Delta: %.3f Best_t: %.2f Best_m: %.2f Best_d: %.3f \n" p comb combinations t m d best_theta best_mutation best_delta
 
-comb += 1
+end #thetas 
+end #mutations
+end #Deltas 
 
-@printf "[%d / %d] Theta: %.2f Mutation: %.2f Delta: %.3f Best_t: %.2f Best_m: %.2f Best_d: %.3f \n" comb, combinations t, m, d, best_theta, best_mutation, best_delta
-
-end
-end
-end
+end #P for end
