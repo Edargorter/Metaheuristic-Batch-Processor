@@ -79,6 +79,8 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	# Default state
 	state::BPS_State = BPS_State(unit_amounts, unit_activated, copy(config.initial_volumes))
 
+	storages::Array{BPS_Storage} = config.storages
+
 	if print_data
 		@printf "State unit_active size: "
 		print(size(state.unit_active))
@@ -109,6 +111,8 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	instruction::Int = 0
 	amount::Float64 = 0.0
 	max_reached::Bool = false
+
+	use_prev_unit::Bool = false
 
 	# Iterate through events
 	for event in 1:params.no_events
@@ -176,6 +180,11 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 				# Get feeding/receiving storage containments
 				feeders = config.tasks[instruction].feeders
 				receivers = config.tasks[instruction].receivers
+
+				if size(feeders)[1] == 1
+					use_prev_unit = true
+				end
+				# Take residue state from previous unit 
 
 				alpha = tasks[instruction].alpha
 				beta = tasks[instruction].beta
