@@ -116,6 +116,27 @@ function main_func()
 
 	config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storage_capacity, initial_volumes)
 
+	
+	params = read_parameters("test_params.txt")
+
+	instructions = [1 0 1 0 0 0 0 0 0 0 0 0;
+					2 3 0 3 4 4 4 4 3 0 4 3; 
+					2 3 0 2 3 0 2 0 3 0 4 3;
+					0 0 0 0 0 5 5 0 0 5 0 5]
+
+	durations = [2.667, 2.349, 0.327, 2.68, 1.334, 1.38, 1.277, 1.453, 0.845, 2.016, 1.515, 2.157]
+
+	# Confirm that time horizons match
+	@printf "Horizon: %.3f\n" sum(durations)
+	@printf "Params Horizon: %.3f\n" params.horizon
+
+	candidate = BPS_Program(instructions, durations)
+
+	fitness = get_fitness(config, params, candidate, true)
+	@printf "Fitness: %.3f\n" fitness 
+
+#=
+
 	no_params = 9
 	no_tests = 3
 
@@ -210,6 +231,7 @@ function main_func()
 	end #P for end
 
 
+=#
 end
 
 main_func()

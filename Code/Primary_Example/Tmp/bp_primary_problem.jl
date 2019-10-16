@@ -177,25 +177,17 @@ function main_func()
 
 	config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storages, initial_volumes)
 
-	instructions = [1 0 1 0 0 0 0 0 0 0 0 0;
-					2 3 0 3 4 4 4 4 3 0 4 3; 
-					2 3 0 2 3 0 2 0 3 0 4 3;
-					0 0 0 0 0 5 5 0 0 5 0 5]
+	params = read_parameters("tmp_params.txt")
 
-	durations = [2.667, 2.349, 0.327, 2.68, 1.334, 1.38, 1.277, 1.453, 0.845, 2.016, 1.515, 2.157]
+	instructions = [1 1 1 0 0 1 1 0 0 1 0 0 1 1 1 0 1 0 1 0 1; 2 2 0 3 0 2 3 2 0 4 2 0 0 3 0 4 0 0 3 4 0; 2 3 0 3 0 3 4 0 4 3 0 4 4 3 0 4 0 0 3 0 4; 0 0 0 5 0 0 5 0 0 5 0 5 5 5 5 5 0 5 5 0 5]
+	durations = [2.70124, 0.98126, 1.68606, 1.20393, 1.47519, 2.6835, 0.124424, 1.24122, 1.42906, 1.66661, 1.01, 1.56972, 0.0876, 2.32005, 0.363589, 0.116204, 0.894455, 0.298675, 1.48692, 0.657943, 0.00235711]
 
-	#=
-	instructions = [1 0 0 0 0 0 0 0;
-					2 0 3 0 4 0 3 0;
-					2 0 0 3 0 4 5 0;
-					0 0 0 0 0 0 0 5]
-
-	durations = [1.135, 0.962, 0.514, 2.139, 0.335, 0.992, 0.961, 0.962]
-	=#
+	@printf "Horizon: %.3f\n" sum(durations)
+	@printf "Params Horizon: %.3f\n" params.horizon
 
 	candidate = BPS_Program(instructions, durations)
 
-	fitness = get_fitness(config, params, candidate)
+	fitness = get_fitness(config, params, candidate, true)
 	@printf "Fitness: %.3f\n" fitness 
 end
 
