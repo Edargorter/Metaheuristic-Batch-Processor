@@ -192,6 +192,11 @@ function main_func()
 
 	durations = [1.135, 0.962, 0.514, 2.139, 0.335, 0.992, 0.961, 0.962]
 	=#
+
+	candidate = BPS_Program(instructions, durations)
+
+	fitness = get_fitness(config, params, candidate)
+	@printf "Fitness: %.3f\n" fitness 
 end
 
 main_func()
