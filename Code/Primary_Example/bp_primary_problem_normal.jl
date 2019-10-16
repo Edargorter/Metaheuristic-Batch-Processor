@@ -128,9 +128,9 @@ function main_func()
 	thetas = 0.1:0.1:1.0
 	mutations = 0.1:0.1:1.0
 	deltas = 0:0.125:1.0
+	sigmas = 1:1:100
 
 	# Metaheuristic parameters 
-
 
 	#Keep track of best combination of metaheuristic parameters
 	best_theta = 0
@@ -144,19 +144,17 @@ function main_func()
 	
 	for p in 1:no_params
 
+		best_sigma = 1
+
+		for sigma in sigmas
+
 		#### METAHEURISTIC PARAMETERS ####
 		parameters_filename = "parameters_$(p).txt"
-		params_file = read_parameters(parameters_filename)
+		params = read_parameters(parameters_filename)
 		overall_top_fitness = 0
 
 		##### GENERATE CANDIDATES #####
-		cands = generate_pool(config, params_file)
-
-		for t in thetas
-		for m in mutations
-		for d in deltas
-
-		params = Params(params_file.horizon, params_file.no_events, params_file.population, params_file.generations, t, m, d)
+		cands = generate_pool(config, params)
 		
 		#Temporary instructions / duration arrays
 		#instr_arr::Array{Int, 2} = zeros(config.no_units, params.no_events)	
@@ -173,7 +171,7 @@ function main_func()
 			#write(logfile, "Test: $(test)\n")
 
 			##### EVOLVE CHROMOSOMES #####
-			#seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
+			#seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false, sigma)
 			#time_sum += seconds
 
 			best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
@@ -188,9 +186,7 @@ function main_func()
 
 		if top_fitness > overall_top_fitness
 			overall_top_fitness = top_fitness
-			best_theta = t
-			best_mutation = m
-			best_delta = d
+			best_sigma = sigma
 		end
 
 		#@printf "Total Time: %.6f Optimal Fitness: %.6f " time_sum top_fitness
@@ -200,12 +196,9 @@ function main_func()
 
 		#close(logfile)
 	
-		comb += 1
-	@printf "For P: %d [%d / %d] Theta: %.2f Mutation: %.2f Delta: %.3f Best_t: %.2f Best_m: %.2f Best_d: %.3f \n" p comb combinations t m d best_theta best_mutation best_delta
-
-	end #thetas 
-	end #mutations
-	end #Deltas 
+		end #End sigmas 
+		
+		@printf "P: %d Best sigma: %d\n" p best_sigma
 
 	end #P for end
 

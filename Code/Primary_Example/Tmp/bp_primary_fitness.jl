@@ -79,6 +79,8 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	# Default state
 	state::BPS_State = BPS_State(unit_amounts, unit_activated, copy(config.initial_volumes))
 
+	storages::Array{BPS_Storage} = config.storages
+
 	if print_data
 		@printf "State unit_active size: "
 		print(size(state.unit_active))
@@ -109,6 +111,8 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 	instruction::Int = 0
 	amount::Float64 = 0.0
 	max_reached::Bool = false
+
+	prev_unit_amount::Float64 = 0.0
 
 	# Iterate through events
 	for event in 1:params.no_events
@@ -154,6 +158,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 			unit_capacity = config.units[unit].capacity
 			unit_amount = state.unit_amounts[unit, event]
+			prev_unit_amount = 0.0
 
 			active = state.unit_active[unit, event]
 
@@ -176,6 +181,18 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 				# Get feeding/receiving storage containments
 				feeders = config.tasks[instruction].feeders
 				receivers = config.tasks[instruction].receivers
+
+				# Take residue state from previous unit 
+				if size(feeders)[1] == 1 # If unit has only a single storage feed
+
+					# If that single feeder has a single unit feeder 
+					if size(config.storages[feeder].feeders)[1] == 1
+						prev_unit::Int = config.storages[feeder].feeders[1]
+						if !(state.unit_active[prev_unit, event] && candidate.instructions[prev_unit, event] == 0)
+							prev_unit_amount = state.unit_amounts[prev_unit, event]
+						end
+					end
+				end
 
 				alpha = tasks[instruction].alpha
 				beta = tasks[instruction].beta
@@ -209,6 +226,12 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 					amount = 0.0
 					task_duration = 0.0
 					max_reached = false
+					max_amount::Float64 = state.storage_amounts[feeder]
+					
+					if prev_unit_amount > 0
+						max_amount += prev_unit_amount 
+					end
+
 					active = 0
 
 					task_end::Int = event # from current event to final event point of task
@@ -220,8 +243,8 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 							active = instruction
 							amount = (task_duration - alpha) / beta 
 							for (feeder, fraction) in feeders
-								if fraction * amount > state.storage_amounts[feeder]
-									amount = state.storage_amounts[feeder] / fraction
+								if fraction * amount > max_amount
+									amount = max_amount / fraction
 									max_reached = true
 								end
 							end
@@ -237,10 +260,22 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 						if task_end >= params.no_events break end #If time horizon reached
 						if candidate.instructions[unit, task_end] != 0 break end #If next instuction is a new one
 
-					end
+					end #While 
 
 					if active > 0
 						state.unit_amounts[unit, event + 1] = amount
+
+						# Flush from previous unit 
+						if prev_unit_amount > 0
+							if amount >= prev_unit_amount
+								state.unit_amounts[prev_unit, event] = 0
+								amount -= prev_unit_amount
+							else
+								state.unit_amounts[prev_unit, event] = prev_unit_amount - amount	
+								amount = 0
+							end
+						end
+						
 						for (feeder, fraction) in feeders
 							state.storage_amounts[feeder] -= fraction * amount
 						end

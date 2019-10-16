@@ -47,8 +47,8 @@ struct BPS_Config
 	#Tasks
 	tasks::Array{RTask}
 
-	# Storages
-	storages::Array{BPS_Storage}
+	# Storages capacity
+	storage_capacity::Array{Float64}
 
 	#Initial volumes
 	initial_volumes::Array{Float64}

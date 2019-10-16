@@ -1,0 +1,11 @@
+TESTS: 5
+
+P: 1 Best sigma: 100
+P: 2 Best sigma: 100
+P: 3 Best sigma: 100
+P: 4 Best sigma: 100
+P: 5 Best sigma: 100
+P: 6 Best sigma: 100
+P: 7 Best sigma: 100
+P: 8 Best sigma: 100
+P: 9 Best sigma: 100
