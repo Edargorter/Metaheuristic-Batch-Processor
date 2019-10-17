@@ -140,13 +140,16 @@ function main_func()
 	combinations = size(thetas)[1] * size(mutations)[1] * size(deltas)[1]
 	comb = 0
 
-	logfile = open("default.txt", "a")
+	#logfile = open("default.txt", "a")
 	
 	for p in 1:no_params
+
 
 		best_sigma = 1
 
 		for sigma in sigmas
+
+		logfile = open("Sigmas/sigma_$(p)_$(sigma).txt", "w")
 
 		#### METAHEURISTIC PARAMETERS ####
 		parameters_filename = "parameters_$(p).txt"
@@ -168,13 +171,13 @@ function main_func()
 		for test in 1:no_tests
 
 			#### Test No. ####
-			#write(logfile, "Test: $(test)\n")
+			write(logfile, "Test: $(test)\n")
 
 			##### EVOLVE CHROMOSOMES #####
-			#seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false, sigma)
-			#time_sum += seconds
+			seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false, sigma)
+			time_sum += seconds
 
-			best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
+			#best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
 
 			if best_fitness > top_fitness
 				top_fitness = best_fitness
@@ -189,7 +192,9 @@ function main_func()
 			best_sigma = sigma
 		end
 
-		#@printf "Total Time: %.6f Optimal Fitness: %.6f " time_sum top_fitness
+		time_sum = time_sum / no_tests 
+
+		@printf "Total Time: %.6f Optimal Fitness: %.6f Sigma: %d\n" time_sum top_fitness sigma
 		#print(instr_arr)
 		#print(durat_arr)
 		#newline()

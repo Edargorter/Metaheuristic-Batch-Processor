@@ -122,7 +122,7 @@ end
 
 ### key=evolfunc Evolution Function ###
 
-function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Program}, params::Params, display_info::Bool=true, std_dev::Float64 = 3.0)
+function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Program}, params::Params, display_info::Bool=true, std_dev::Int=3)
 	N::Int = params.population
 	fitness::Array{Float64} = zeros(N)
 	best_index::Int = 0
@@ -144,10 +144,8 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s]) end
 		average_fitness::Float64 = sum(fitness)/N
 
-		#=
 		to_write::String = "Generation: $(generation)\t ----- Average Fitness: $(average_fitness) \t----- Best: $(best_fitness)\n"
 		write(logfd, to_write)
-		=#
 
 		indices::Array{Int} = sortperm(fitness, rev=true)
 		best_index = indices[1]
