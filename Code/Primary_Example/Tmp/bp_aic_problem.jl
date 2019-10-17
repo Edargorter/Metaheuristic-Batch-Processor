@@ -21,6 +21,7 @@ function main_func()
 
 	no_units = 4
 	no_storages = 6
+	no_instructions = 4
 	no_tasks = 4
 	products = [6]
 	prices = [10.0, 10.0]
@@ -94,15 +95,49 @@ function main_func()
 	unit_4 = Unit("Still", 40, unit_tasks)
 	push!(units, unit_4)
 
-	#Setup storages
-	storage_capacity = [Inf, 10, 15, 10, 15, Inf]
+	#### Setup storages ####
+	storages = []
+	
+	feeders = []
+	receivers = [1]
+	state_1 = BPS_Storage("S1", Inf, feeders, receivers)
+	push!(storages, state_1)
+
+	feeders = [1]
+	receivers = [2]
+	state_2 = BPS_Storage("S2", 10, feeders, receivers)
+	push!(storages, state_2)
+
+	feeders = [1]
+	receivers = [3]
+	state_3 = BPS_Storage("S3", 15, feeders, receivers)
+	push!(storages, state_3)
+
+	feeders = [2]
+	receivers = [4]
+	state_4 = BPS_Storage("S4", 10, feeders, receivers)
+	push!(storages, state_4)
+
+	feeders = [3]
+	receivers = [4]
+	state_5 = BPS_Storage("S5", 15, feeders, receivers)
+	push!(storages, state_5)
+
+	feeders = [4]
+	receivers = []
+	state_6 = BPS_Storage("S6", Inf, feeders, receivers)
+	push!(storages, state_6)
 
 	#Initial volumes
 	initial_volumes = [Inf, 0, 0, 0, 0, 0]
 
+	config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storages, initial_volumes)
+
+	params = read_parameters("tmp_params.txt")
+	
+	instructions = [1 1 1 0 0 0 0 0 0 0; 0 0 0 2 2 2 2 
 
 ##########################  TESTS  ############################### 
-
 
 	#=
 
