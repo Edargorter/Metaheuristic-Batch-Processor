@@ -5,7 +5,7 @@ using Printf
 include("bp_primary_structs.jl")
 include("bp_primary_functions.jl")
 include("ga_alg.jl")
-include("bp_primary_fitness.jl")
+include("bp_primary_fitness_improved.jl")
 
 #Seed
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
@@ -19,12 +19,12 @@ function main_func()
 
 	#### CONFIG PARAMETERS ####
 
-	no_units = 4
+	no_units = 6
 	no_storages = 6
-	no_instructions = 4
 	no_tasks = 4
+	no_instructions = no_tasks
 	products = [6]
-	prices = [10.0, 10.0]
+	prices = [2.0]
 
 	# Setup tasks 
 	tasks = []
@@ -32,110 +32,141 @@ function main_func()
 	feeders = Dict{Int, Float64}()
 	receivers = Dict{Int, Float64}()
 	feeders[1] = 1.0
-	receivers[2] = 0.5
-	receivers[3] = 0.5
-	push!(tasks, RTask("Reaction 1", feeders, receivers))
+	receivers[3] = 1.0
+	push!(tasks, RTask("Reaction", feeders, receivers))
 
 	feeders = Dict{Int, Float64}()
 	receivers = Dict{Int, Float64}()
-	feeders[2] = 1.0
+	feeders[2] = 0.5
+	feeders[3] = 0.5
 	receivers[4] = 1.0
-	push!(tasks, RTask("reaction 2", feeders, receivers))
+	push!(tasks, RTask("Mixing", feeders, receivers))
 
 	feeders = Dict{Int, Float64}()
 	receivers = Dict{Int, Float64}()
-	feeders[3] = 1.0
+	feeders[4] = 1.0
 	receivers[5] = 1.0
-	push!(tasks, RTask("reaction 3", feeders, receivers))
+	push!(tasks, RTask("Filtering", feeders, receivers))
 
 	feeders = Dict{Int, Float64}()
 	receivers = Dict{Int, Float64}()
-	feeders[4] = 0.5
-	feeders[5] = 0.5
+	feeders[5] = 1.0
+	feeders[6] = 1.0
 	receivers[6] = 1.0
-	push!(tasks, RTask("reaction 4", feeders, receivers))
-
+	push!(tasks, RTask("Stripping", feeders, receivers))
 
 	##### Reactions #####
 	#=
 
-	Reaction 1	: 1
-	Reaction 2	: 2
-	Reaction 3	: 3
-	Reaction 5	: 4
+	Reaction	: 1
+	Mixing		: 2
+	Flitering	: 3
+	Stripping 	: 4
 	
 	=#
 	#####################
 
+	var = 1/3
 
 	#Setup units
 	units = []
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[1] = Coefs(5/3, 1/30)
+	alpha, beta = get_duration_parameters(var, 26.0, 20.0)
+	unit_tasks[1] = Coefs(alpha, beta)
 
-	unit_1 = Unit("Heater", 40, unit_tasks)
-	push!(units, unit_1)
-
-	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[2] = Coefs(7/3, 1/12)
-
-	unit_2 = Unit("Reactor 1", 20, unit_tasks)
-	push!(units, unit_2)
+	reactor = Unit("Reactor", 20, unit_tasks)
+	push!(units, reactor)
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[3] = Coefs(2/3, 1/15)
+	alpha, beta = get_duration_parameters(var, 4.0, 20.0)
+	unit_tasks[2] = Coefs(alpha, beta)
 
-	unit_3 = Unit("Reactor 2", 5, unit_tasks)
-	push!(units, unit_3)
+	mixer_1 = Unit("Mixer 1", 20, unit_tasks)
+	push!(units, mixer_1)
+
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[5] = Coefs(8/3, 1/120)
+	alpha, beta = get_duration_parameters(var, 4.0, 20.0)
+	unit_tasks[2] = Coefs(alpha, beta)
 
-	unit_4 = Unit("Still", 40, unit_tasks)
-	push!(units, unit_4)
+	mixer_2 = Unit("Mixer 1", 20, unit_tasks)
+	push!(units, mixer_2)
+
+
+	unit_tasks = Dict{Int, Coefs}()
+	alpha, beta = get_duration_parameters(var, 6.0, 20.0)
+	unit_tasks[3] = Coefs(alpha, beta)
+
+	filter = Unit("Filter", 20, unit_tasks)
+	push!(units, filter)
+
+
+	unit_tasks = Dict{Int, Coefs}()
+	alpha, beta = get_duration_parameters(var, 8.0, 20.0)
+	unit_tasks[4] = Coefs(alpha, beta)
+
+	strip_tank_1 = Unit("Strip Tank 1", 20, unit_tasks)
+	push!(units, strip_tank_1)
+
+
+	unit_tasks = Dict{Int, Coefs}()
+	alpha, beta = get_duration_parameters(var, 8.0, 20.0)
+	unit_tasks[4] = Coefs(alpha, beta)
+
+	strip_tank_2 = Unit("Strip Tank 2", 20, unit_tasks)
+	push!(units, strip_tank_2)
 
 	#### Setup storages ####
 	storages = []
 	
 	feeders = []
 	receivers = [1]
-	state_1 = BPS_Storage("S1", Inf, feeders, receivers)
-	push!(storages, state_1)
+	feed = BPS_Storage("Feed", Inf, feeders, receivers)
+	push!(storages, feed)
+
+	feeders = []
+	receivers = [2]
+	add_1 = BPS_Storage("Add 1", Inf, feeders, receivers)
+	push!(storages, add_1)
 
 	feeders = [1]
 	receivers = [2]
-	state_2 = BPS_Storage("S2", 10, feeders, receivers)
-	push!(storages, state_2)
-
-	feeders = [1]
-	receivers = [3]
-	state_3 = BPS_Storage("S3", 15, feeders, receivers)
-	push!(storages, state_3)
+	r_prod = BPS_Storage("R Prod", 100, feeders, receivers)
+	push!(storages, r_prod)
 
 	feeders = [2]
-	receivers = [4]
-	state_4 = BPS_Storage("S4", 10, feeders, receivers)
-	push!(storages, state_4)
+	receivers = [3]
+	blend = BPS_Storage("Blend", 100, feeders, receivers)
+	push!(storages, blend)
 
 	feeders = [3]
 	receivers = [4]
-	state_5 = BPS_Storage("S5", 15, feeders, receivers)
-	push!(storages, state_5)
+	filt = BPS_Storage("Filt", 100, feeders, receivers)
+	push!(storages, filt)
 
 	feeders = [4]
 	receivers = []
-	state_6 = BPS_Storage("S6", Inf, feeders, receivers)
-	push!(storages, state_6)
+	prod = BPS_Storage("Prod", Inf, feeders, receivers)
+	push!(storages, prod)
 
 	#Initial volumes
-	initial_volumes = [Inf, 0, 0, 0, 0, 0]
+	initial_volumes = [Inf, Inf, 0, 0, 0, 0]
 
 	config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storages, initial_volumes)
 
 	params = read_parameters("tmp_params.txt")
-	
-	instructions = [1 1 1 0 0 0 0 0 0 0; 0 0 0 2 2 2 2 
+
+	cands = generate_pool(config, params)
+
+	best_index, best_fitness = evolve_chromosomes(config, cands, params)
+
+	@printf "Best Fitness: %.3f\n" best_fitness
+	fitness = get_fitness(config, params, cands[best_index], true)
+	@printf "Fitness: %.3f\n" fitness
+	newline()
+	print(cands[best_index])
+	newline()
 
 ##########################  TESTS  ############################### 
 

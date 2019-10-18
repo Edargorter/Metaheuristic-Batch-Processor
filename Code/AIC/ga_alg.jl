@@ -23,7 +23,7 @@
 using Random
 using Dates
 
-include("bp_primary_fitness.jl")
+include("bp_primary_fitness_improved.jl")
 
 #Random seed based on number of milliseconds of current date
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
@@ -118,7 +118,7 @@ end
 
 ### key=evolfunc Evolution Function ###
 
-function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Program}, params::Params, display_info::Bool=true)
+function evolve_chromosomes(config::BPS_Config, candidates::Array{BPS_Program}, params::Params, display_info::Bool=true)
 	N::Int = params.population
 	fitness::Array{Float64} = zeros(N)
 	best_index::Int = 0

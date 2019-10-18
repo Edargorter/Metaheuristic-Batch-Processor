@@ -336,6 +336,6 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 	# Return profit
 
-	result::Float64 = 10.0 * (state.storage_amounts[8] + state.storage_amounts[9])
+	result::Float64 = sum(config.prices.*(state.storage_amounts[config.products]))
 	return result
 end
