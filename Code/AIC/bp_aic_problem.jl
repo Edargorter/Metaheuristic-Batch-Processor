@@ -147,7 +147,6 @@ function main_func()
 
 	fitness = get_fitness(config, params, candidate)
 	@printf "Fitness: %.3f\n" fitness
-=#
 	
 	cands = generate_pool(config, params)
 
@@ -157,6 +156,56 @@ function main_func()
 	newline()
 	print(cands[best_index])
 	newline()
+
+=#
+	no_params = 10
+	no_tests = 30
+
+	for p in 1:no_params
+
+		logfile = open("log_$(p).txt", "a")
+
+		#### METAHEURISTIC PARAMETERS ####
+		parameters_filename = "parameters_$(p).txt"
+		params = read_parameters(parameters_filename)
+		
+		@printf "P:%d Horizon: %.3f Events: %.3f\n" p params.horizon params.no_events
+
+		#Temporary instructions / duration arrays
+		instr_arr::Array{Int, 2} = zeros(config.no_units, params.no_events)	
+		durat_arr::Array{Float64} = zeros(params.no_events)
+
+		time_sum = 0.0
+		top_fitness = 0.0
+
+		for test in 1:no_tests
+
+			#### Test No. ####
+			write(logfile, "Test: $(test)\n")
+
+			##### GENERATE CANDIDATES #####
+			cands = generate_pool(config, params)
+
+			##### EVOLVE CHROMOSOMES #####
+			seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
+			time_sum += seconds
+
+			if best_fitness > top_fitness
+				top_fitness = best_fitness
+				instr_arr = copy(cands[best_index].instructions)
+				durat_arr = copy(cands[best_index].durations)
+			end
+
+		end
+
+		@printf "Total Time: %.6f Optimal Fitness: %.6f " time_sum top_fitness
+		print(instr_arr)
+		print(durat_arr)
+		newline()
+
+		close(logfile)
+
+	end
 
 ##########################  TESTS  ############################### 
 
