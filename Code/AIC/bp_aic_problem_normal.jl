@@ -158,7 +158,7 @@ function main_func()
 	newline()
 
 =#
-	no_params = 10
+	no_params = 11
 	no_tests = 30
 
 	for p in 1:no_params

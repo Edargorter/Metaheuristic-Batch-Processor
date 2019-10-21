@@ -1,4 +1,4 @@
-horizon:5
+horizon:10
 no_events:5
 population:500
 generations:500

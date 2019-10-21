@@ -116,6 +116,7 @@ function main_func()
 
 	config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storage_capacity, initial_volumes)
 
+	#=
 	
 	params = read_parameters("test_params.txt")
 
@@ -135,9 +136,10 @@ function main_func()
 	fitness = get_fitness(config, params, candidate, true)
 	@printf "Fitness: %.3f\n" fitness 
 
-#=
+	=#
 
-	no_params = 9
+
+	no_params = 5
 	no_tests = 3
 
 	### RUN TESTS ###
@@ -162,7 +164,7 @@ function main_func()
 
 	logfile = open("default.txt", "a")
 	
-	for p in 1:no_params
+	for p in 2:no_params
 
 		#### METAHEURISTIC PARAMETERS ####
 		parameters_filename = "parameters_$(p).txt"
@@ -231,7 +233,6 @@ function main_func()
 	end #P for end
 
 
-=#
 end
 
 main_func()
