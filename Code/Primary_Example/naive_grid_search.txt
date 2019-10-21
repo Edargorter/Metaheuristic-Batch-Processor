@@ -194,3 +194,16 @@ For P: 2 [191 / 900] Theta: 0.30 Mutation: 0.20 Delta: 0.125 Best_t: 0.10 Best_m
 For P: 2 [192 / 900] Theta: 0.30 Mutation: 0.20 Delta: 0.250 Best_t: 0.10 Best_m: 0.10 Best_d: 0.000 
 For P: 2 [193 / 900] Theta: 0.30 Mutation: 0.20 Delta: 0.375 Best_t: 0.10 Best_m: 0.10 Best_d: 0.000 
 For P: 2 [194 / 900] Theta: 0.30 Mutation: 0.20 Delta: 0.500 Best_t: 0.10 Best_m: 0.10 Best_d: 0.000 
+For P: 2 [195 / 900] Theta: 0.30 Mutation: 0.20 Delta: 0.625 Best_t: 0.10 Best_m: 0.10 Best_d: 0.000 
+For P: 2 [196 / 900] Theta: 0.30 Mutation: 0.20 Delta: 0.750 Best_t: 0.10 Best_m: 0.10 Best_d: 0.000 
+For P: 2 [197 / 900] Theta: 0.30 Mutation: 0.20 Delta: 0.875 Best_t: 0.10 Best_m: 0.10 Best_d: 0.000 
+For P: 2 [198 / 900] Theta: 0.30 Mutation: 0.20 Delta: 1.000 Best_t: 0.10 Best_m: 0.10 Best_d: 0.000 
+For P: 2 [199 / 900] Theta: 0.30 Mutation: 0.30 Delta: 0.000 Best_t: 0.10 Best_m: 0.10 Best_d: 0.000 
+For P: 2 [200 / 900] Theta: 0.30 Mutation: 0.30 Delta: 0.125 Best_t: 0.10 Best_m: 0.10 Best_d: 0.000 
+For P: 2 [201 / 900] Theta: 0.30 Mutation: 0.30 Delta: 0.250 Best_t: 0.10 Best_m: 0.10 Best_d: 0.000 
+For P: 2 [202 / 900] Theta: 0.30 Mutation: 0.30 Delta: 0.375 Best_t: 0.10 Best_m: 0.10 Best_d: 0.000 
+For P: 2 [203 / 900] Theta: 0.30 Mutation: 0.30 Delta: 0.500 Best_t: 0.10 Best_m: 0.10 Best_d: 0.000 
+For P: 2 [204 / 900] Theta: 0.30 Mutation: 0.30 Delta: 0.625 Best_t: 0.10 Best_m: 0.10 Best_d: 0.000 
+For P: 2 [205 / 900] Theta: 0.30 Mutation: 0.30 Delta: 0.750 Best_t: 0.10 Best_m: 0.10 Best_d: 0.000 
+For P: 2 [206 / 900] Theta: 0.30 Mutation: 0.30 Delta: 0.875 Best_t: 0.10 Best_m: 0.10 Best_d: 0.000 
+For P: 2 [207 / 900] Theta: 0.30 Mutation: 0.30 Delta: 1.000 Best_t: 0.10 Best_m: 0.10 Best_d: 0.000 
