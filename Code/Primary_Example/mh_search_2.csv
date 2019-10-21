@@ -1,0 +1,2 @@
+Hours (H),Population Size,Generations,Crossover (t),Mutation (m),Delta
+8,1000,50,0.1,0.9,0.650

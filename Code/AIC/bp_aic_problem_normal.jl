@@ -4,8 +4,8 @@ using Printf
 
 include("bp_primary_structs.jl")
 include("bp_primary_functions.jl")
-include("ga_alg.jl")
-include("bp_primary_fitness.jl")
+include("ga_alg_normal.jl")
+include("bp_primary_fitness_improved.jl")
 
 #Seed
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
@@ -21,9 +21,10 @@ function main_func()
 
 	no_units = 4
 	no_storages = 6
+	no_instructions = 4
 	no_tasks = 4
 	products = [6]
-	prices = [10.0, 10.0]
+	prices = [10.0]
 
 	# Setup tasks 
 	tasks = []
@@ -33,7 +34,7 @@ function main_func()
 	feeders[1] = 1.0
 	receivers[2] = 0.5
 	receivers[3] = 0.5
-	push!(tasks, RTask("Reaction 1", feeders, receivers))
+	push!(tasks, RTask("reaction 1", feeders, receivers))
 
 	feeders = Dict{Int, Float64}()
 	receivers = Dict{Int, Float64}()
@@ -61,7 +62,7 @@ function main_func()
 	Reaction 1	: 1
 	Reaction 2	: 2
 	Reaction 3	: 3
-	Reaction 5	: 4
+	Reaction 4	: 4
 	
 	=#
 	#####################
@@ -89,20 +90,124 @@ function main_func()
 	push!(units, unit_3)
 
 	unit_tasks = Dict{Int, Coefs}()
-	unit_tasks[5] = Coefs(8/3, 1/120)
+	unit_tasks[4] = Coefs(8/3, 1/120)
 
 	unit_4 = Unit("Still", 40, unit_tasks)
 	push!(units, unit_4)
 
-	#Setup storages
-	storage_capacity = [Inf, 10, 15, 10, 15, Inf]
+	#### Setup storages ####
+	storages = []
+	
+	feeders = []
+	receivers = [1]
+	state_1 = BPS_Storage("S1", Inf, feeders, receivers)
+	push!(storages, state_1)
+
+	feeders = [1]
+	receivers = [2]
+	state_2 = BPS_Storage("S2", 10, feeders, receivers)
+	push!(storages, state_2)
+
+	feeders = [1]
+	receivers = [3]
+	state_3 = BPS_Storage("S3", 15, feeders, receivers)
+	push!(storages, state_3)
+
+	feeders = [2]
+	receivers = [4]
+	state_4 = BPS_Storage("S4", 10, feeders, receivers)
+	push!(storages, state_4)
+
+	feeders = [3]
+	receivers = [4]
+	state_5 = BPS_Storage("S5", 15, feeders, receivers)
+	push!(storages, state_5)
+
+	feeders = [4]
+	receivers = []
+	state_6 = BPS_Storage("S6", Inf, feeders, receivers)
+	push!(storages, state_6)
 
 	#Initial volumes
 	initial_volumes = [Inf, 0, 0, 0, 0, 0]
 
+	config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storages, initial_volumes)
+
+	params = read_parameters("tmp_params.txt")
+	
+#=
+	instructions = [1 1 1 1 1 1;
+					0 2 0 0 0 2;
+					0 3 3 3 3 0;
+					0 0 0 0 0 4]
+
+	durations = [3 1 1 1 1 3]
+
+	candidate = BPS_Program(instructions, durations)
+
+	fitness = get_fitness(config, params, candidate)
+	@printf "Fitness: %.3f\n" fitness
+	
+	cands = generate_pool(config, params)
+
+	best_index, best_fitness = evolve_chromosomes(config, cands, params)
+
+	@printf "Best Fitness: %.3f\n" best_fitness
+	newline()
+	print(cands[best_index])
+	newline()
+
+=#
+	no_params = 11
+	no_tests = 30
+
+	for p in 1:no_params
+
+		logfile = open("log_$(p).txt", "a")
+
+		#### METAHEURISTIC PARAMETERS ####
+		parameters_filename = "parameters_$(p).txt"
+		params = read_parameters(parameters_filename)
+
+		@printf "P:%d Horizon: %.3f Events: %.3f\n" p params.horizon params.no_events
+		
+		#Temporary instructions / duration arrays
+		instr_arr::Array{Int, 2} = zeros(config.no_units, params.no_events)	
+		durat_arr::Array{Float64} = zeros(params.no_events)
+
+		time_sum = 0.0
+		top_fitness = 0.0
+
+		for test in 1:no_tests
+
+			#### Test No. ####
+			write(logfile, "Test: $(test)\n")
+
+			##### GENERATE CANDIDATES #####
+			cands = generate_pool(config, params)
+
+			##### EVOLVE CHROMOSOMES #####
+			seconds = @elapsed best_index, best_fitness = evolve_chromosomes(logfile, config, cands, params, false)
+			time_sum += seconds
+
+			if best_fitness > top_fitness
+				top_fitness = best_fitness
+				instr_arr = copy(cands[best_index].instructions)
+				durat_arr = copy(cands[best_index].durations)
+			end
+
+		end
+
+		@printf "Total Time: %.6f Optimal Fitness: %.6f " time_sum top_fitness
+		print(instr_arr)
+		print(durat_arr)
+		newline()
+
+		close(logfile)
+
+	end
 
 ##########################  TESTS  ############################### 
-
 
 	#=
 
@@ -140,7 +245,7 @@ function main_func()
 	
 	for p in 1:no_params
 
-		#logfile = open("log_$(p).txt", "a")
+		#logfile = open("log_$(p)_normal.txt", "a")
 
 		#### METAHEURISTIC PARAMETERS ####
 		#parameters_filename = "parameters_$(p).txt"
