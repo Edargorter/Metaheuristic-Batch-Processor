@@ -1,5 +1,3 @@
-TESTS: 5
-
 Total Time: 0.203380 Optimal Fitness: 1057.500000 Sigma: 1
 Total Time: 0.150895 Optimal Fitness: 1498.175543 Sigma: 2
 Total Time: 0.145410 Optimal Fitness: 1498.185050 Sigma: 3
@@ -100,7 +98,6 @@ Total Time: 0.145029 Optimal Fitness: 866.666667 Sigma: 97
 Total Time: 0.150582 Optimal Fitness: 1498.172154 Sigma: 98
 Total Time: 0.145479 Optimal Fitness: 1498.185118 Sigma: 99
 Total Time: 0.131898 Optimal Fitness: 866.666667 Sigma: 100
-P: 1 Best sigma: 100
 Total Time: 0.837542 Optimal Fitness: 1893.096557 Sigma: 1
 Total Time: 0.771060 Optimal Fitness: 1744.166667 Sigma: 2
 Total Time: 0.792172 Optimal Fitness: 1744.166667 Sigma: 3
@@ -201,7 +198,6 @@ Total Time: 0.793826 Optimal Fitness: 1744.166667 Sigma: 97
 Total Time: 0.779601 Optimal Fitness: 1856.991421 Sigma: 98
 Total Time: 0.614533 Optimal Fitness: 1895.035606 Sigma: 99
 Total Time: 0.772210 Optimal Fitness: 1860.052277 Sigma: 100
-P: 2 Best sigma: 100
 Total Time: 0.848509 Optimal Fitness: 2472.563180 Sigma: 1
 Total Time: 0.681490 Optimal Fitness: 2491.389226 Sigma: 2
 Total Time: 0.853771 Optimal Fitness: 2370.000000 Sigma: 3
@@ -302,7 +298,6 @@ Total Time: 0.757405 Optimal Fitness: 2443.677511 Sigma: 97
 Total Time: 0.826928 Optimal Fitness: 2410.000000 Sigma: 98
 Total Time: 0.673489 Optimal Fitness: 2431.023265 Sigma: 99
 Total Time: 0.682440 Optimal Fitness: 2486.932824 Sigma: 100
-P: 3 Best sigma: 100
 Total Time: 1.117803 Optimal Fitness: 3025.065056 Sigma: 1
 Total Time: 1.200437 Optimal Fitness: 2958.459472 Sigma: 2
 Total Time: 1.393486 Optimal Fitness: 2887.187500 Sigma: 3
@@ -403,7 +398,6 @@ Total Time: 1.411424 Optimal Fitness: 2952.974044 Sigma: 97
 Total Time: 1.435300 Optimal Fitness: 2890.720867 Sigma: 98
 Total Time: 1.498464 Optimal Fitness: 3028.102152 Sigma: 99
 Total Time: 1.543259 Optimal Fitness: 2955.000000 Sigma: 100
-P: 4 Best sigma: 100
 Total Time: 3.381746 Optimal Fitness: 3547.083333 Sigma: 1
 Total Time: 2.558767 Optimal Fitness: 3472.232304 Sigma: 2
 Total Time: 3.457657 Optimal Fitness: 3637.083333 Sigma: 3
@@ -504,7 +498,6 @@ Total Time: 3.460289 Optimal Fitness: 3580.833333 Sigma: 97
 Total Time: 3.438454 Optimal Fitness: 3423.333333 Sigma: 98
 Total Time: 3.483912 Optimal Fitness: 3547.522010 Sigma: 99
 Total Time: 3.032854 Optimal Fitness: 3406.458285 Sigma: 100
-P: 5 Best sigma: 100
 Total Time: 3.701152 Optimal Fitness: 3974.583333 Sigma: 1
 Total Time: 3.806963 Optimal Fitness: 4205.508472 Sigma: 2
 Total Time: 3.812006 Optimal Fitness: 4247.708333 Sigma: 3
@@ -605,7 +598,6 @@ Total Time: 2.606273 Optimal Fitness: 4174.189591 Sigma: 97
 Total Time: 3.709343 Optimal Fitness: 3881.860107 Sigma: 98
 Total Time: 2.539238 Optimal Fitness: 4134.644801 Sigma: 99
 Total Time: 3.761261 Optimal Fitness: 4205.520833 Sigma: 100
-P: 6 Best sigma: 100
 Total Time: 8.335388 Optimal Fitness: 4476.666667 Sigma: 1
 Total Time: 6.351415 Optimal Fitness: 4749.726056 Sigma: 2
 Total Time: 6.257561 Optimal Fitness: 4684.165470 Sigma: 3
@@ -706,7 +698,6 @@ Total Time: 8.532511 Optimal Fitness: 4667.916667 Sigma: 97
 Total Time: 8.758447 Optimal Fitness: 4656.666667 Sigma: 98
 Total Time: 5.859402 Optimal Fitness: 4641.173022 Sigma: 99
 Total Time: 7.391239 Optimal Fitness: 4591.531677 Sigma: 100
-P: 7 Best sigma: 100
 Total Time: 9.094806 Optimal Fitness: 5079.626278 Sigma: 1
 Total Time: 6.207182 Optimal Fitness: 5215.147238 Sigma: 2
 Total Time: 6.093547 Optimal Fitness: 4946.198945 Sigma: 3
@@ -807,7 +798,6 @@ Total Time: 8.114746 Optimal Fitness: 5076.043110 Sigma: 97
 Total Time: 9.457314 Optimal Fitness: 5393.042404 Sigma: 98
 Total Time: 9.042158 Optimal Fitness: 5182.916667 Sigma: 99
 Total Time: 6.651685 Optimal Fitness: 4785.565568 Sigma: 100
-P: 8 Best sigma: 100
 Total Time: 10.350655 Optimal Fitness: 5901.250000 Sigma: 1
 Total Time: 8.920716 Optimal Fitness: 5758.364971 Sigma: 2
 Total Time: 10.944715 Optimal Fitness: 5525.481771 Sigma: 3
@@ -908,4 +898,3 @@ Total Time: 10.545542 Optimal Fitness: 5508.750000 Sigma: 97
 Total Time: 8.473052 Optimal Fitness: 5476.622422 Sigma: 98
 Total Time: 10.901339 Optimal Fitness: 5710.000000 Sigma: 99
 Total Time: 8.483422 Optimal Fitness: 5750.381458 Sigma: 100
-P: 9 Best sigma: 100
