@@ -23,7 +23,7 @@
 using Random
 using Dates
 
-include("bp_primary_fitness.jl")
+include("bp_primary_fitness_improved.jl")
 
 #Random seed based on number of milliseconds of current date
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
@@ -118,7 +118,45 @@ end
 
 ### key=evolfunc Evolution Function ###
 
-function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Program}, params::Params, display_info::Bool=true)
+#Print GA progression
+function display_data(height::Int, width::Int, objective::Float64, candidate::BPS_Program, generations, best::Array{Float64}, average::Array{Float64})
+
+	interval::Int = parse(Int, height / 7)
+	disp_array::Array{String}(undef, height, generations)
+	scale = objective / height
+	for i in 1:size(best)[1]
+		disp_array[height - i][best[i] * scale] = "x"
+		disp_array[height - i][average[i] * scale] = "-"
+	end
+
+	#Print array 
+	for r in 1:height
+		if r % interval == 0
+			@printf "%.1f" (objective - r*interval)
+			@printf "\t- "
+		else
+			@printf "\t- "
+		end
+		for c in 1:generations
+			@printf "%s " disp_array[r][c]
+		end
+		@printf "\n"
+	end
+	#Print x-axis
+	@printf "\t -"
+	for i in 1:generations
+		@printf "--"
+	end
+	@printf "\n"
+	str::String = "Generations"
+	len::Int = parse(Int, (2*generations - size(str)[1])/2)
+	for i in 1:len
+		@printf "  "
+	end
+	@printf "%s" str
+end
+
+function evolve_chromosomes(config::BPS_Config, params::Params, candidates::Array{BPS_Program}, display_info::Bool=false)
 	N::Int = params.population
 	fitness::Array{Float64} = zeros(N)
 	best_index::Int = 0
@@ -161,6 +199,13 @@ function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Pro
 			mutate_durations(candidates[index], params.no_events, params.delta, params.horizon)
 		end
 
+		height::Int = 100
+		width::Int = 100
+		seconds::Int = 3
+		objective::Float64 = 1498.5691
+		display_data(height, width, objective, candidates[best_index], params.generations, best_fitness, average_fitness)
+		sleep(seconds)
+		@printf "\33[2J\n"
 	end
 	best_index, best_fitness
 end

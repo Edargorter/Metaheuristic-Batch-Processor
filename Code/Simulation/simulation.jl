@@ -4,7 +4,7 @@ using Printf
 
 include("bp_primary_structs.jl")
 include("bp_primary_functions.jl")
-include("bp_primary_fitness.jl")
+include("bp_primary_fitness_improved.jl")
 include("ga_alg.jl")
 
 #=
@@ -188,6 +188,7 @@ function main_func()
 
 	for runs in 1:no_runs
 		cands = generate_pool(config, params)
+		evolve_chromosomes(config, params, cands)
 	end
 
 end
