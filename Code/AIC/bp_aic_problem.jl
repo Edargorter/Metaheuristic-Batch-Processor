@@ -159,17 +159,34 @@ function main_func()
 
 =#
 	no_params = 11
-	no_tests = 30
+	no_tests = 5
+	gens = 50
+	horizon = 10.0
+	events = 15
+	theta = 0.1
+	mutation = 0.8
+	delta = 0.125
+	population = 500
 
-	for p in 1:no_params
+	ts = 0.1:0.1:0.9
+	ms = 0.1:0.1:0.9
+	ds = 0.05:0.05:0.25
 
-		logfile = open("log_$(p).txt", "a")
+	bt = 0.1
+	bm = 0.1
+	bd = 0.05
+	
+
+	for t in ts
+	for m in ms
+	for d in ds
+
+		logfile = open("log_1.txt", "a")
 
 		#### METAHEURISTIC PARAMETERS ####
-		parameters_filename = "parameters_$(p).txt"
-		params = read_parameters(parameters_filename)
 		
-		@printf "P:%d Horizon: %.3f Events: %.3f\n" p params.horizon params.no_events
+		@printf "Horizon: %.3f Events: %.3f\n" horizon events
+		params = Params(horizon, events, population, gens, t, m, d)
 
 		#Temporary instructions / duration arrays
 		instr_arr::Array{Int, 2} = zeros(config.no_units, params.no_events)	
@@ -181,7 +198,7 @@ function main_func()
 		for test in 1:no_tests
 
 			#### Test No. ####
-			write(logfile, "Test: $(test)\n")
+			#write(logfile, "Test: $(test)\n")
 
 			##### GENERATE CANDIDATES #####
 			cands = generate_pool(config, params)
@@ -194,17 +211,23 @@ function main_func()
 				top_fitness = best_fitness
 				instr_arr = copy(cands[best_index].instructions)
 				durat_arr = copy(cands[best_index].durations)
+				bt = t
+				bm = m
+				bd = d
 			end
 
 		end
 
-		@printf "Total Time: %.6f Optimal Fitness: %.6f " time_sum top_fitness
+		@printf "Total Time: %.6f Optimal Fitness: %.6f %.3f %.3f %.3f" time_sum top_fitness bt bm bd
 		print(instr_arr)
 		print(durat_arr)
+
 		newline()
 
 		close(logfile)
 
+	end
+	end
 	end
 
 ##########################  TESTS  ############################### 
