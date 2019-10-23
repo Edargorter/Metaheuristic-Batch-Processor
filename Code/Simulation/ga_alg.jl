@@ -23,7 +23,7 @@
 using Random
 using Dates
 
-include("bp_primary_fitness_improved.jl")
+include("bp_primary_fitness.jl")
 
 #Random seed based on number of milliseconds of current date
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
