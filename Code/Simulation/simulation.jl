@@ -185,9 +185,11 @@ function main_func()
 
 	params = read_parameters("tmp_params.txt")
 	no_runs = 100
+	cmd = `reset`
 
 	for runs in 1:no_runs
 		cands = generate_pool(config, params)
+		run(cmd)
 		evolve_chromosomes(config, params, cands)
 	end
 
