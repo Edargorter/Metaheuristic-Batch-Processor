@@ -23,7 +23,9 @@
 using Random
 using Dates
 
-include("bp_primary_fitness_improved.jl")
+include("mbp_simulator.jl")
+include("mbp_structs.jl")
+include("ga_structs.jl")
 
 #Random seed based on number of milliseconds of current date
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
@@ -34,17 +36,14 @@ rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
 function newline() @printf "\n" end
 function newline(n::Int) for i in 1:n @printf "\n" end end
 
-# Round up to 0 if value < 0
+# Round up to 1 if value < 0
 function keep_positive(value::Float64) value < 0.0 ? 0.0 : value end
-
-# Round up to 1 if value < 1
-function keep_one(value::Int) value < 1 ? 1 : value end
 
 # Bit-flip
 function bit_flip(bit::Int) bit == 0 ? 1 : 0 end
 
 # Instruction change
-function instr_change(unit::Unit) 
+function instr_change(unit::MBP_Unit) 
 	instrs = [[v.first for v in collect(unit.tasks)]; 0]
 	instrs[rand(1:size(instrs)[1])]
 end
@@ -84,23 +83,23 @@ function time_crossover(ti_a::Array{Float64}, ti_b::Array{Float64}, c_index::Int
 end
 
 # Perform crossovers
-function crossover(A::BPS_Program, B::BPS_Program, c_point::Int)
+function crossover(A::MBP_Program, B::MBP_Program, c_point::Int)
 	instr_a, instr_b = instruction_crossover(A.instructions, B.instructions, c_point)
 	ti_a, ti_b = time_crossover(A.durations, B.durations, c_point)
-	BPS_Program(instr_a, ti_a), BPS_Program(instr_b, ti_b)
+	MBP_Program(instr_a, ti_a), MBP_Program(instr_b, ti_b)
 end
 
 ### key=mutfuncs Mutation Functions ###
 
 # Mutation on instruction array
-function mutate_instructions(B::BPS_Program, config::BPS_Config, no_events::Int)
+function mutate_instructions(B::MBP_Program, config::MBP_Config, no_events::Int)
 	unit::Int = rand(1:config.no_units)
 	event::Int = rand(1:no_events)
 	B.instructions[unit, event] = instr_change(config.units[unit])
 end
 
 # Mutation on duration array
-function mutate_durations(B::BPS_Program, no_events::Int, delta::Float64, horizon::Float64)
+function mutate_durations(B::MBP_Program, no_events::Int, delta::Float64, horizon::Float64)
 	r::Float64 = 2.0*rand() - 1.0
 	index::Int = rand(1:no_events)
 	addition::Float64 = r*delta
@@ -121,136 +120,11 @@ end
 
 ### key=evolfunc Evolution Function ###
 
-#Print GA progression
-function display_data(seconds::Float32, horizon::Float64, no_units::Int, no_events::Int, height::Int, width::Int, objective::Float64, candidate::BPS_Program, generations, best::Array{Float64}, average::Array{Float64})
-
-	#Colours
-	green::String = "\033[0;32m"
-	yellow::String = "\033[1;33m"
-	red::String = "\033[0;31m"
-	lblue::String = "\033[1;34m"
-	white::String = "\033[1;37m"
-
-	interval::Int = trunc(Int, height / 7)
-	disp_array::Array{String, 2} = fill(" ", (height, generations))
-	scale = height / objective
-	graph_offset::Int = 1
-	offset::Int = 15
-
-	@printf "\n"
-
-	#Load display array
-	for i in 1:size(best)[1]
-		disp_array[keep_one(trunc(Int, height - best[i] * scale)), i] = "x"
-		disp_array[keep_one(trunc(Int, height - average[i] * scale)), i] = "-"
-	end
-
-	print_unit_height::Int = trunc(Int, height / 2)
-	unit::Int = 1
-
-	#Print array 
-	for r in 1:height
-		for i in 1:graph_offset @printf " " end
-
-		if r % interval == 0
-			@printf "%.1f" (objective - r*interval)
-		end
-		@printf "\t- "
-		for c in 1:generations 
-			if disp_array[r, c] == "x"
-				print(green)
-				@printf "%s " disp_array[r, c] 
-				print(white)
-			elseif disp_array[r, c] == "-"
-				print(yellow)
-				@printf "%s " disp_array[r, c] 
-				print(white)
-			else
-				@printf "%s " disp_array[r, c] 
-			end
-		end
-
-		#Print other info
-		if r == print_unit_height - 11
-			for i in 1:offset @printf " " end
-			@printf "Horizon: %.1f Events: %d" horizon no_events
-		elseif r == print_unit_height - 9
-			for i in 1:offset @printf " " end
-			@printf "Objective: %.2f" objective
-		elseif r == print_unit_height - 7
-			for i in 1:offset @printf " " end
-			@printf "Key:"
-		elseif r == print_unit_height - 5
-			for i in 1:offset @printf " " end
-			print(green)
-			@printf "x"
-			print(white)
-			@printf " = Best fitness"
-		elseif r == print_unit_height - 4
-			for i in 1:offset @printf " " end
-			print(yellow)
-			@printf "-"
-			print(white)
-			@printf " = Average fitness"
-		elseif r == print_unit_height - 1
-			for i in 1:offset @printf " " end
-			@printf "INSTRUCTION CHROMOSOME:"
-		elseif r > print_unit_height && unit <= no_units 
-			for i in 1:offset @printf " " end
-			for event in 1:no_events
-				@printf "%d  " candidate.instructions[unit, event]
-			end
-			unit += 1
-		elseif r == print_unit_height + no_units + 2
-			for i in 1:offset @printf " " end
-			@printf "TIME CHROMOSOME:"
-		elseif r == print_unit_height + no_units + 4
-			for i in 1:offset @printf " " end
-			@printf "[ "
-			for event in 1:no_events
-				@printf "%.2f " candidate.durations[event]
-			end
-			@printf "]"
-		elseif r == print_unit_height + no_units + 6
-			for i in 1:offset @printf " " end
-			print(red)
-			@printf "Top fitness: "
-			print(white)
-			@printf "%.2f" best[end]
-		elseif r == print_unit_height + no_units + 7
-			for i in 1:offset @printf " " end
-			@printf "Error: %.2f%%" 100*(1.0 - best[end]/objective)
-		elseif r == print_unit_height + no_units + 10
-			for i in 1:offset @printf " " end
-			@printf "Delay (seconds): %.1f" seconds 
-		end
-
-		@printf "\n"
-	end
-
-	#Print x-axis
-	for i in 1:graph_offset @printf " " end
-	@printf "\t -"
-
-	for i in 1:generations @printf "--" end
-
-	@printf "\n"
-	for i in 1:graph_offset @printf " " end
-	str::String = "Generations ---> $(generations)"
-	len::Int = trunc(Int, (2 * generations)/2)
-	for i in 1:len @printf " " end
-	@printf "%s" str
-	for i in 1:offset @printf "   " end
-end
-
-function evolve_chromosomes(config::BPS_Config, params::Params, candidates::Array{BPS_Program}, display_info::Bool=false)
+function evolve_chromosomes(logfd, config::MBP_Config, candidates::Array{MBP_Program}, params::Params, display_info::Bool=true)
 	N::Int = params.population
 	fitness::Array{Float64} = zeros(N)
 	best_index::Int = 0
 	best_fitness::Float64 = 0
-
-	bests::Array{Float64} = []
-	avgs::Array{Float64} = []
 
 	elite::Int = ceil(params.theta*N) # Number of elite (parents) to be picked
 	if (N - elite) % 2 != 0 elite -= 1 end # Keep elite even (convenient for reproduction)
@@ -271,10 +145,6 @@ function evolve_chromosomes(config::BPS_Config, params::Params, candidates::Arra
 		best_index = indices[1]
 		best_fitness = round(fitness[best_index], digits=4)
 
-		### Add to best / average fitness arrays 
-		push!(bests, best_fitness)
-		push!(avgs, average_fitness)
-
 		#=
 		to_write::String = "Generation: $(generation)\t ----- Average Fitness: $(average_fitness) \t----- Best: $(best_fitness)\n" 
 		write(logfd, to_write)
@@ -293,13 +163,6 @@ function evolve_chromosomes(config::BPS_Config, params::Params, candidates::Arra
 			mutate_durations(candidates[index], params.no_events, params.delta, params.horizon)
 		end
 
-		height::Int = 48
-		width::Int = 100
-		seconds::Float32 = 1.5
-		objective::Float64 = 1498.5691
-		display_data(seconds, params.horizon, config.no_units, params.no_events, height, width, objective, candidates[best_index], params.generations, bests, avgs)
-		sleep(seconds)
-		run(`clear`)
 	end
 	best_index, best_fitness
 end
