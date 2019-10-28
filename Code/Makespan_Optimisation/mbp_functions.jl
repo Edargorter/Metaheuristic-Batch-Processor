@@ -27,19 +27,24 @@ Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
 ### key=hfuncs Helper functions ###
 
-
-function set_array(a::Array{Float64}, b::Array{Float64})
-	for i in 1:length(a) a[i] = b[i] end
-end
-
 # alpha / beta calculation
 function get_duration_parameters(var::Float64, mean::Float64, max_vol::Float64, min_vol::Float64=0.0)
 	alpha::Float64 = (1.0 - var) * mean
 	beta::Float64 = ((1.0 + var)*mean - alpha) / (max_vol - min_vol)
+	alpha, beta 
 end
 
-function estimate_upper(config::MBP_Config, demand::Float64)
+function estimate_upper(config::MBP_Config, params::Params, demand::Float64)
 	# Estimate the upper bound for the horizon of a system in order to produce 'demand'
+	profit::Float64 = 0
+	best_index::Int = 0
+	while true
+		cands::Array{MBP_Program} = generate_pool(config, params)
+		best_index, profit = evolve_chromosomes(config, params, cands)
+		if profit >= demand break end
+		params::Params = Params(params.horizon * 2, params.no_events, params.population, params.generations, params.theta, params.mutation_rate, params.delta)
+	end	
+	return params.horizon
 end
 
 # Copy state
@@ -175,7 +180,7 @@ function get_random_instructions(config::MBP_Config, params::Params)
 	instr_arr::Array{Int, 2} = zeros(config.no_units, params.no_events) #Initialise instruction array to zeros
 
 	for unit in 1:config.no_units
-		tasks::Array{Int} = [[0]; collect(keys(config.units[unit].tasks))]
+		tasks::Array{Int} = [zeros(3); collect(keys(config.units[unit].tasks))]
 		index_range::Int = size(tasks)[1]
 
 		for event in 1:params.no_events
