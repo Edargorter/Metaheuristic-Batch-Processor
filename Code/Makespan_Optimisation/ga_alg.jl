@@ -120,7 +120,7 @@ end
 
 ### key=evolfunc Evolution Function ###
 
-function evolve_chromosomes(logfd, config::MBP_Config, candidates::Array{MBP_Program}, params::Params, display_info::Bool=true)
+function evolve_chromosomes(config::MBP_Config, params::Params, candidates::Array{MBP_Program}, display_info::Bool=true)
 	N::Int = params.population
 	fitness::Array{Float64} = zeros(N)
 	best_index::Int = 0
@@ -145,6 +145,7 @@ function evolve_chromosomes(logfd, config::MBP_Config, candidates::Array{MBP_Pro
 		best_index = indices[1]
 		best_fitness = round(fitness[best_index], digits=4)
 
+		#Include logfd as first argument to this function
 		#=
 		to_write::String = "Generation: $(generation)\t ----- Average Fitness: $(average_fitness) \t----- Best: $(best_fitness)\n" 
 		write(logfd, to_write)

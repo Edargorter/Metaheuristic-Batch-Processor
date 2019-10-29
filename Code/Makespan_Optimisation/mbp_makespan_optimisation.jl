@@ -178,6 +178,7 @@ function main_func()
 
 	config = MBP_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storages, initial_volumes)
 
+	#=
 	params = read_parameters("tmp_params.txt")
 
 	instructions = [1 1 1 0 0 1 1 0 0 1 0 0 1 1 1 0 1 0 1 0 1; 2 2 0 3 0 2 3 2 0 4 2 0 0 3 0 4 0 0 3 4 0; 2 3 0 3 0 3 4 0 4 3 0 4 4 3 0 4 0 0 3 0 4; 0 0 0 5 0 0 5 0 0 5 0 5 5 5 5 5 0 5 5 0 5]
@@ -190,44 +191,65 @@ function main_func()
 
 	fitness = get_fitness(config, params, candidate, true)
 	@printf "Fitness: %.3f\n" fitness 
+	=#
 
 	#### MAKESPAN OPTIMISATION ####
 
-	demand = 100.0
-	lower = 0 #Lower bound for horizon
-	upper = estimate_upper(config, demand) #Upper bound for horizon
+	#params = read_parameters("tmp_params.txt")
 
-	#MH Params 
-	no_events = 7 # Needs better estimation
+	demand = 100.0
+
+	#MH Parameters:
+
+	no_events = 7  # Needs better estimation
 	population = 100
 	generations = 50
 	theta = 0.1
-	mutation = 0.3
+	mutation = 0.5
 	delta = 0.125
+	params = Params(1.0, no_events, population, generations, theta, mutation, delta)
+
+	init_lower = 0 #Lower bound for horizon
+	init_upper = estimate_upper(config, params, demand) #Upper bound for horizon
 
 	time_sum = 0.0
-	no_tests = 10
+	best_horizon = init_upper
+	no_tests = 30
+	trials = 5
 	profit = 0
+	best_fitness = 0.0
+	best_index = 0
 	mid = 0
-	epsilon = 0.01
+	epsilon = 0.0001
 	profit = 0.0
 
-	while abs(profit - demand) < epsilon
+	for trial in 1:trials
+
+	upper = init_upper
+	lower = init_lower
+
+	while abs(upper - lower) > epsilon
 		mid = lower + (upper - lower) / 2
-		params = (mid, no_events, population, generations, theta, mutation, delta)
+		params = Params(mid, no_events, population, generations, theta, mutation, delta)
 		profit = 0.0
 		time_sum = 0.0
 		cands = generate_pool(config, params)
 
 		for test in 1:no_tests
-			seconds = @elapsed best_fitness, best_index = evolve_chromosomes(config, params, cands)
+			seconds = @elapsed best_index, best_fitness = evolve_chromosomes(config, params, cands)
 			time_sum += seconds
 			if best_fitness > profit
 				profit = best_fitness
 			end
 		end
 
+		@printf "Upper: %.7f Mid: %.7f Lower: %.7f\n" upper mid lower
 		@printf "Best fitness: %.3f in %.3f seconds. Horizon: %.3f \n" best_fitness time_sum mid
+		print(cands[best_index].instructions)
+		newline()
+		print(cands[best_index].durations)
+		newline(2)
+
 		if profit > demand
 			upper = mid
 		elseif profit < demand
@@ -235,7 +257,16 @@ function main_func()
 		else 
 			@printf "Found. Horizon: %.3f\n" mid 	
 		end
+
+	end #While
+
+	if mid < best_horizon
+		best_horizon = mid
 	end
+
+	end #Trials
+
+	@printf "Shortest horizon found: %.7f\n" best_horizon
 
 end
 

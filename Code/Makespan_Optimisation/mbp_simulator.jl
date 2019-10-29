@@ -149,7 +149,7 @@ function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program,
 			if print_data @printf "Event: %d [ %.3f ] Unit: %d Name: %s\n" event candidate.durations[event] unit config.units[unit].name end
 
 			# Unit parameters
-			tasks::Dict{Int, Coefs} = config.units[unit].tasks
+			tasks::Dict{Int, MBP_Coefs} = config.units[unit].tasks
 
 			if print_data
 				newline()
