@@ -135,9 +135,8 @@ function main_func()
 
 	params = read_parameters("tmp_params.txt")
 	
-#=
 	instructions = [1 1 1 1 1 1;
-					0 2 0 0 0 2;
+					0 2 0 0 2 2;
 					0 3 3 3 3 0;
 					0 0 0 0 0 4]
 
@@ -145,9 +144,10 @@ function main_func()
 
 	candidate = BPS_Program(instructions, durations)
 
-	fitness = get_fitness(config, params, candidate)
+	fitness = get_fitness(config, params, candidate, true)
 	@printf "Fitness: %.3f\n" fitness
 	
+#=
 	cands = generate_pool(config, params)
 
 	best_index, best_fitness = evolve_chromosomes(config, cands, params)
@@ -156,8 +156,9 @@ function main_func()
 	newline()
 	print(cands[best_index])
 	newline()
-
 =#
+
+	#=
 	no_params = 11
 	no_tests = 5
 	gens = 50
@@ -229,6 +230,7 @@ function main_func()
 	end
 	end
 	end
+=#
 
 ##########################  TESTS  ############################### 
 

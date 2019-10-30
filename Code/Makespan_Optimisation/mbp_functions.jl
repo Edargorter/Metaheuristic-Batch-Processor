@@ -39,6 +39,7 @@ function estimate_upper(config::MBP_Config, params::Params, demand::Float64)
 	profit::Float64 = 0
 	best_index::Int = 0
 	while true
+		@printf "Finding upper bound ... \n"
 		cands::Array{MBP_Program} = generate_pool(config, params)
 		best_index, profit = evolve_chromosomes(config, params, cands)
 		if profit >= demand break end
