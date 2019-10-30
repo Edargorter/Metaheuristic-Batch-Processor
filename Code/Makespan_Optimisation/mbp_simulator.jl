@@ -336,6 +336,9 @@ function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program,
 
 	# Return profit
 
+	if state.storage_amounts[config.products[1]] != 200 ||  state.storage_amounts[config.products[2]] != 200
+		return 0.0
+	end
 	result::Float64 = sum(config.prices.*(state.storage_amounts[config.products]))
 	return result
 end

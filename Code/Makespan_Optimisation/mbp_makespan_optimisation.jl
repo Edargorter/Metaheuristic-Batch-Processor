@@ -197,11 +197,11 @@ function main_func()
 
 	#params = read_parameters("tmp_params.txt")
 
-	demand = 100.0
+	demand = 400.0
 
 	#MH Parameters:
 
-	no_events = 7  # Needs better estimation
+	no_events = 12  # Needs better estimation
 	population = 100
 	generations = 50
 	theta = 0.1
