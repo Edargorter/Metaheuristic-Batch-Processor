@@ -24,12 +24,11 @@ include("bp_primary_structs.jl")
 function newline() @printf "\n" end
 function newline(n::Int) for i in 1:n @printf "\n" end end
 
-# Flush the contents of the unit into receiving storages according to distribution ratio
+# Flush the contents of the unit into receiving storages according to distribution ratios
 function flush(config::BPS_Config, state::BPS_State, unit::Int, event::Int, instruction::Int)	
-	active::Int = state.unit_active[unit, event - 1] #Flush from action (task)
+	active::Int = state.unit_active[unit, event] #Flush from action (task)
 
-	if active == 0 return end
-	if instruction == 0 return end
+	if active > 0 return end
 
 	# Get receiving storages
 	unit_amount::Float64 = state.unit_amounts[unit, event]
@@ -41,8 +40,8 @@ function flush(config::BPS_Config, state::BPS_State, unit::Int, event::Int, inst
 
 	for (receiver, fraction) in receivers
 	
-		recv_cap = config.storages[receiver].capacity
-		recv_amount = state.storage_amounts[receiver]
+		recv_cap::Float64 = config.storages[receiver].capacity
+		recv_amount::Float64 = state.storage_amounts[receiver]
 
 		if (recv_cap - recv_amount) < (amount * fraction)
 			amount = (recv_cap - recv_amount) / fraction
@@ -191,10 +190,12 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 					if size(config.storages[prev_feeder].feeders)[1] == 1
 
-						prev_unit::Int = config.storages[prev_feeder].feeders[1]
-						if !(state.unit_active[prev_unit, event] > 0 && candidate.instructions[prev_unit, event] == 0)
-							prev_unit_amount = state.unit_amounts[prev_unit, event]
+						task_::Int = config.storages[prev_feeder].feeders[1]
+
+						if !(task_ in state.unit_active[:, event]) || !(0 in candidate.instructions[:, event])
+							prev_unit_amount = state.unit_amounts[, event]
 						end
+
 					end
 				end
 

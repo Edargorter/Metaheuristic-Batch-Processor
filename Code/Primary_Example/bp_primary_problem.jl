@@ -116,8 +116,28 @@ function main_func()
 
 	config = BPS_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storage_capacity, initial_volumes)
 
-	#=
-	
+	### Parameters ###
+	horizon = 16.0
+	no_events = 12
+	population = 2000
+	generations = 75
+	theta = 0.1
+	mutation = 0.8
+	delta = 0.25
+
+	params = Params(horizon, no_events, population, generations, theta, mutation, delta)
+	params = read_parameters("parameters_9.txt")
+
+	cands = generate_pool(config, params)
+
+	index, best = evolve_chromosomes(config, params, cands)
+	@printf "best: %.3f\n" best
+	newline()
+	print(cands[index].instructions)
+	newline()
+	print(cands[index].durations)
+
+	#=	
 	params = read_parameters("test_params.txt")
 
 	instructions = [1 0 1 0 0 0 0 0 0 0 0 0;
@@ -138,6 +158,7 @@ function main_func()
 
 	=#
 
+	#=
 
 	no_params = 5
 	no_tests = 3
@@ -231,7 +252,7 @@ function main_func()
 	end #Deltas 
 
 	end #P for end
-
+	=#
 
 end
 

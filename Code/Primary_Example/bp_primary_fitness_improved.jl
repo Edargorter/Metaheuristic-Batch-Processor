@@ -26,10 +26,14 @@ function newline(n::Int) for i in 1:n @printf "\n" end end
 
 # Flush the contents of the unit into receiving storages according to distribution ratio
 function flush(config::BPS_Config, state::BPS_State, unit::Int, event::Int, instruction::Int)	
+	active::Int = state.unit_active[unit, event] 
+	if active > 0 return end
+	#=
 	active::Int = state.unit_active[unit, event - 1] #Flush from action (task)
 
 	if active == 0 return end
 	if instruction == 0 return end
+	=#
 
 	# Get receiving storages
 	unit_amount::Float64 = state.unit_amounts[unit, event]
@@ -262,7 +266,6 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 						task_duration += candidate.durations[task_end]
 						if task_duration >= alpha 
-							active = instruction
 							amount = (task_duration - alpha) / beta 
 							for (feeder, fraction) in feeders
 								if fraction * amount > state.storage_amounts[feeder]
@@ -286,7 +289,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 
 					end #end if/else
 
-					if active > 0
+					if amount > 0
 						state.unit_amounts[unit, event + 1] = amount
 
 						# Flush from previous unit 

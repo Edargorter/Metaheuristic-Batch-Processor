@@ -118,7 +118,7 @@ end
 
 ### key=evolfunc Evolution Function ###
 
-function evolve_chromosomes(logfd, config::BPS_Config, candidates::Array{BPS_Program}, params::Params, display_info::Bool=true)
+function evolve_chromosomes(config::BPS_Config, params::Params, candidates::Array{BPS_Program}, display_info::Bool=true)
 	N::Int = params.population
 	fitness::Array{Float64} = zeros(N)
 	best_index::Int = 0
