@@ -181,7 +181,7 @@ function get_random_instructions(config::MBP_Config, params::Params)
 	instr_arr::Array{Int, 2} = zeros(config.no_units, params.no_events) #Initialise instruction array to zeros
 
 	for unit in 1:config.no_units
-		tasks::Array{Int} = [zeros(3); collect(keys(config.units[unit].tasks))]
+		tasks::Array{Int} = [zeros(1); collect(keys(config.units[unit].tasks))]
 		index_range::Int = size(tasks)[1]
 
 		for event in 1:params.no_events
