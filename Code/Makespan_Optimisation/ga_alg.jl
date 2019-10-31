@@ -137,7 +137,7 @@ function evolve_chromosomes(config::MBP_Config, params::Params, candidates::Arra
 		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
 		rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
-		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s], false) end
+		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s], false, display_info) end
 
 		average_fitness::Float64 = round(sum(fitness)/N, digits=4)
 

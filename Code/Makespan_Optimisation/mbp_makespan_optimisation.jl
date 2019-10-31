@@ -195,63 +195,96 @@ function main_func()
 
 	#### MAKESPAN OPTIMISATION ####
 
-	#params = read_parameters("tmp_params.txt")
+	#Lit. Example 2 -> profit/demand = 10 x sum(mu)
+	demand = 4000.0 
 
-	demand = 400.0
+	#Regression coefficients  -->  coefs[1]*horizon^0 + coefs[2]*horizon^1
+	coefs = [-2.9166666, 0.9583333] 
 
 	#MH Parameters:
 
-	no_events = 12  # Needs better estimation
-	population = 100
+	no_events = 10  # Estimated using regression of Horizons against Event points from previous configurations
+	population = 100000
+	elite_pop = 500
 	generations = 50
 	theta = 0.1
-	mutation = 0.5
+	mutation = 0.8
 	delta = 0.125
-	params = Params(1.0, no_events, population, generations, theta, mutation, delta)
+	params = Params(20.0, no_events, population, generations, theta, mutation, delta)
 
 	init_lower = 0 #Lower bound for horizon
-	init_upper = estimate_upper(config, params, demand) #Upper bound for horizon
+	init_cands, init_upper = estimate_upper(config, params, demand, coefs, elite_pop) #Upper bound for horizon
+
+	@printf "Upper bound: %.3f\n" init_upper
+	newline()
 
 	time_sum = 0.0
 	best_horizon = init_upper
-	no_tests = 30
+	top_horizon = init_upper
+
+	#Iterations 
+	no_tests = 10
 	trials = 5
+
 	profit = 0
 	best_fitness = 0.0
 	best_index = 0
 	mid = 0
-	epsilon = 0.0001
+	epsilon = 0.01
 	profit = 0.0
+	best_states = []
+
+	#Time taken across all trials and test numbers 
+	time_sum = 0.0
 
 	for trial in 1:trials
 
 	upper = init_upper
 	lower = init_lower
 
+	instructions = Array{Float64}(undef, 0, 0)
+	durations = []
+
+	best_horizon = 0
+
 	while abs(upper - lower) > epsilon
 		mid = lower + (upper - lower) / 2
-		params = Params(mid, no_events, population, generations, theta, mutation, delta)
-		profit = 0.0
-		time_sum = 0.0
+		no_events = keep_two(get_events(mid, coefs))
+
+		params = Params(mid, no_events, elite_pop, generations, theta, mutation, delta)
+		profit = -1.0
+		#cands = copy(init_cands)
 		cands = generate_pool(config, params)
 
 		for test in 1:no_tests
-			seconds = @elapsed best_index, best_fitness = evolve_chromosomes(config, params, cands)
+			seconds = @elapsed best_index, best_fitness = evolve_chromosomes(config, params, cands, false)
 			time_sum += seconds
 			if best_fitness > profit
 				profit = best_fitness
+				instructions = cands[best_index].instructions
+				durations = cands[best_index].durations 
 			end
 		end
 
 		@printf "Upper: %.7f Mid: %.7f Lower: %.7f\n" upper mid lower
 		@printf "Best fitness: %.3f in %.3f seconds. Horizon: %.3f \n" best_fitness time_sum mid
-		print(cands[best_index].instructions)
+
+		##### Receive states array from fitness function #####
+
+		print(instructions)
 		newline()
-		print(cands[best_index].durations)
+		print(durations)
+		newline()
+
+		best_cand = MBP_Program(instructions, durations)
+		states = get_fitness(config, params, best_cand, false, true)
+
+		print(states)
 		newline(2)
 
 		if profit > demand
 			upper = mid
+			best_horizon = mid
 		elseif profit < demand
 			lower = mid
 		else 
@@ -260,13 +293,13 @@ function main_func()
 
 	end #While
 
-	if mid < best_horizon
-		best_horizon = mid
+	if best_horizon < top_horizon
+		top_horizon = best_horizon
 	end
 
 	end #Trials
 
-	@printf "Shortest horizon found: %.7f\n" best_horizon
+	@printf "Shortest horizon found: %.7f in %.3f seconds\n" top_horizon time_sum
 
 end
 

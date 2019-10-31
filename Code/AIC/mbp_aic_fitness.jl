@@ -193,6 +193,7 @@ function get_fitness(config::BPS_Config, params::Params, candidate::BPS_Program,
 						task_::Int = config.storages[prev_feeder].feeders[1]
 
 						if !(task_ in state.unit_active[:, event]) || !(0 in candidate.instructions[:, event])
+							unit_::Int = find(x->x==task_
 							prev_unit_amount = state.unit_amounts[, event]
 						end
 

@@ -28,8 +28,8 @@ struct BPS_Storage
 	capacity::Float64
 
 	# Reactor feeders / receivers 
-	feeders::Array{Int}
-	receivers::Array{Int}
+	feeders::Dict{Int, Float64}
+	receivers::Dict{Int, Float64}
 end
 
 # Parameter configurations for a batch process of this complexity

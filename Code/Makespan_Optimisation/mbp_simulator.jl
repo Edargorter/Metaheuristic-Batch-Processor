@@ -1,4 +1,4 @@
-##### Multipurpose Batch Plant Simulator (Primary Example) ##### Zachary Bowditch 2019 #####
+##### Multipurpose Batch Plant Simulator (General Simulator: A) ##### Zachary Bowditch 2019 #####
 
 #= 
 	
@@ -58,7 +58,7 @@ end
 
 ### key=fitfunc FITNESS FUNCTION ###
 
-function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program, print_data::Bool=false)
+function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program, print_data::Bool=false, return_states::Bool=false)
 	# If sum of durations of candidate exceeds horizon, candidate is nullified
 
 	if round(sum(candidate.durations), digits=4) > params.horizon return 0 end
@@ -334,11 +334,28 @@ function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program,
 		newline(2)
 	end
 
-	# Return profit
-
-	if state.storage_amounts[config.products[1]] != 200 ||  state.storage_amounts[config.products[2]] != 200
-		return 0.0
+	if return_states
+		return state.storage_amounts
 	end
+
+	#=
+	if state.storage_amounts[config.products[1]] < 200 || state.storage_amounts[config.products[2]] < 200
+		val::Float64 = state.storage_amounts[config.products[1]] - 200
+		val += state.storage_amounts[config.products[2]] - 200
+		return -val
+	end
+	=#
+
+	val::Float64 = minimum(abs(state.storage_amounts[config.products[1]] - 200), 0)
+	val += minimum(abs(state.storage_amounts[config.products[2]] - 200), 0)
+	return val
+
+	##### Return minimum of two products #####
+	#=
+	return 2.0 * 10.0 * minimum(state.storage_amounts[config.products])
+	=#
+
+	# Return profit
 	result::Float64 = sum(config.prices.*(state.storage_amounts[config.products]))
 	return result
 end

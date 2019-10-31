@@ -98,33 +98,43 @@ function main_func()
 	#### Setup storages ####
 	storages = []
 	
-	feeders = []
-	receivers = [1]
+	feeders = Dict{Int, Float64}
+	receivers = Dict{Int, Float64}
+	receivers[1] = 1.0
 	state_1 = BPS_Storage("S1", Inf, feeders, receivers)
 	push!(storages, state_1)
 
-	feeders = [1]
-	receivers = [2]
+	feeders = Dict{Int, Float64}
+	feeders[1] = 0.5
+	receivers = Dict{Int, Float64}
+	receivers[2] = 1.0
 	state_2 = BPS_Storage("S2", 10, feeders, receivers)
 	push!(storages, state_2)
 
-	feeders = [1]
-	receivers = [3]
+	feeders = Dict{Int, Float64}
+	feeders[1] = 0.5
+	receivers = Dict{Int, Float64}
+	receivers[3] = 1.0
 	state_3 = BPS_Storage("S3", 15, feeders, receivers)
 	push!(storages, state_3)
 
-	feeders = [2]
-	receivers = [4]
+	feeders = Dict{Int, Float64}
+	feeders[2] = 1.0
+	receivers = Dict{Int, Float64}
+	receivers[4] = 0.5
 	state_4 = BPS_Storage("S4", 10, feeders, receivers)
 	push!(storages, state_4)
 
-	feeders = [3]
-	receivers = [4]
+	feeders = Dict{Int, Float64}
+	feeders[3] = 1.0
+	receivers = Dict{Int, Float64}
+	receivers[4] = 0.5
 	state_5 = BPS_Storage("S5", 15, feeders, receivers)
 	push!(storages, state_5)
 
-	feeders = [4]
-	receivers = []
+	feeders = Dict{Int, Float64}
+	feeders[4] = 1.0
+	receivers = Dict{Int, Float64}
 	state_6 = BPS_Storage("S6", Inf, feeders, receivers)
 	push!(storages, state_6)
 
