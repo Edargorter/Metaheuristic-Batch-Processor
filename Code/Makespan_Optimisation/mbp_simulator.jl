@@ -58,10 +58,10 @@ end
 
 ### key=fitfunc FITNESS FUNCTION ###
 
-function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program, print_data::Bool=false, return_states::Bool=false)
+function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program, print_data::Bool=false, return_states::Bool=true)
 	# If sum of durations of candidate exceeds horizon, candidate is nullified
 
-	if round(sum(candidate.durations), digits=4) > params.horizon return 0 end
+	if round(sum(candidate.durations), digits=4) > params.horizon return -500 end
 
 	if print_data
 		@printf "Instructions: "
@@ -333,10 +333,16 @@ function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program,
 		end
 		newline(2)
 	end
-
+	
 	if return_states
 		return state.storage_amounts
 	end
+
+	#=
+	val::Float64 = abs(minimum([state.storage_amounts[config.products[1]], 200]) - 200)
+	val += abs(minimum([state.storage_amounts[config.products[2]], 200]) - 200)
+	return -val
+	=#
 
 	#=
 	if state.storage_amounts[config.products[1]] < 200 || state.storage_amounts[config.products[2]] < 200
@@ -346,14 +352,9 @@ function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program,
 	end
 	=#
 
-	val::Float64 = minimum(abs(state.storage_amounts[config.products[1]] - 200), 0)
-	val += minimum(abs(state.storage_amounts[config.products[2]] - 200), 0)
-	return val
 
 	##### Return minimum of two products #####
-	#=
-	return 2.0 * 10.0 * minimum(state.storage_amounts[config.products])
-	=#
+	return -2.0 * (abs(minimum([minimum(state.storage_amounts[config.products]), 200]) - 200))
 
 	# Return profit
 	result::Float64 = sum(config.prices.*(state.storage_amounts[config.products]))

@@ -41,8 +41,8 @@ function get_duration_parameters(var::Float64, mean::Float64, max_vol::Float64, 
 end
 
 #Get appropriate event point number based on horizon
-function get_events(horizon::Float64, coefs::Array{Float64})
-	trunc(Int, ceil(sum([(horizon ^ (i - 1))*coefs[i] for i in 1:length(coefs)])))
+function get_estimate(val::Float64, coefs::Array{Float64})
+	trunc(Int, ceil(sum([(val ^ (i - 1))*coefs[i] for i in 1:length(coefs)])))
 end
 
 # Estimate the upper bound for the horizon of a system in order to produce 'demand'
@@ -51,7 +51,7 @@ function estimate_upper(config::MBP_Config, params::Params, demand::Float64, coe
 	profit::Float64 = 0
 	best_index::Int = 0
 	horizon::Float64 = params.horizon
-	no_events::Int = keep_two(get_events(horizon, coefs))
+	no_events::Int = keep_two(get_estimate(horizon, coefs))
 	params = Params(horizon, no_events, params.population, params.generations, params.theta, params.mutation_rate, params.delta)
 	cands::Array{MBP_Program} = []
 
@@ -63,7 +63,7 @@ function estimate_upper(config::MBP_Config, params::Params, demand::Float64, coe
 			break 
 		end
 		horizon *= 2.0
-		no_events = keep_two(get_events(horizon, coefs))
+		no_events = keep_two(get_estimate(horizon, coefs))
 		params = Params(horizon, no_events, params.population, params.generations, params.theta, params.mutation_rate, params.delta)
 	end	
 

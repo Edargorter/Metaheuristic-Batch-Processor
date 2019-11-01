@@ -130,18 +130,19 @@ function evolve_chromosomes(config::MBP_Config, params::Params, candidates::Arra
 	if (N - elite) % 2 != 0 elite -= 1 end # Keep elite even (convenient for reproduction)
 	no_mutations::Int = ceil(params.mutation_rate*(N - elite)) # Number of progeny to undergo mutation
 
+	# New random seed
+	Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
+	rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
+
 	# Generation loop
 	for generation in 1:params.generations
 
-		# New random seed
-		Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now()))) 
-		rng = MersenneTwister(Dates.value(convert(Dates.Millisecond, Dates.now())))
-
-		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s], false, display_info) end
+		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s], false, false) end
 
 		average_fitness::Float64 = round(sum(fitness)/N, digits=4)
 
 		indices::Array{Int} = sortperm(fitness, rev=true)
+
 		best_index = indices[1]
 		best_fitness = round(fitness[best_index], digits=4)
 
