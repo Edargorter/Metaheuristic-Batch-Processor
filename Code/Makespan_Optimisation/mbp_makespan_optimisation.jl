@@ -1,12 +1,15 @@
-##### Batch Processing literature example #####
+##### Batch Processing Case Study File #####
 
 using Printf
 
+### Data structs ###
 include("mbp_structs.jl")
-include("mbp_functions.jl")
-include("mbp_simulator.jl")
-include("ga_alg.jl")
 include("ga_structs.jl")
+
+### Function packages ###
+include("mbp_simulator.jl")
+include("ga_alg_rates.jl") # Rate reduction GA (On instruction component)
+include("mbp_functions.jl")
 
 #=
 
@@ -29,6 +32,36 @@ Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
 function newline() @printf "\n" end
 function newline(n::Int) for i in 1:n @printf "\n" end end
+
+#Get appropriate event point number based on horizon
+function get_estimate(val::Float64, coefs::Array{Float64})
+	trunc(Int, ceil(sum([(val ^ (i - 1))*coefs[i] for i in 1:length(coefs)])))
+end
+
+# Estimate the upper bound for the horizon of a system in order to produce 'demand'
+function estimate_upper(config::MBP_Config, params::Params, demand_error::Float64, coefs::Array{Float64}, popul::Int)
+
+	profit::Float64 = 0
+	best_index::Int = 0
+	horizon::Float64 = params.horizon
+	no_events::Int = keep_two(get_estimate(horizon, coefs))
+	params = Params(horizon, no_events, params.population, params.generations, params.theta, params.instruction_theta, params.mutation_rate, params.instruction_mutation, params.delta)
+	cands::Array{MBP_Program} = []
+
+	while true
+		@printf "Finding upper bound ... Horizon: %.3f Events: %d\n" horizon no_events
+		cands = generate_pool(config, params)
+		best_index, best_error = evolve_chromosomes(config, params, cands, false)
+		if best_error >= demand_error
+			break 
+		end
+		horizon *= 2.0
+		no_events = keep_two(get_estimate(horizon, coefs))
+		params = Params(horizon, no_events, params.population, params.generations, params.theta, params.mutation_rate, params.delta)
+	end	
+
+	cands[1:popul], horizon
+end
 
 function main_func()
 
@@ -207,17 +240,19 @@ function main_func()
 
 	no_events = 10  # Estimated using regression of Horizons against Event points from previous configurations
 	population = 100000
-	elite_pop = 150
+	elite_pop = 100
 	generations = 50
 	theta = 0.1
+	instruction_theta = 0.1
 	mutation = 0.8
+	instruction_mutation = 0.8
 	delta = 0.125
-	params = Params(20.0, no_events, population, generations, theta, mutation, delta)
-
-	init_lower = 0 #Lower bound for horizon
-	#init_cands, init_upper = estimate_upper(config, params, demand, coefs, elite_pop) #Upper bound for horizon
+	params = Params(20.0, no_events, population, generations, theta, instruction_theta, mutation, instruction_mutation, delta)
 
 	init_upper = 20.0
+
+	init_lower = 0 #Lower bound for horizon
+	#init_cands, init_upper = estimate_upper(config, params, demand_error, coefs, elite_pop) #Upper bound for horizon
 
 	@printf "Upper bound: %.3f\n" init_upper
 	newline()
@@ -242,11 +277,16 @@ function main_func()
 
 	epsilon = 0.1
 	elite_pop = 50
-	max_pop = 2000
+	max_pop = 100
 
 	#Approximate exponential increase factor 
 	incr_factor = (max_pop / elite_pop) ^ (1 / ceil(log(2, (init_upper - init_lower) / epsilon)))
 
+	cands::Array{MBP_Program} = []
+
+	counter = 1
+
+	######## TRIALS #########
 	for trial in 1:trials
 
 	generations = get_estimate(elite_pop + 0.0, pop_gen_coefs)
@@ -260,6 +300,8 @@ function main_func()
 	best_horizon = 0
 	states = []
 
+	display_data = false
+
 	while abs(upper - lower) > epsilon
 
 		#### New horizon ####
@@ -267,21 +309,26 @@ function main_func()
 
 		no_events = keep_two(get_estimate(mid, coefs))
 
-		params = Params(mid, no_events, elite_pop, generations, theta, mutation, delta)
+		params = Params(mid, no_events, elite_pop, generations, theta, instruction_theta, mutation, instruction_mutation, delta)
 		trial_error = -Inf
 		#cands = copy(init_cands)
 
-		@printf "Generating Cands ... \n"
-		cands = generate_pool(config, params)
-		newline()
-		print(cands)
-		newline()
-
+		@printf "COUNTER = %d\n" counter 
 		@printf "Population: %d Generations: %d\n" elite_pop generations 
+		@printf "Generating Cands ... \n"
+
+		cands = generate_pool(config, params)
+
+		if display_data
+			for i in 1:10
+				print(cands[i])
+				newline()
+			end
+		end
 
 		for test in 1:no_tests
 
-			seconds = @elapsed best_index, best_error = evolve_chromosomes(config, params, cands, false)
+			seconds = @elapsed best_index, best_error = evolve_chromosomes(config, params, cands, display_data)
 
 			time_sum += seconds
 
@@ -293,7 +340,7 @@ function main_func()
 		end
 
 		if trial_error < -400 
-			readline()
+			display_data = true
 			continue 
 		end
 
@@ -326,6 +373,8 @@ function main_func()
 
 		elite_pop = trunc(Int, ceil(elite_pop * incr_factor))
 		generations = get_estimate(elite_pop + 0.0, pop_gen_coefs) #Suited for elite_pop population
+
+		counter += 1
 
 	end #While
 

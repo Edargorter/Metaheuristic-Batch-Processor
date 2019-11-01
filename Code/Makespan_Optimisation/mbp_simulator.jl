@@ -58,7 +58,7 @@ end
 
 ### key=fitfunc FITNESS FUNCTION ###
 
-function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program, print_data::Bool=false, return_states::Bool=true)
+function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program, print_data::Bool=false, return_states::Bool=false)
 	# If sum of durations of candidate exceeds horizon, candidate is nullified
 
 	if round(sum(candidate.durations), digits=4) > params.horizon return -500 end
@@ -349,7 +349,6 @@ function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program,
 		return -val
 	end
 	=#
-
 
 	##### Return minimum of two products #####
 	return -2.0 * (abs(minimum([minimum(state.storage_amounts[config.products]), 200]) - 200))

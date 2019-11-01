@@ -22,7 +22,6 @@ using Random
 
 include("mbp_structs.jl") # Structures for relevent data representations
 include("ga_structs.jl") # Structures for relevant metaheuristic data
-include("ga_alg.jl")
 
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
@@ -38,36 +37,6 @@ function get_duration_parameters(var::Float64, mean::Float64, max_vol::Float64, 
 	alpha::Float64 = (1.0 - var) * mean
 	beta::Float64 = ((1.0 + var)*mean - alpha) / (max_vol - min_vol)
 	alpha, beta 
-end
-
-#Get appropriate event point number based on horizon
-function get_estimate(val::Float64, coefs::Array{Float64})
-	trunc(Int, ceil(sum([(val ^ (i - 1))*coefs[i] for i in 1:length(coefs)])))
-end
-
-# Estimate the upper bound for the horizon of a system in order to produce 'demand'
-function estimate_upper(config::MBP_Config, params::Params, demand::Float64, coefs::Array{Float64}, pop::Int)
-
-	profit::Float64 = 0
-	best_index::Int = 0
-	horizon::Float64 = params.horizon
-	no_events::Int = keep_two(get_estimate(horizon, coefs))
-	params = Params(horizon, no_events, params.population, params.generations, params.theta, params.mutation_rate, params.delta)
-	cands::Array{MBP_Program} = []
-
-	while true
-		@printf "Finding upper bound ... Horizon: %.3f Events: %d\n" horizon no_events
-		cands = generate_pool(config, params)
-		best_index, profit = evolve_chromosomes(config, params, cands, false)
-		if profit >= demand 
-			break 
-		end
-		horizon *= 2.0
-		no_events = keep_two(get_estimate(horizon, coefs))
-		params = Params(horizon, no_events, params.population, params.generations, params.theta, params.mutation_rate, params.delta)
-	end	
-
-	cands[1:pop], horizon
 end
 
 # Copy state
