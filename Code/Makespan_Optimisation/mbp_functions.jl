@@ -216,6 +216,7 @@ end
 
 # Time Interval Array
 function get_random_durations(config::MBP_Config, params::Params)
+	Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 	stamps = sort(params.horizon * rand(params.no_events - 1))
 	time_intervals = Array{Float64}(undef, params.no_events)
 	time_intervals[end] = params.horizon - stamps[end]
@@ -226,13 +227,13 @@ end
 
 # Random MBP_Program structure
 function get_random_program(config::MBP_Config, params::Params)
+	Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 	instructions::Array{Int, 2} = get_random_instructions(config, params)
 	durations::Array{Float64} = get_random_durations(config, params)
 	MBP_Program(instructions, durations)
 end
 
 function generate_pool(config::MBP_Config, params::Params)
-	Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 	candidates::Array{MBP_Program} = Array{MBP_Program}(undef, params.population)
 	for i in 1:params.population candidates[i] = get_random_program(config, params) end
 	candidates

@@ -36,9 +36,9 @@ function main_func()
 
 	#### CONFIG PARAMETERS ####
 
-	no_units = 4
-	no_storages = 9
-	no_instructions = 5
+	no_units = 6
+	no_storages = 4
+	no_instructions = 3
 	products = [8, 9]
 	prices = [10.0, 10.0]
 
@@ -50,14 +50,14 @@ function main_func()
 	receivers = Dict{Int, Float64}()
 	feeders[1] = 1.0
 	receivers[4] = 1.0
-	push!(tasks, MBP_Task("Heating", feeders, receivers))
+	push!(tasks, MBP_Task("Task 1", feeders, receivers))
 
 	feeders = Dict{Int, Float64}()
 	receivers = Dict{Int, Float64}()
 	feeders[2] = 0.5
 	feeders[3] = 0.5
 	receivers[6] = 1.0
-	push!(tasks, MBP_Task("reaction 1", feeders, receivers))
+	push!(tasks, MBP_Task("Task 2", feeders, receivers))
 
 	feeders = Dict{Int, Float64}()
 	receivers = Dict{Int, Float64}()
@@ -65,21 +65,7 @@ function main_func()
 	feeders[6] = 0.6
 	receivers[8] = 0.4
 	receivers[5] = 0.6
-	push!(tasks, MBP_Task("reaction 2", feeders, receivers))
-
-	feeders = Dict{Int, Float64}()
-	receivers = Dict{Int, Float64}()
-	feeders[3] = 0.2
-	feeders[5] = 0.8
-	receivers[7] = 1.0
-	push!(tasks, MBP_Task("reaction 3", feeders, receivers))
-
-	feeders = Dict{Int, Float64}()
-	receivers = Dict{Int, Float64}()
-	feeders[7] = 1.0
-	receivers[5] = 0.1
-	receivers[9] = 0.9
-	push!(tasks, MBP_Task("still", feeders, receivers))
+	push!(tasks, MBP_Task("Task 3", feeders, receivers))
 
 	#### Setup storages ####	
 	
@@ -233,6 +219,7 @@ function main_func()
 	best_error = Inf
 	best_index = 0
 	mid = 0
+	epsilon = 0.05
 	profit = Inf
 	best_states = []
 
@@ -240,15 +227,9 @@ function main_func()
 	time_sum = 0.0
 	trial_error = -Inf
 
-	epsilon = 0.1
-	elite_pop = 50
-	max_pop = 2000
-
-	#Approximate exponential increase factor 
-	incr_factor = (max_pop / elite_pop) ^ (1 / ceil(log(2, (init_upper - init_lower) / epsilon)))
-
 	for trial in 1:trials
 
+	elite_pop = 100
 	generations = get_estimate(elite_pop + 0.0, pop_gen_coefs)
 
 	upper = init_upper
@@ -261,23 +242,13 @@ function main_func()
 	states = []
 
 	while abs(upper - lower) > epsilon
-
-		#### New horizon ####
 		mid = lower + (upper - lower) / 2
-
 		no_events = keep_two(get_estimate(mid, coefs))
 
 		params = Params(mid, no_events, elite_pop, generations, theta, mutation, delta)
 		trial_error = -Inf
 		#cands = copy(init_cands)
-
-		@printf "Generating Cands ... \n"
 		cands = generate_pool(config, params)
-		newline()
-		print(cands)
-		newline()
-
-		@printf "Population: %d Generations: %d\n" elite_pop generations 
 
 		for test in 1:no_tests
 
@@ -292,11 +263,9 @@ function main_func()
 			end
 		end
 
-		if trial_error < -400 
-			readline()
-			continue 
-		end
+		if trial_error < -400 continue end
 
+		@printf "Population: %d Generations: %d\n" elite_pop generations 
 		@printf "Upper: %.7f Mid: %.7f Lower: %.7f\n" upper mid lower
 		@printf "Best error %.3f in %.3f seconds. Horizon: %.3f \n" trial_error time_sum mid
 
@@ -324,8 +293,8 @@ function main_func()
 			@printf "Found. Horizon: %.3f\n" mid 	
 		end
 
-		elite_pop = trunc(Int, ceil(elite_pop * incr_factor))
-		generations = get_estimate(elite_pop + 0.0, pop_gen_coefs) #Suited for elite_pop population
+		elite_pop += 500
+		generations = get_estimate(elite_pop + 0.0, pop_gen_coefs)
 
 	end #While
 
