@@ -8,8 +8,8 @@ include("ga_structs.jl")
 
 ### Function packages ###
 include("mbp_simulator.jl")
-#include("ga_alg_rates.jl") # Rate reduction GA (On instruction component)
-include("ga_alg.jl")
+include("ga_alg_rates.jl") # Rate reduction GA (On instruction component)
+#include("ga_alg.jl")
 include("mbp_functions.jl")
 
 #=
@@ -219,6 +219,7 @@ function main_func()
 
 	#Lit. Example 2 -> profit/demand = 10 x sum(mu)
 	demand_error = 0.0
+	demand = 400
 
 	#Regression coefficients  -->  coefs[1]*horizon^0 + coefs[2]*horizon^1
 	coefs = [-2.9166666, 0.9583333] 
@@ -228,16 +229,23 @@ function main_func()
 	#MH Parameters:
 
 	no_events = 10  # Estimated using regression of Horizons against Event points from previous configurations
-	population = 1000
-	elite_pop = 100
-	generations = 50
+	population = 50000
+	elite_pop = 750
+	generations = 100
 	theta = 0.1
-	instruction_theta = 0.1
-	mutation = 0.8
-	instruction_mutation = 0.8
-	delta = 0.125
 
-	#params = Params(20.0, no_events, population, generations, theta, instruction_theta, mutation, instruction_mutation, delta)
+	instr_theta = 0.1
+	min_instr_theta = 0
+
+	mutation = 0.8
+
+	instr_mutation = 0.8
+	min_instr_mut = 0
+
+	delta = 0.125
+	max_delta = 0.25
+
+	params = Params(10.0, no_events, population, generations, theta, instr_theta, mutation, instr_mutation, delta)
 
 	init_upper = 20.0
 
@@ -250,7 +258,7 @@ function main_func()
 
 	time_sum = 0.0
 	best_horizon = init_upper
-	top_horizon = init_upper
+	top_horizon = Inf
 
 	#Iterations 
 	no_tests = 5
@@ -264,14 +272,20 @@ function main_func()
 
 	#Time taken across all trials and test numbers 
 	time_sum = 0.0
-	trial_error = -Inf
 
-	epsilon = 0.1
-	elite_pop = 50
-	max_pop = 1000
+	epsilon = 0.05
+	elite_pop = 1000
+	max_pop = 3000
+
+	#Approx number of iterations
+	iters = ceil(log(2, (init_upper - init_lower) / epsilon))
 
 	#Approximate exponential increase factor 
-	incr_factor = (max_pop / elite_pop) ^ (1 / ceil(log(2, (init_upper - init_lower) / epsilon)))
+	incr_factor = (max_pop / elite_pop) ^ (1 / iters)
+
+	instr_cr_change = (instr_theta - min_instr_theta) / iters
+	instr_mu_change = (instr_mutation - min_instr_mut) / iters 
+	delta_change = (max_delta - delta) / iters 
 
 	counter = 1
 
@@ -286,10 +300,17 @@ function main_func()
 	instructions = Array{Float64}(undef, 0, 0)
 	durations = Array{Float64}(undef, 0)
 
+	trial = -Inf
+
 	best_horizon = 0
+	curr_best = -demand 
 	states = []
 
 	display_data = false
+	trial_error = -Inf
+	prev_trial_error = -Inf
+
+	dir_up::Bool = false
 
 	while abs(upper - lower) > epsilon
 
@@ -298,15 +319,16 @@ function main_func()
 
 		no_events = keep_two(get_estimate(mid, coefs))
 
-		params::Params = Params(mid, no_events, elite_pop, generations, theta, instruction_theta, mutation, instruction_mutation, delta)
-		trial_error = -Inf
+		params::Params = Params(mid, no_events, elite_pop, generations, theta, instr_theta, mutation, instr_mutation, delta)
+		curr_error = -Inf
 
 		#@printf "Generating Cands ... \n"
-		cands::Array{MBP_Program} = generate_pool(config, params)
+		#cands::Array{MBP_Program} = generate_pool(config, params)
+		#cands::Array{MBP_Program} = copy(init_cands)
 
 		@printf "COUNTER = %d\n" counter 
 		@printf "Population: %d Generations: %d\n" elite_pop generations 
-		@printf "Upper: %.7f Mid: %.7f Lower: %.7f\n" upper mid lower
+		@printf "Upper: %.7f Mid: %.7f Lower: %.7f --- Events: %d\n" upper mid lower no_events
 
 		if display_data
 			for i in 1:10
@@ -317,25 +339,42 @@ function main_func()
 
 		for test in 1:no_tests
 
-			#cands::Array{MBP_Program} = generate_pool(config, params)
+			cands::Array{MBP_Program} = generate_pool(config, params)
+			#cands::Array{MBP_Program} = copy(init_cands)
 
 			seconds = @elapsed best_index, best_error = evolve_chromosomes(config, params, cands, display_data)
+			@printf "Best Error: %.3f\n" best_error 
 
 			time_sum += seconds
 
-			if best_error > trial_error
-				trial_error = best_error
+			if best_error > curr_error 
+				curr_error = best_error
 				instructions = copy(cands[best_index].instructions)
 				durations = copy(cands[best_index].durations)
+				if best_error >= demand_error
+					break
+				end
 			end
+
 		end
 
-		if trial_error < -400 
-			@printf "Trial error too small.\n"
-			continue 
+		trial_error = curr_error
+
+		#If horizon increased but error didn't improve
+		if dir_up && trial_error <= prev_trial_error
+			newline()
+			@printf "Didn't improve. Repeating level.\n"
+			no_events *= 2
+			newline()
+			continue
 		end
 
-		@printf "Best error %.3f in %.3f seconds. Horizon: %.3f \n" trial_error time_sum mid
+		#In the (rare) event all solutions have overshot horizons 
+		if trial_error < -400
+			continue
+		end
+
+		@printf "Trial error: %.3f in %.3f seconds. Horizon: %.3f \n" trial_error time_sum mid
 
 		##### Receive states array from fitness function #####
 
@@ -351,8 +390,10 @@ function main_func()
 		newline(2)
 
 		if trial_error < demand_error
+			dir_up = true
 			lower = mid
 		else 
+			dir_up = false
 			upper = mid
 			best_horizon = mid
 			if best_horizon < top_horizon
@@ -361,8 +402,17 @@ function main_func()
 			@printf "Found. Horizon: %.3f\n" mid 	
 		end
 
+		#### Update of variable parameters ####
+
 		elite_pop = trunc(Int, ceil(elite_pop * incr_factor))
 		generations = get_estimate(elite_pop + 0.0, pop_gen_coefs) #Suited for elite_pop population
+
+		instr_theta -= instr_cr_change
+		instr_mutation -= instr_mu_change 
+
+		delta += delta_change 
+
+		prev_trial_error = trial_error 
 
 		counter += 1
 
@@ -370,7 +420,11 @@ function main_func()
 
 	end #Trials
 
-	@printf "Shortest horizon found: %.7f in %.3f seconds\n" top_horizon time_sum
+	if top_horizon == Inf
+		@printf "No horizon found.\n"
+	else
+		@printf "Shortest horizon found: %.7f in %.3f seconds\n" top_horizon time_sum
+	end
 
 end
 

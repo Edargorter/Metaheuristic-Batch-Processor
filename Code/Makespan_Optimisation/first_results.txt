@@ -1,0 +1,151 @@
+Upper bound: 20.000
+
+COUNTER = 1
+Population: 1000 Generations: 62
+Upper: 20.0000000 Mid: 10.0000000 Lower: 0.0000000 --- Events: 7
+Best Error: -225.583
+Best Error: -225.583
+Best Error: -225.583
+Best Error: -225.583
+Best Error: -225.583
+Trial error: -225.583 in 3.244 seconds. Horizon: 10.000 
+[1 1 1 1 0 1 1; 2 3 0 4 4 3 3; 2 3 0 4 4 4 3; 5 0 0 5 5 0 5]
+[2.92782, 2.25562, 0.615894, 0.490527, 1.23392, 0.252428, 2.2238]
+[Inf, Inf, Inf, 100.0, 61.75, 3.55271e-15, 0.0, 86.6667, 87.75]
+
+COUNTER = 2
+Population: 1130 Generations: 63
+Upper: 20.0000000 Mid: 15.0000000 Lower: 10.0000000 --- Events: 12
+Best Error: -116.345
+Best Error: -116.345
+Best Error: -116.345
+Best Error: -116.345
+Best Error: -116.345
+Trial error: -116.345 in 8.301 seconds. Horizon: 15.000 
+[1 1 0 0 1 1 1 0 0 0 1 1; 2 0 2 0 0 2 4 4 4 0 4 3; 2 3 0 0 3 3 3 0 0 0 4 3; 5 0 5 5 5 5 0 0 5 5 0 5]
+[2.12102, 0.545458, 1.22409, 0.472485, 2.18598, 2.68421, 0.294808, 0.281137, 0.776478, 0.643075, 1.31087, 2.46039]
+[Inf, Inf, Inf, 58.6612, 78.9141, 0.0, 0.0, 131.503, 152.152]
+
+COUNTER = 3
+Population: 1277 Generations: 64
+Upper: 20.0000000 Mid: 17.5000000 Lower: 15.0000000 --- Events: 14
+Best Error: -121.191
+Best Error: -72.622
+Best Error: -72.622
+Best Error: -72.622
+Best Error: -69.319
+Trial error: -69.319 in 14.649 seconds. Horizon: 17.500 
+[1 1 1 1 0 1 0 0 0 1 0 1 1 1; 2 2 0 0 4 0 3 2 3 4 2 0 0 3; 2 3 0 0 4 4 3 0 3 4 3 4 0 3; 0 0 5 0 5 0 0 5 5 0 5 0 0 5]
+[2.17887, 1.03241, 1.47199, 0.724759, 0.687919, 0.593181, 0.140095, 2.55269, 2.69071, 1.21875, 0.0737501, 0.140473, 1.59525, 2.39914]
+[Inf, Inf, Inf, 85.3192, 39.5158, 0.0, 0.0, 130.681, 201.221]
+
+COUNTER = 4
+Population: 1443 Generations: 65
+Upper: 20.0000000 Mid: 18.7500000 Lower: 17.5000000 --- Events: 16
+Best Error: -46.570
+Best Error: -46.570
+Best Error: -46.570
+Best Error: -46.570
+Best Error: -46.570
+Trial error: -46.570 in 22.514 seconds. Horizon: 18.750 
+[1 1 1 1 0 0 1 0 1 1 1 0 0 0 0 1; 2 3 0 0 0 3 3 2 4 3 0 0 2 4 3 3; 2 0 4 4 4 2 0 3 3 3 0 0 4 4 3 3; 0 5 0 5 0 0 0 0 5 5 5 5 0 5 0 5]
+[2.14959, 0.897138, 0.359049, 0.182346, 0.907883, 2.60249, 0.190099, 2.76269, 0.247679, 1.5766, 0.308935, 0.988445, 1.49427, 1.33502, 0.219451, 2.52833]
+[Inf, Inf, Inf, 100.0, 99.6446, 0.0, 0.0, 164.43, 189.0]
+
+COUNTER = 5
+Population: 1631 Generations: 66
+Upper: 20.0000000 Mid: 19.3750000 Lower: 18.7500000 --- Events: 16
+Best Error: -49.588
+Best Error: -48.038
+Best Error: -48.038
+Best Error: -48.038
+Best Error: -48.038
+
+Didn't improve. Repeating level.
+
+COUNTER = 5
+Population: 1631 Generations: 66
+Upper: 20.0000000 Mid: 19.3750000 Lower: 18.7500000 --- Events: 16
+Best Error: -30.330
+Best Error: -30.330
+Best Error: -30.330
+Best Error: -30.330
+Best Error: -30.330
+Trial error: -30.330 in 41.226 seconds. Horizon: 19.375 
+[1 1 1 0 0 1 1 1 0 1 1 1 0 1 0 1; 2 2 0 0 3 0 0 3 0 3 0 0 4 4 4 3; 2 3 0 0 3 4 3 0 4 4 4 2 0 0 2 3; 0 5 0 5 5 5 0 5 5 0 0 0 5 0 5 5]
+[3.08796, 1.1467, 1.4003, 0.182216, 0.624618, 1.15383, 0.646377, 2.45464, 0.638565, 1.11236, 1.37827, 0.419524, 0.962384, 1.51713, 0.0431963, 2.60693]
+[Inf, Inf, Inf, 50.3297, 91.8902, 5.49462, 0.0, 169.67, 209.077]
+
+COUNTER = 6
+Population: 1843 Generations: 67
+Upper: 20.0000000 Mid: 19.6875000 Lower: 19.3750000 --- Events: 16
+Best Error: -21.575
+Best Error: -21.574
+Best Error: -21.574
+Best Error: -21.574
+Best Error: -21.574
+Trial error: -21.574 in 51.393 seconds. Horizon: 19.688 
+[1 1 0 0 0 1 1 1 1 0 1 0 1 1 1 0; 2 0 3 0 0 3 4 2 0 0 4 0 3 4 4 3; 2 0 2 0 0 3 2 0 3 0 3 0 0 4 3 3; 0 0 0 0 0 0 5 0 0 5 5 5 5 5 5 5]
+[1.3486, 0.860236, 0.657786, 1.19166, 0.772792, 2.57197, 1.74824, 0.509255, 1.4078, 1.15482, 1.07574, 0.179652, 2.15599, 1.56163, 0.21075, 2.28058]
+[Inf, Inf, Inf, 63.0572, 110.731, 0.506727, 0.0, 178.426, 201.739]
+
+COUNTER = 7
+Population: 2083 Generations: 68
+Upper: 20.0000000 Mid: 19.8437500 Lower: 19.6875000 --- Events: 17
+Best Error: -29.818
+Best Error: -29.818
+Best Error: -29.818
+Best Error: -29.818
+Best Error: -29.818
+
+Didn't improve. Repeating level.
+
+COUNTER = 7
+Population: 2083 Generations: 68
+Upper: 20.0000000 Mid: 19.8437500 Lower: 19.6875000 --- Events: 17
+Best Error: -22.556
+Best Error: -22.556
+Best Error: -22.556
+Best Error: -22.556
+Best Error: -22.556
+
+Didn't improve. Repeating level.
+
+COUNTER = 7
+Population: 2083 Generations: 68
+Upper: 20.0000000 Mid: 19.8437500 Lower: 19.6875000 --- Events: 17
+Best Error: -72.395
+Best Error: -72.395
+Best Error: -32.000
+Best Error: -32.000
+Best Error: -32.000
+
+Didn't improve. Repeating level.
+
+COUNTER = 7
+Population: 2083 Generations: 68
+Upper: 20.0000000 Mid: 19.8437500 Lower: 19.6875000 --- Events: 17
+Best Error: -34.665
+Best Error: -34.665
+Best Error: -34.665
+Best Error: -34.665
+Best Error: -34.665
+
+Didn't improve. Repeating level.
+
+COUNTER = 7
+Population: 2083 Generations: 68
+Upper: 20.0000000 Mid: 19.8437500 Lower: 19.6875000 --- Events: 17
+Best Error: -36.058
+Best Error: -36.057
+Best Error: -29.331
+Best Error: -29.331
+Best Error: -29.331
+
+Didn't improve. Repeating level.
+
+COUNTER = 7
+Population: 2083 Generations: 68
+Upper: 20.0000000 Mid: 19.8437500 Lower: 19.6875000 --- Events: 17
+Best Error: -53.151
+Best Error: -53.150

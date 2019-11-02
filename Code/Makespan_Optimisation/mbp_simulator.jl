@@ -352,10 +352,12 @@ function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program,
 	end
 	=#
 
+	#=
 	##### Return minimum of two products #####
 	return -2.0 * (abs(minimum([minimum(state.storage_amounts[config.products]), 200]) - 200))
 
 	# Return profit
 	result::Float64 = sum(config.prices.*(state.storage_amounts[config.products]))
 	return result
+	=#
 end

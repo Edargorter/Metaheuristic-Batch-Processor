@@ -118,8 +118,6 @@ end
 ### key=evolfunc Evolution Function ###
 function evolve_chromosomes(config::MBP_Config, params::Params, candidates::Array{MBP_Program}, display_info::Bool=false)
 
-	@printf "Evolving ... \n"
-	
 	N::Int = params.population
 	fitness::Array{Float64} = zeros(N)
 	best_index::Int = 0
