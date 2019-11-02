@@ -203,7 +203,7 @@ function main_func()
 
 	init_lower = 0 #Lower bound for horizon
 
-	#init_cands, init_upper = estimate_upper(config, params, demand, coefs, elite_pop) #Upper bound for horizon
+	init_cands, init_upper = estimate_upper(config, params, demand, coefs, elite_pop) #Upper bound for horizon
 
 	@printf "Upper bound: %.3f\n" init_upper
 	newline()

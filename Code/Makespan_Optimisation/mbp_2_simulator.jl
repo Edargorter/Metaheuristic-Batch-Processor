@@ -62,7 +62,7 @@ function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program,
 	# If sum of durations of candidate exceeds horizon, candidate is nullified
 
 	if round(sum(candidate.durations), digits=4) > round(params.horizon, digits=4)
-		return -500 
+		return -1
 	end
 
 	if print_data

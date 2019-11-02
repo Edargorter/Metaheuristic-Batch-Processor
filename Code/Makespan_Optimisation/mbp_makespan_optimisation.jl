@@ -28,8 +28,11 @@ Storages:
 
 =#
 
-function newline() @printf "\n" end
-function newline(n::Int) for i in 1:n @printf "\n" end end
+function newline(n::Int=1) for i in 1:n @printf "\n" end end
+
+function keep_zero(n::Float64)
+	n < 0 ? 0 : n
+end
 
 #Get appropriate event point number based on horizon
 function get_estimate(val::Float64, coefs::Array{Float64})
@@ -247,7 +250,7 @@ function main_func()
 
 	params = Params(10.0, no_events, population, generations, theta, instr_theta, mutation, instr_mutation, delta)
 
-	init_upper = 20.0
+	init_upper = 50.0
 
 	init_lower = 0 #Lower bound for horizon
 
@@ -262,7 +265,7 @@ function main_func()
 
 	#Iterations 
 	no_tests = 5
-	trials = 1
+	trials = 10
 
 	best_error = Inf
 	best_index = 0
@@ -274,8 +277,9 @@ function main_func()
 	time_sum = 0.0
 
 	epsilon = 0.05
-	elite_pop = 1000
-	max_pop = 3000
+	elite_pop = 500
+	max_pop = 1000
+	pop_change::Int = 500
 
 	#Approx number of iterations
 	iters = ceil(log(2, (init_upper - init_lower) / epsilon))
@@ -308,16 +312,23 @@ function main_func()
 
 	display_data = false
 	trial_error = -Inf
-	prev_trial_error = -Inf
+	prev_trial_error::Float64 = -Inf
+	prev_trial_pop::Int = 0
 
 	dir_up::Bool = false
+	repeats::Int = 0
+	counter = 1
+
+	time_sum = 0
+
+	#### New horizon ####
+	mid = lower + (upper - lower) / 2
+	no_events = keep_two(get_estimate(mid, coefs))
+
+	#Approximate exponential increase factor 
+	incr_factor = (max_pop / elite_pop) ^ (1 / iters)
 
 	while abs(upper - lower) > epsilon
-
-		#### New horizon ####
-		mid = lower + (upper - lower) / 2
-
-		no_events = keep_two(get_estimate(mid, coefs))
 
 		params::Params = Params(mid, no_events, elite_pop, generations, theta, instr_theta, mutation, instr_mutation, delta)
 		curr_error = -Inf
@@ -327,7 +338,7 @@ function main_func()
 		#cands::Array{MBP_Program} = copy(init_cands)
 
 		@printf "COUNTER = %d\n" counter 
-		@printf "Population: %d Generations: %d\n" elite_pop generations 
+		@printf "Population: %d Generations: %d instr_cr: %.3f instr_mu: %.3f delta: %.3f\n" elite_pop generations instr_theta instr_mutation delta
 		@printf "Upper: %.7f Mid: %.7f Lower: %.7f --- Events: %d\n" upper mid lower no_events
 
 		if display_data
@@ -364,9 +375,17 @@ function main_func()
 		if dir_up && trial_error <= prev_trial_error
 			newline()
 			@printf "Didn't improve. Repeating level.\n"
-			no_events *= 2
+			prev_trial_pop = elite_pop
+			elite_pop = trunc(Int, ceil(elite_pop * incr_factor))
+			generations = get_estimate(elite_pop + 0.0, pop_gen_coefs) #Suited for elite_pop population
 			newline()
+			repeats += 1
 			continue
+		end
+
+		if repeats > 0
+			elite_pop = prev_trial_pop
+			repeats = 0
 		end
 
 		#In the (rare) event all solutions have overshot horizons 
@@ -374,7 +393,7 @@ function main_func()
 			continue
 		end
 
-		@printf "Trial error: %.3f in %.3f seconds. Horizon: %.3f \n" trial_error time_sum mid
+		@printf "Trial error: %.3f Prev Trial error: %.3f in %.3f seconds. Horizon: %.3f \n" trial_error prev_trial_error time_sum mid
 
 		##### Receive states array from fitness function #####
 
@@ -390,7 +409,7 @@ function main_func()
 		newline(2)
 
 		if trial_error < demand_error
-			dir_up = true
+			#dir_up = true
 			lower = mid
 		else 
 			dir_up = false
@@ -404,11 +423,15 @@ function main_func()
 
 		#### Update of variable parameters ####
 
+		#### New horizon ####
+		mid = lower + (upper - lower) / 2
+		no_events = keep_two(get_estimate(mid, coefs))
+
 		elite_pop = trunc(Int, ceil(elite_pop * incr_factor))
 		generations = get_estimate(elite_pop + 0.0, pop_gen_coefs) #Suited for elite_pop population
 
-		instr_theta -= instr_cr_change
-		instr_mutation -= instr_mu_change 
+		instr_theta = keep_zero(instr_theta - instr_cr_change)
+		instr_mutation = keep_zero(instr_mutation - instr_mu_change)
 
 		delta += delta_change 
 
@@ -416,15 +439,18 @@ function main_func()
 
 		counter += 1
 
+
 	end #While
 
-	end #Trials
+	max_pop += pop_change 
 
 	if top_horizon == Inf
 		@printf "No horizon found.\n"
 	else
 		@printf "Shortest horizon found: %.7f in %.3f seconds\n" top_horizon time_sum
 	end
+
+	end #Trials
 
 end
 

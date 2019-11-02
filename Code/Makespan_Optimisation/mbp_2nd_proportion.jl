@@ -7,29 +7,29 @@ include("mbp_structs.jl")
 include("ga_structs.jl")
 
 ### Function packages ###
-include("mbp_simulator.jl")
-#include("ga_alg_rates.jl") # Rate reduction GA (On instruction component)
-include("ga_alg.jl")
+include("mbp_2_simulator.jl")
+#include("ga_2_alg_rates.jl") # Rate reduction GA (On instruction component)
+include("ga_2_alg.jl")
 include("mbp_functions.jl")
 
 #=
 
 Storages:
 
-1: Feed A
-2: Feed B
-3: Feed C
-4: Hot A
-5: Int AB
-6: Int BC
-7: Impure E
-8: Product 1
-9: Product 2
+1: S1
+2: S2
+3: S3
+4: S4
 
 =#
 
-function newline() @printf "\n" end
-function newline(n::Int) for i in 1:n @printf "\n" end end
+#### HELPER FUNCTIONS ####
+
+function newline(n::Int=1) for i in 1:n @printf "\n" end end
+
+function keep_zero(n::Float64)
+	n < 0 ? 0 : n
+end
 
 #Get appropriate event point number based on horizon
 function get_estimate(val::Float64, coefs::Array{Float64})
@@ -37,7 +37,7 @@ function get_estimate(val::Float64, coefs::Array{Float64})
 end
 
 # Estimate the upper bound for the horizon of a system in order to produce 'demand'
-function estimate_upper(config::MBP_Config, params::Params, demand_error::Float64, coefs::Array{Float64}, popul::Int)
+function estimate_upper(config::MBP_Config, params::Params, demand::Float64, coefs::Array{Float64}, popul::Int)
 
 	profit::Float64 = 0
 	best_index::Int = 0
@@ -49,8 +49,8 @@ function estimate_upper(config::MBP_Config, params::Params, demand_error::Float6
 	while true
 		@printf "Finding upper bound ... Horizon: %.3f Events: %d\n" horizon no_events
 		cands = generate_pool(config, params)
-		best_index, best_error = evolve_chromosomes(config, params, cands, false)
-		if best_error >= demand_error
+		best_index, best_demand = evolve_chromosomes(config, params, cands, false)
+		if best >= demand
 			break 
 		end
 		horizon *= 2.0
@@ -73,11 +73,11 @@ function main_func()
 
 	#### CONFIG PARAMETERS ####
 
-	no_units = 4
-	no_storages = 9
-	no_instructions = 5
-	products = [8, 9]
-	prices = [10.0, 10.0]
+	no_units = 5
+	no_storages = 4
+	no_instructions = 3
+	products = [4]
+	prices = [1.0]
 
 	#### Setup tasks ####
 
@@ -86,140 +86,92 @@ function main_func()
 	feeders = Dict{Int, Float64}()
 	receivers = Dict{Int, Float64}()
 	feeders[1] = 1.0
+	receivers[2] = 1.0
+	push!(tasks, MBP_Task("Task 1", feeders, receivers))
+
+	feeders = Dict{Int, Float64}()
+	receivers = Dict{Int, Float64}()
+	feeders[2] = 1.0
+	receivers[3] = 1.0
+	push!(tasks, MBP_Task("Task 2", feeders, receivers))
+
+	feeders = Dict{Int, Float64}()
+	receivers = Dict{Int, Float64}()
+	feeders[3] = 1.0
 	receivers[4] = 1.0
-	push!(tasks, MBP_Task("Heating", feeders, receivers))
+	push!(tasks, MBP_Task("Task 3", feeders, receivers))
 
-	feeders = Dict{Int, Float64}()
-	receivers = Dict{Int, Float64}()
-	feeders[2] = 0.5
-	feeders[3] = 0.5
-	receivers[6] = 1.0
-	push!(tasks, MBP_Task("reaction 1", feeders, receivers))
-
-	feeders = Dict{Int, Float64}()
-	receivers = Dict{Int, Float64}()
-	feeders[4] = 0.4
-	feeders[6] = 0.6
-	receivers[8] = 0.4
-	receivers[5] = 0.6
-	push!(tasks, MBP_Task("reaction 2", feeders, receivers))
-
-	feeders = Dict{Int, Float64}()
-	receivers = Dict{Int, Float64}()
-	feeders[3] = 0.2
-	feeders[5] = 0.8
-	receivers[7] = 1.0
-	push!(tasks, MBP_Task("reaction 3", feeders, receivers))
-
-	feeders = Dict{Int, Float64}()
-	receivers = Dict{Int, Float64}()
-	feeders[7] = 1.0
-	receivers[5] = 0.1
-	receivers[9] = 0.9
-	push!(tasks, MBP_Task("still", feeders, receivers))
 
 	#### Setup storages ####	
+
 	
 	storages = []
 	
 	feeders = []
 	receivers = [1]
-	feed_A = MBP_Storage("Feed_A", Inf, feeders, receivers)
-	push!(storages, feed_A)
-
-	feeders = []
-	receivers = [2]
-	feed_B = MBP_Storage("Feed_B", Inf, feeders, receivers)
-	push!(storages, feed_B)
-
-	feeders = []
-	receivers = [2, 4]
-	feed_C = MBP_Storage("Feed_C", Inf, feeders, receivers)
-	push!(storages, feed_C)
+	s1 = MBP_Storage("S1", Inf, feeders, receivers)
+	push!(storages, s1)
 
 	feeders = [1]
-	receivers = [3]
-	hot_A = MBP_Storage("Hot A", 100, feeders, receivers)
-	push!(storages, hot_A)
-
-	feeders = [4]
-	receivers = [3, 5]
-	int_AB = MBP_Storage("Int AB", 200, feeders, receivers)
-	push!(storages, int_AB)
-
-	feeders = [3]
 	receivers = [2]
-	int_BC = MBP_Storage("Int BC", 150, feeders, receivers)
-	push!(storages, int_BC)
+	s2 = MBP_Storage("S2", 200.0, feeders, receivers)
+	push!(storages, s1)
 
-	feeders = [4]
-	receivers = [5]
-	impure_E = MBP_Storage("Impure E", 200, feeders, receivers)
-	push!(storages, impure_E)
+	feeders = [2]
+	receivers = [3]
+	s3 = MBP_Storage("S3", 250.0, feeders, receivers)
+	push!(storages, s1)
 
 	feeders = [3]
-	receivers = []
-	product_1 = MBP_Storage("Product 1", Inf, feeders, receivers)
-	push!(storages, product_1)
+	receivers = [4]
+	s4 = MBP_Storage("S4", Inf, feeders, receivers)
+	push!(storages, s1)
 
-	feeders = [5]
-	receivers = []
-	product_2 = MBP_Storage("Product 2", Inf, feeders, receivers)
-	push!(storages, product_2)
 
-	##### Reactions #####
-	#=
+	#### Setup units ####
 
-	Mixing		: 1
-	Reaction 1	: 2
-	Reaction 2	: 3
-	Reaction 3	: 4
-	Seperation	: 5
-	
-	=#
-	#####################
 
-	#Setup units
 	units = []
 
 	unit_tasks = Dict{Int, MBP_Coefs}()
-	unit_tasks[1] = MBP_Coefs(2/3, 1/150)
+	unit_tasks[1] = MBP_Coefs(4/3, 2/150)
 
-	unit_1 = MBP_Unit("Heater", 100.0, unit_tasks)
+	unit_1 = MBP_Unit("Unit 1", 100.0, unit_tasks)
 	push!(units, unit_1)
 
 	unit_tasks = Dict{Int, MBP_Coefs}()
-	unit_tasks[2] = MBP_Coefs(4/3, 2/75)
-	unit_tasks[3] = MBP_Coefs(4/3, 2/75)
-	unit_tasks[4] = MBP_Coefs(2/3, 1/75)
+	unit_tasks[1] = MBP_Coefs(4/3, 2/150)
 
-	unit_2 = MBP_Unit("Reactor 1", 50.0, unit_tasks)
+	unit_2 = MBP_Unit("Unit 2", 150.0, unit_tasks)
 	push!(units, unit_2)
 
 	unit_tasks = Dict{Int, MBP_Coefs}()
-	unit_tasks[2] = MBP_Coefs(4/3, 1/60)
-	unit_tasks[3] = MBP_Coefs(4/3, 1/60)
-	unit_tasks[4] = MBP_Coefs(2/3, 1/120)
+	unit_tasks[2] = MBP_Coefs(1.0, 1/200)
 
-	unit_3 = MBP_Unit("Reactor 2", 80.0, unit_tasks)
+	unit_3 = MBP_Unit("Unit 3", 200.0, unit_tasks)
 	push!(units, unit_3)
 
 	unit_tasks = Dict{Int, MBP_Coefs}()
-	unit_tasks[5] = MBP_Coefs(4/3, 1/150)
+	unit_tasks[3] = MBP_Coefs(2/3, 2/450)
 
-	unit_4 = MBP_Unit("Still", 200.0, unit_tasks)
+	unit_4 = MBP_Unit("Unit 4", 150.0, unit_tasks)
 	push!(units, unit_4)
 
+	unit_tasks = Dict{Int, MBP_Coefs}()
+	unit_tasks[3] = MBP_Coefs(2/3, 2/450)
+
+	unit_5 = MBP_Unit("Unit 5", 150.0, unit_tasks)
+	push!(units, unit_5)
+
+
 	#Initial volumes
-	initial_volumes = [Inf, Inf, Inf, 0, 0, 0, 0, 0, 0]
+	initial_volumes = [Inf, 0.0, 0.0, 0.0]
 
 	config = MBP_Config(no_units, no_storages, no_instructions, products, prices, units, tasks, storages, initial_volumes)
 
 	#### MAKESPAN OPTIMISATION ####
 
-	#Lit. Example 2 -> profit/demand = 10 x sum(mu)
-	demand_error = 0.0
-	demand = 400
+	demand = 2000
 
 	#Regression coefficients  -->  coefs[1]*horizon^0 + coefs[2]*horizon^1
 	coefs = [-2.9166666, 0.9583333] 
@@ -235,11 +187,11 @@ function main_func()
 	theta = 0.1
 
 	instr_theta = 0.1
-	min_instr_theta = 0
+	instr_mutation = 0.8
 
 	mutation = 0.8
 
-	instr_mutation = 0.8
+	min_instr_theta = 0
 	min_instr_mut = 0
 
 	delta = 0.125
@@ -247,11 +199,11 @@ function main_func()
 
 	params = Params(10.0, no_events, population, generations, theta, instr_theta, mutation, instr_mutation, delta)
 
-	init_upper = 20.0
+	init_upper = 50.0
 
 	init_lower = 0 #Lower bound for horizon
 
-	#init_cands, init_upper = estimate_upper(config, params, demand_error, coefs, elite_pop) #Upper bound for horizon
+	#init_cands, init_upper = estimate_upper(config, params, demand, coefs, elite_pop) #Upper bound for horizon
 
 	@printf "Upper bound: %.3f\n" init_upper
 	newline()
@@ -261,10 +213,9 @@ function main_func()
 	top_horizon = Inf
 
 	#Iterations 
-	no_tests = 5
-	trials = 1
-
-	best_error = Inf
+	no_tests = 5 
+	trials = 10
+	best_profit = Inf
 	best_index = 0
 	mid = 0
 	profit = Inf
@@ -274,8 +225,9 @@ function main_func()
 	time_sum = 0.0
 
 	epsilon = 0.05
-	elite_pop = 1000
-	max_pop = 3000
+	elite_pop = 500
+	max_pop = 1000
+	pop_change::Int = 500
 
 	#Approx number of iterations
 	iters = ceil(log(2, (init_upper - init_lower) / epsilon))
@@ -285,6 +237,7 @@ function main_func()
 
 	instr_cr_change = (instr_theta - min_instr_theta) / iters
 	instr_mu_change = (instr_mutation - min_instr_mut) / iters 
+	delta_change = (max_delta - delta) / iters 
 
 	counter = 1
 
@@ -300,33 +253,45 @@ function main_func()
 	durations = Array{Float64}(undef, 0)
 
 	trial = -Inf
+	repeats::Int = 0
+
+	instr_theta = 0.1
+	instr_mutation = 0.8
+
+	top_horizon = 0
+	time_sum = 0
 
 	best_horizon = 0
-	curr_best = -demand 
+	curr_best = 0
 	states = []
 
 	display_data = false
-	trial_error = -Inf
-	prev_trial_error = -Inf
+	trial_profit = -Inf
+	prev_trial_profit = -Inf
+
+	#### New horizon ####
+	mid = lower + (upper - lower) / 2
+	no_events = keep_two(get_estimate(mid, coefs))
+
+	counter = 1
 
 	dir_up::Bool = false
+	repeats::Int = 0
+
+	#Approximate exponential increase factor 
+	incr_factor = (max_pop / elite_pop) ^ (1 / iters)
 
 	while abs(upper - lower) > epsilon
 
-		#### New horizon ####
-		mid = lower + (upper - lower) / 2
-
-		no_events = keep_two(get_estimate(mid, coefs))
-
 		params::Params = Params(mid, no_events, elite_pop, generations, theta, instr_theta, mutation, instr_mutation, delta)
-		curr_error = -Inf
+		curr_profit = 0
 
 		#@printf "Generating Cands ... \n"
-		cands::Array{MBP_Program} = generate_pool(config, params)
+		#cands::Array{MBP_Program} = generate_pool(config, params)
 		#cands::Array{MBP_Program} = copy(init_cands)
 
 		@printf "COUNTER = %d\n" counter 
-		@printf "Population: %d Generations: %d\n" elite_pop generations 
+		@printf "Population: %d Generations: %d instr_cr: %.3f instr_mu: %.3f delta: %.3f\n" elite_pop generations instr_theta instr_mutation delta
 		@printf "Upper: %.7f Mid: %.7f Lower: %.7f --- Events: %d\n" upper mid lower no_events
 
 		if display_data
@@ -338,42 +303,48 @@ function main_func()
 
 		for test in 1:no_tests
 
-			#cands::Array{MBP_Program} = generate_pool(config, params)
+			cands::Array{MBP_Program} = generate_pool(config, params)
 			#cands::Array{MBP_Program} = copy(init_cands)
 
-			seconds = @elapsed best_index, best_error = evolve_chromosomes(config, params, cands, display_data)
-			@printf "Best Error: %.3f\n" best_error 
+			seconds = @elapsed best_index, best_profit = evolve_chromosomes(config, params, cands, display_data)
+			@printf "Best profit: %.3f\n" best_profit 
 
 			time_sum += seconds
 
-			if best_error > curr_error 
-				curr_error = best_error
+			if best_profit > curr_profit 
+				curr_profit = best_profit
 				instructions = copy(cands[best_index].instructions)
 				durations = copy(cands[best_index].durations)
-				if best_error >= demand_error
+				if best_profit >= demand
 					break
 				end
 			end
 
 		end
 
-		trial_error = curr_error
+		trial_profit = curr_profit
 
-		#If horizon increased but error didn't improve
-		if dir_up && trial_error <= prev_trial_error
+		#If horizon increased but profit didn't improve
+		if dir_up && trial_profit <= prev_trial_profit
 			newline()
 			@printf "Didn't improve. Repeating level.\n"
-			no_events *= 2
+			elite_pop *= 2
+			generations = get_estimate(elite_pop + 0.0, pop_gen_coefs) #Suited for elite_pop population
 			newline()
 			continue
+		end
+
+		if repeats > 0
+			elite_pop /= 2^(repeats)
+			repeats = 0
 		end
 
 		#In the (rare) event all solutions have overshot horizons 
-		if trial_error < -400
+		if trial_profit == -1
 			continue
 		end
 
-		@printf "Trial error: %.3f in %.3f seconds. Horizon: %.3f \n" trial_error time_sum mid
+		@printf "Trial profit: %.3f in %.3f seconds. Horizon: %.3f \n" trial_profit time_sum mid
 
 		##### Receive states array from fitness function #####
 
@@ -388,8 +359,8 @@ function main_func()
 
 		newline(2)
 
-		if trial_error < demand_error
-			dir_up = true
+		if trial_profit < demand
+			#dir_up = true
 			lower = mid
 		else 
 			dir_up = false
@@ -403,19 +374,25 @@ function main_func()
 
 		#### Update of variable parameters ####
 
+		#### New horizon ####
+		mid = lower + (upper - lower) / 2
+		no_events = keep_two(get_estimate(mid, coefs))
+
 		elite_pop = trunc(Int, ceil(elite_pop * incr_factor))
 		generations = get_estimate(elite_pop + 0.0, pop_gen_coefs) #Suited for elite_pop population
 
-		instr_theta -= instr_cr_change
-		instr_mutation -= instr_mu_change 
+		instr_theta = keep_zero(instr_theta - instr_cr_change)
+		instr_mutation = keep_zero(instr_mutation - instr_mu_change)
 
-		prev_trial_error = trial_error 
+		delta += delta_change 
+
+		prev_trial_profit = trial_profit 
 
 		counter += 1
 
 	end #While
 
-	end #Trials
+	max_pop += pop_change 
 
 	if top_horizon == Inf
 		@printf "No horizon found.\n"
@@ -423,6 +400,7 @@ function main_func()
 		@printf "Shortest horizon found: %.7f in %.3f seconds\n" top_horizon time_sum
 	end
 
+	end #Trials
 end
 
 main_func()
