@@ -137,7 +137,9 @@ function evolve_chromosomes(config::MBP_Config, params::Params, candidates::Arra
 	# Generation loop
 	for generation in 1:params.generations
 
-		for s in 1:N fitness[s] = get_fitness(config, params, candidates[s], false, false) end
+		for s in 1:N
+			fitness[s] = get_fitness(config, params, candidates[s])
+		end
 
 		average_fitness::Float64 = round(sum(fitness)/N, digits=4)
 

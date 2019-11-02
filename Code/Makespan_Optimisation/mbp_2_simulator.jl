@@ -336,5 +336,5 @@ function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program,
 		newline(2)
 	end
 	
-	return state.storage_amounts[config.products]
+	state.storage_amounts[config.products[1]]
 end

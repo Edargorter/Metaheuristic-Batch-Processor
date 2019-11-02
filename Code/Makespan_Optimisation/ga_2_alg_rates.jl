@@ -87,7 +87,7 @@ function time_crossover(ti_a::Array{Float64}, ti_b::Array{Float64}, c_index::Int
 	new_ta = copy(ti_a)
 	new_tb = copy(ti_b)
 	size_arr::Int = length(new_ta)
-	avg::Float64 = 0.50000 * (new_ta[c_index] + new_tb[c_index])
+	avg::Float64 = 0.5 * (new_ta[c_index] + new_tb[c_index])
 	diff_a::Float64 = (new_ta[c_index] - avg) / (size_arr - 1.0)
 	diff_b::Float64 = (new_tb[c_index] - avg) / (size_arr - 1.0)
 	for i in 1:size_arr
@@ -134,11 +134,11 @@ function evolve_chromosomes(config::MBP_Config, params::Params, candidates::Arra
 	instr_mu_no::Int = 0
 	instr_cr_no::Int = 0
 
-	instr_cross_rate::Float32 = params.theta
-	instr_mutation_rate::Float32 = mutation_rate
+	instr_cross_rate::Float32 = params.instruction_theta 
+	instr_mutation_rate::Float32 = params.instruction_mutation
 
-	instr_cr_decr::Float32 = params.theta / generations
-	instr_mu_decr::Float32 = mutation_rate / generations
+	instr_cr_decr::Float32 = instr_cross_rate/ generations
+	instr_mu_decr::Float32 = instr_mutation_rate / generations
 
 	no_mutation::Int = 0
 
@@ -187,11 +187,12 @@ function evolve_chromosomes(config::MBP_Config, params::Params, candidates::Arra
 
 		### CROSSOVERS ###
 
-		count_p::Int = 0
 		cr_instr::Bool = true
 
 		for new in (elite + 1):2:N
-			if count_p == instr_cr_no cr_instr = false end
+			if instr_cr_no == 0
+				cr_instr = false
+			end
 			i_a::Int, i_b::Int = indices[rand(1:elite)], indices[rand(1:elite)] # Random parents
 			c_point::Int = rand(1:params.no_events)
 			candidates[indices[new]], candidates[indices[new + 1]] = crossover(candidates[i_a], candidates[i_b], c_point, cr_instr)

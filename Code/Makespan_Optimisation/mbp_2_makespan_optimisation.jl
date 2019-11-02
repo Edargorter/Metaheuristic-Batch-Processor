@@ -216,7 +216,7 @@ function main_func()
 
 	epsilon = 0.1
 	elite_pop = 50
-	max_pop = 1000
+	max_pop = 2000
 
 	#Approximate exponential increase factor 
 	incr_factor = (max_pop / elite_pop) ^ (1 / ceil(log(2, (init_upper - init_lower) / epsilon)))
