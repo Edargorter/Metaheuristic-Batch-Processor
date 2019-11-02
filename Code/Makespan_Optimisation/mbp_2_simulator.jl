@@ -336,26 +336,5 @@ function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program,
 		newline(2)
 	end
 	
-	if return_states
-		return state.storage_amounts
-	end
-
-	val::Float64 = abs(minimum([state.storage_amounts[config.products[1]], 200]) - 200)
-	val += abs(minimum([state.storage_amounts[config.products[2]], 200]) - 200)
-	return -val
-
-	#=
-	if state.storage_amounts[config.products[1]] < 200 || state.storage_amounts[config.products[2]] < 200
-		val::Float64 = state.storage_amounts[config.products[1]] - 200
-		val += state.storage_amounts[config.products[2]] - 200
-		return -val
-	end
-	=#
-
-	##### Return minimum of two products #####
-	return -2.0 * (abs(minimum([minimum(state.storage_amounts[config.products]), 200]) - 200))
-
-	# Return profit
-	result::Float64 = sum(config.prices.*(state.storage_amounts[config.products]))
-	return result
+	return state.storage_amounts[config.products]
 end

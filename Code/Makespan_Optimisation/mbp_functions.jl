@@ -23,8 +23,6 @@ using Random
 include("mbp_structs.jl") # Structures for relevent data representations
 include("ga_structs.jl") # Structures for relevant metaheuristic data
 
-Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
-
 ### key=hfuncs Helper functions ###
 
 #Keep integer >= 2
@@ -180,30 +178,31 @@ function get_random_instructions(config::MBP_Config, params::Params)
 		end
 	end
 
-	instr_arr
+	copy(instr_arr)
 end
 
 # Time Interval Array
 function get_random_durations(config::MBP_Config, params::Params)
-	Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 	stamps = sort(params.horizon * rand(params.no_events - 1))
 	time_intervals = Array{Float64}(undef, params.no_events)
 	time_intervals[end] = params.horizon - stamps[end]
 	for i in params.no_events - 1:-1:2 time_intervals[i] = stamps[i] - stamps[i - 1] end
 	time_intervals[1] = stamps[1]
-	time_intervals
+	copy(time_intervals)
 end
 
 # Random MBP_Program structure
 function get_random_program(config::MBP_Config, params::Params)
-	Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 	instructions::Array{Int, 2} = get_random_instructions(config, params)
 	durations::Array{Float64} = get_random_durations(config, params)
 	MBP_Program(instructions, durations)
 end
 
 function generate_pool(config::MBP_Config, params::Params)
+	Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 	candidates::Array{MBP_Program} = Array{MBP_Program}(undef, params.population)
-	for i in 1:params.population candidates[i] = get_random_program(config, params) end
+	for i in 1:params.population 
+		candidates[i] = get_random_program(config, params)
+	end
 	candidates
 end
