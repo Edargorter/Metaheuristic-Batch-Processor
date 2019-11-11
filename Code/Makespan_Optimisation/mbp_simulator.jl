@@ -340,9 +340,16 @@ function get_fitness(config::MBP_Config, params::Params, candidate::MBP_Program,
 		return state.storage_amounts
 	end
 
+	val::Float64 = sum(state.storage_amounts[config.products]) - 400
+	val += -abs(state.storage_amounts[config.products[1]] - state.storage_amounts[config.products[2]])
+	return val
+
+	##### Balanced return #####
+	#=
 	val::Float64 = abs(minimum([state.storage_amounts[config.products[1]], 200]) - 200)
 	val += abs(minimum([state.storage_amounts[config.products[2]], 200]) - 200)
 	return -val
+	=#
 
 	#=
 	if state.storage_amounts[config.products[1]] < 200 || state.storage_amounts[config.products[2]] < 200
