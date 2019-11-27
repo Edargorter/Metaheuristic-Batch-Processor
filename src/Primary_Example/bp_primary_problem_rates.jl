@@ -10,9 +10,6 @@ include("bp_primary_fitness.jl")
 #Seed
 Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
-function newline() @printf "\n" end
-function newline(n::Int) for i in 1:n @printf "\n" end end
-
 function main_func()
 
 	##### TESTS #####

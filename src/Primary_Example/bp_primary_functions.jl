@@ -26,6 +26,9 @@ Random.seed!(Dates.value(convert(Dates.Millisecond, Dates.now())))
 
 ### key=hfuncs Helper functions ###
 
+function newline(n::Int=1)
+	for i in 1:n @print "\n" end
+end
 
 function set_array(a::Array{Float64}, b::Array{Float64})
 	for i in 1:length(a) a[i] = b[i] end
