@@ -3,10 +3,12 @@
 using Printf
 
 ### Data structs ###
+
 include("mbp_structs.jl")
 include("ga_structs.jl")
 
 ### Function packages ###
+
 include("mbp_simulator.jl")
 include("ga_alg_rates.jl") # Rate reduction GA (On instruction component)
 #include("ga_alg.jl")
