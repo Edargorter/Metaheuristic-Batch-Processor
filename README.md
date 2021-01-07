@@ -1,6 +1,6 @@
-# Chemical Batch Processing Simulator and Experiments 
+# Chemical Batch Processing Simulator and Optimisation Experiments for Scheduling
 
-Applying selected metaheuristics to the optimisation of chemical batch process scheduling.
+Applying selected metaheuristics to the optimisation of the scheduling with respect to profit (amount of chemical(s) produced in a fixed length of time) and makespan (minimising process time for fixed amount of profit). The schedules' mathematical representations and formulation come from the first paper listed below.
 
 ## Related Papers: 
 
