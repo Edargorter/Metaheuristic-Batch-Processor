@@ -2,7 +2,9 @@
 
 Applying selected metaheuristics to the optimisation of the scheduling with respect to profit (amount of chemical(s) produced in a fixed length of time) and makespan (minimising process time for fixed amount of profit). The schedules' mathematical representations and formulation come from the first paper listed below.
 
-## Related Papers: 
+MBP = Metaheuristics for Batch Processing
+
+## Related Papers
 
 "On the application of a metaheuristic suite with parallel implementations for the scheduling of multipurpose batch plants" (M. Woolway, T. Majozi, 2019)
 
