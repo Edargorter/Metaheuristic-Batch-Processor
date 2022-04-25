@@ -10,8 +10,8 @@ MBP = Metaheuristics for Batch Processing
 
 URL: https://www.sciencedirect.com/science/article/abs/pii/S0098135419300146
 
-![Motivating Example](data/MotivatingExample36HourVPT.pdf "Motivating Example")
-![Primary Example](data/PE_20_hours_VPT.pdf "Primary Example")
+![Motivating Example](data/motivating_example.png "Motivating Example")
+![Primary Example](data/primary_example.png "Primary Example")
 
 "Comparative Metaheuristic Performance for the Scheduling of Multipurpose Batch Plants" (Z. D. Bowditch, M. Woolway, T.L van Zyl)
 
