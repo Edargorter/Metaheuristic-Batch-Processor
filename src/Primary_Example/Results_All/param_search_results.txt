@@ -1,1 +1,0 @@
-P = 5 Theta: 1.00 Mutation: 1.00 Delta: 1.000 Best_t: 0.10 Best_m: 0.90 Best_d: 0.650

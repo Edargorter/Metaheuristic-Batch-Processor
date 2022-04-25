@@ -1,7 +1,0 @@
-horizon:14.0
-no_events:10
-population:1000
-generations:75
-theta:0.1
-mutation:0.8
-delta:0.5
